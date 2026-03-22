@@ -18,7 +18,7 @@ If you are contributing to openRuyi development or packaging for the first time,
 
 ## 📜 Packaging Style Guide
 
-These are the core principles of packaging. All packages should follow the [openRuyi RPM Packaging Specification](/guide/packaging-guidelines). You should also refer to the more detailed guidelines below when constructing packages.
+These are the core principles of packaging. All packages should follow the [openRuyi RPM Packaging Specification](/docs/guide/packaging-guidelines). You should also refer to the more detailed guidelines below when constructing packages.
 
 ### Metadata
 

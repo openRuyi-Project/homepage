@@ -18,7 +18,7 @@ sidebar_position: 1
 
 ## 📜 软件包构建规范
 
-这些是打包的核心准则，所有软件包应以基于 [openRuyi RPM Packaging Specification](/guide/packaging-guidelines) 为基准，并参考以下细化指南进行构建。
+这些是打包的核心准则，所有软件包应以基于 [openRuyi RPM Packaging Specification](/docs/guide/packaging-guidelines) 为基准，并参考以下细化指南进行构建。
 
 ### 元数据
 

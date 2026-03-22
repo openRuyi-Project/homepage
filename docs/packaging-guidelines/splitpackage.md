@@ -122,4 +122,4 @@ In addition, the policy recommends appending `%{?_isa}` to the main package name
 
 ### Language Packs
 
-Packagers must split translation and locale resources into a separate subpackage. See [Language Packs](/guide/packaging-guidelines/LangPacks) for details.
+Packagers must split translation and locale resources into a separate subpackage. See [Language Packs](/docs/guide/packaging-guidelines/LangPacks) for details.

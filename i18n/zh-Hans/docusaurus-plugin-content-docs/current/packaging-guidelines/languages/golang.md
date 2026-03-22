@@ -7,11 +7,11 @@ slug: /guide/packaging-guidelines/languages/Golang
 
 # Golang 打包指南
 
-这个文档讲述了 openRuyi 的 Golang 打包指南。对于相关的构建系统，请参阅 [Golang](/guide/packaging-guidelines/BuildSystems/Golang).
+这个文档讲述了 openRuyi 的 Golang 打包指南。对于相关的构建系统，请参阅 [Golang](/docs/guide/packaging-guidelines/BuildSystems/golang).
 
 ## Versioning
 
-许多 Go 库 (以及部分 Go 程序) 是直接存在于版本控制系统中的，而从未发布过版本。关于版本号的编写，请参阅[版本号](/guide/packaging-guidelines/Versioning)。
+许多 Go 库 (以及部分 Go 程序) 是直接存在于版本控制系统中的，而从未发布过版本。关于版本号的编写，请参阅[版本号](/docs/guide/packaging-guidelines/Versioning)。
 
 ## 仅包含二进制的软件包
 

@@ -7,11 +7,11 @@ slug: /guide/packaging-guidelines/languages/Golang
 
 # Golang Packaging Guidelines
 
-This document describes the Golang packaging guidelines for openRuyi. For the relevant build system, please refer to [Golang](/guide/packaging-guidelines/BuildSystems/Golang).
+This document describes the Golang packaging guidelines for openRuyi. For the relevant build system, please refer to [Golang](/docs/guide/packaging-guidelines/BuildSystems/golang).
 
 ## Versioning
 
-Many Go libraries, as well as some Go programs, exist only in version control systems and are never released as formal upstream versions. For versioning rules, please refer to the [Versioning](/guide/packaging-guidelines/Versioning) section.
+Many Go libraries, as well as some Go programs, exist only in version control systems and are never released as formal upstream versions. For versioning rules, please refer to the [Versioning](/docs/guide/packaging-guidelines/Versioning) section.
 
 ## Binary-Only Packages
 
