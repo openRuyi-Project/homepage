@@ -120,4 +120,4 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 ### 语言包
 
-翻译/语言资源须拆成单独的子包，详见[语言包](/guide/packaging-guidelines/LangPacks)。
+翻译/语言资源须拆成单独的子包，详见[语言包](/docs/guide/packaging-guidelines/LangPacks)。
