@@ -11,7 +11,7 @@ slug: /guide/quick-start-for-developers
 
 ## 环境准备与工具安装
 
-由于 OpenRuyi 基于 RISC-V RVA23 规范构建，对构建环境的 `qemu-user` 版本有较高要求。
+由于 openRuyi 基于 RISC-V RVA23 规范构建，对构建环境的 `qemu-user` 版本有较高要求。
 
 **推荐操作系统：** Fedora、openSUSE Tumbleweed 或 Arch Linux。
 

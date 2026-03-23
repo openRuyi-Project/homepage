@@ -8,7 +8,7 @@
     "description": "The label for category 'Guides' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Guides.link.generated-index.description": {
-    "message": "这里提供了帮助您入门 OpenRuyi 的指南。",
+    "message": "这里提供了帮助您入门 openRuyi 的指南。",
     "description": "The generated-index page description for category 'Guides' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Packaging Guidelines": {
