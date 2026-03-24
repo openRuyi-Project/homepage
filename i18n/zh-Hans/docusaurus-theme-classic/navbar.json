@@ -3,9 +3,9 @@
     "message": "openRuyi Logo",
     "description": "The alt text of navbar logo"
   },
-  "item.label.Contributing Guide": {
+  "item.label.openRuyi": {
     "message": "openRuyi",
-    "description": "Navbar item with label Contributing Guide"
+    "description": "Navbar item with label openRuyi"
   },
   "item.label.Governance": {
     "message": "社区治理",
