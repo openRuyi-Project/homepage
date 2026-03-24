@@ -34,5 +34,13 @@
   "sidebar.docSidebar.category.Reviewing.link.generated-index.description": {
     "message": "本节提供了审阅指南。",
     "description": "The generated-index page description for category 'Reviewing' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.openRuyi RISC-V Firmware Interface Specification": {
+    "message": "openRuyi RISC-V 固件接口规范",
+    "description": "The label for category 'openRuyi RISC-V Firmware Interface Specification' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.openRuyi RISC-V Firmware Interface Specification.link.generated-index.description": {
+    "message": "本节提供 openRuyi RISC-V 固件接口规范文档。",
+    "description": "The generated-index page description for category 'openRuyi RISC-V Firmware Interface Specification' in sidebar 'docSidebar'"
   }
 }
