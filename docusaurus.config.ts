@@ -100,15 +100,23 @@ const config: Config = {
       style: 'dark',
       links: [
         {
-          title: 'Docs',
+          title: 'Quick Links',
           items: [
             {
-              label: 'Contributing Guide',
+              label: 'Docs Portal',
               to: '/docs/intro',
             },
             {
-              label: 'Governance',
-              to: '/governance',
+              label: 'openRuyi Build',
+              href: 'https://build.openruyi.cn',
+            },
+            {
+              label: 'openRuyi Releases',
+              href: 'https://releases.openruyi.cn',
+            },
+            {
+              label: 'openRuyi Archive',
+              href: 'https://archive.openruyi.cn',
             },
           ],
         },
@@ -125,6 +133,10 @@ const config: Config = {
           title: 'Community',
           items: [
             {
+              label: 'System Status',
+              href: 'https://status.openruyi.cn',
+            },
+            {
               label: 'GitHub',
               href: 'https://github.com/openRuyi-Project',
             },
@@ -135,6 +147,11 @@ const config: Config = {
           ],
         },
       ],
+      logo: {
+          alt: 'ISCAS Logo',
+          src: '/img/iscas.svg',
+          href: 'https://www.iscas.ac.cn',
+      },
       copyright: `Copyright © ${new Date().getFullYear()} openRuyi Project Contributors. | <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">京ICP备05046678号-71</a>`,
     },
     prism: {
