@@ -2,16 +2,62 @@
 title: openRuyi 2026.03 Release
 authors: [misaka00251]
 tags: [release]
-image: ./img/openRuyi-social-card.png
-date: 2026-03-19
+image: /img/openRuyi-social-card.png
+date: 2026-03-24
 ---
 
-We are happy to announce our first openRuyi release!
+We are truly thrilled to share the news of our first openRuyi release! We appreciate your support and enthusiasm as we embark on this journey together.
 
-You can download from here.
+The majority of packages in this release are compatible with the `rva23u64` target, featuring LTO enabled and using `-mtune=generic-ooo` as the default tuning option.
 
 {/* truncate */}
 
-# Release Notes
+## Core Components & Toolchains
 
-TBD.
+* Kernel (mainline): 6.19.9
+
+* Kernel (LTS): 6.18.19
+
+* gcc: 15.2.0 with RVA23 support
+
+* binutils: 2.45
+
+* glibc: 2.42
+
+* grub: 2.14
+
+* systemd: 259
+
+* coreutils: 9.9
+
+* util-linux: 2.41.3
+
+## Other
+
+* Openresty LuaJIT: v2.1-20260114 with riscv64 support
+
+* zlib-ng: 2.3.3 with riscv-hwprobe support
+
+* labwc: 0.9.3
+
+* wayland: 1.24.0
+
+* mesa: 26.0.1
+
+## Images
+
+We offer four editions tailored for different scenarios:
+
+* Server: Designed for use on bare-metal servers.
+
+* Container: For both public and private cloud environments.
+
+* Desktop: Proudly uses labwc as our premier desktop solution.
+
+* Zero (BSP validation): Special Edition for SoC bringup and kernel development, especially in the pre-Silicon stage.
+
+You can download it from [here](https://releases.openruyi.cn/creek/2026.03/rva23/).
+
+***
+
+We welcome the community to test, integrate, and provide feedback on this release.

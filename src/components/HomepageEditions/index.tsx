@@ -27,7 +27,7 @@ const EditionList: EditionItem[] = [
                 openRuyi Server Edition is specifically designed for use on bare-metal servers.
             </Translate>
         ),
-        downloadLink: '#',
+        downloadLink: '//releases.openruyi.cn/creek/2026.03/rva23/',
     },
     {
         icon: faCube,
@@ -42,7 +42,7 @@ const EditionList: EditionItem[] = [
                 system for both public and private cloud environments.
             </Translate>
         ),
-        downloadLink: '#',
+        downloadLink: 'https://releases.openruyi.cn/creek/2026.03/rva23/',
     },
     {
         icon: faDesktop,
@@ -57,7 +57,7 @@ const EditionList: EditionItem[] = [
                 labwc.
             </Translate>
         ),
-        downloadLink: '#',
+        downloadLink: '//releases.openruyi.cn/creek/2026.03/rva23/openruyi-2026.03-Workstation-labwc-dvd.iso',
     },
     {
         icon: faGears,
@@ -72,7 +72,7 @@ const EditionList: EditionItem[] = [
                 development, especially in the pre-Silicon stage.
             </Translate>
         ),
-        downloadLink: '#',
+        downloadLink: '//releases.openruyi.cn/creek/2026.03/rva23/',
     },
 ];
 

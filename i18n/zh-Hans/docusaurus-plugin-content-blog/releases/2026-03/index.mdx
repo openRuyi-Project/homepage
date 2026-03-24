@@ -1,0 +1,63 @@
+---
+title: openRuyi 2026.03 发布
+authors: [misaka00251]
+tags: [release]
+image: /img/openRuyi-social-card.png
+date: 2026-03-24
+---
+
+我们很高兴发布 openRuyi 的首个版本！在我们共同开启这段旅程之际，衷心感谢您的支持与热情。
+
+本次发布中的大多数软件包均兼容 `rva23u64` 目标，启用了 `LTO`，并默认采用 `-mtune=generic-ooo` 作为调优选项。
+
+{/* truncate */}
+
+## 核心组件与工具链
+
+* Kernel (mainline): 6.19.9
+
+* Kernel (LTS): 6.18.19
+
+* gcc: 15.2.0 with RVA23 support
+
+* binutils: 2.45
+
+* glibc: 2.42
+
+* grub: 2.14
+
+* systemd: 259
+
+* coreutils: 9.9
+
+* util-linux: 2.41.3
+
+## 其他组件
+
+* Openresty LuaJIT: v2.1-20260114 with riscv64 support
+
+* zlib-ng: 2.3.3 with riscv-hwprobe support
+
+* labwc: 0.9.3
+
+* wayland: 1.24.0
+
+* mesa: 26.0.1
+
+## 镜像
+
+我们提供四种面向不同使用场景的版本：
+
+* Server: 面向裸金属服务器使用场景。
+
+* Container: 适用于公有云和私有云环境。
+
+* Desktop: 采用 labwc 作为我们的首选桌面方案。
+
+* Zero (BSP 验证): 面向 SoC bring-up 与内核开发的特别版本，尤其适用于 pre-silicon 阶段。
+
+这些镜像都可以在[这里](https://releases.openruyi.cn/creek/2026.03/rva23/)下载到。
+
+***
+
+我们欢迎社区对本次发布进行测试，并向我们反馈意见。
