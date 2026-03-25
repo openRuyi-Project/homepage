@@ -21,6 +21,22 @@ This project uses [Docusaurus](https://docusaurus.io).
 
 > Note: Docusaurus dev server (`start`) runs one locale at a time. Switching locale in dev mode may return 404 if that locale server is not running. Use `start:en` / `start:zh` for locale-specific development, or `npm run preview` to test cross-locale navigation.
 
+## Run with GHCR Image
+
+This repository publishes a container image to GHCR:
+
+- `ghcr.io/openruyi-project/homepage:latest` (default branch)
+- `ghcr.io/openruyi-project/homepage:sha-<commit>`
+- `ghcr.io/openruyi-project/homepage:v*` (git tags)
+
+Run directly:
+
+```bash
+docker run --rm -p 8080:80 ghcr.io/openruyi-project/homepage:latest
+```
+
+Then open <http://localhost:8080>.
+
 ## License
 
 This project is licensed under the [Mulan Permissive Software License v2](./LICENSE) (MulanPSL-2.0).
