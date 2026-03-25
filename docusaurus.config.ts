@@ -86,9 +86,9 @@ const config: Config = {
           label: 'openRuyi',
         },
         {
-            to: '/governance',
-            label: 'Governance',
-            position: 'left',
+          to: '/governance/legal/code-of-conduct',
+          label: 'Governance',
+          position: 'left',
           activeBaseRegex: `/governance(/|$)/`,
         },
         {to: '/news', label: 'News', position: 'left'},
@@ -129,6 +129,10 @@ const config: Config = {
               label: 'Privacy Policy',
               to: '/governance/legal/privacy-policy',
             },
+            {
+              label: 'Contact',
+              href: 'mailto:wangjingwei@iscas.ac.cn',
+            }
           ],
         },
         {

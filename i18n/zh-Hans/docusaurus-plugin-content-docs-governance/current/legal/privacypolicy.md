@@ -37,4 +37,4 @@ slug: /legal/privacy-policy
 
 ## 联系我们
 
-如果您对本隐私政策或我们的数据处理方式有任何疑问，请随时与我们联系： [privacy@openruyi.cn](mailto:privacy@openruyi.cn)
+如果您对本隐私政策或我们的数据处理方式有任何疑问，请随时与我们联系： [wangjingwei@iscas.ac.cn](mailto:wangjingwei@iscas.ac.cn)
