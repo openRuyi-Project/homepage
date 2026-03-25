@@ -326,8 +326,8 @@
     "message": "标签",
     "description": "The title of the tag list page"
   },
-  "homepage.header.download": {
-    "message": "立即体验"
+  "homepage.header.button": {
+    "message": "快速入门"
   },
   "homepage.layout.title": {
     "message": "专为 RISC-V 构建的 Linux 发行版",
@@ -371,7 +371,7 @@
     "message": "Workstation Edition"
   },
   "homepage.editions.workstation.description": {
-    "message": "openRuyi Workstation 是专门为桌面使用设计的版本，其内置 labwc"
+    "message": "openRuyi Workstation 是专门为桌面使用设计的版本"
   },
   "homepage.editions.zero.title": {
     "message": "Zero Edition"

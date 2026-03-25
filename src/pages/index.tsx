@@ -23,8 +23,8 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to="/docs/intro">
-            <Translate id="homepage.header.download">
-              Download now
+            <Translate id="homepage.header.button">
+              Getting Started
             </Translate>
           </Link>
         </div>

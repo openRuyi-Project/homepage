@@ -33,16 +33,18 @@ const config: Config = {
         docs: {
           sidebarPath: './sidebars.ts',
           editUrl:
-            'https://github.com/openRuyi-Project/website',
+            'https://github.com/openRuyi-Project/homepage',
         },
         blog: {
+          path: 'news',
+          routeBasePath: 'news',
           showReadingTime: true,
           feedOptions: {
             type: ['rss', 'atom'],
             xslt: true,
           },
           editUrl:
-            'https://github.com/openRuyi-Project/website',
+            'https://github.com/openRuyi-Project/homepage',
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
           onUntruncatedBlogPosts: 'warn',
@@ -89,7 +91,7 @@ const config: Config = {
             position: 'left',
           activeBaseRegex: `/governance(/|$)/`,
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+        {to: '/news', label: 'News', position: 'left'},
         {
           type: 'localeDropdown',
           position: 'right',
