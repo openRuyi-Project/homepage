@@ -5,9 +5,9 @@ description: 这篇文章教学如何安装 openRuyi 工作站版。
 slug: /guide/how-to-install/workstation
 ---
 
-# 如何安装 openRuyi 服务器版
+# 如何安装 openRuyi 工作站版
 
-本文章介绍了如何启动 openRuyi 的服务器版本。openRuyi 的工作站版提供了标准的桌面操作系统环境。
+本文章介绍了如何启动 openRuyi 的工作站版本。openRuyi 的工作站版提供了标准的桌面操作系统环境。
 
 ## 安装准备
 
