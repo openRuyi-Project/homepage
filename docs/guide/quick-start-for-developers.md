@@ -106,7 +106,7 @@ Then upload the locally prepared `_service` file. A sample configuration is show
 <services>
   <service name="obs_scm">
     <param name="scm">git</param>
-    <param name="url">ssh://git@git.openruyi.cn:54865/misaka00251/openruyi-repo.git</param>
+    <param name="url">https://github.com/misaka00251/openruyi.git</param>
     <param name="revision">add-cryptsetup</param>
     <param name="extract">core/cryptsetup/*</param>
   </service>
@@ -116,7 +116,7 @@ Then upload the locally prepared `_service` file. A sample configuration is show
 
 Here, `revision` is the branch name, and `extract` specifies that the build system should take only a particular subdirectory from the repository. Because we use a monorepo layout, you must set the correct directory.
 
-Once you upload the file, the build system will fetch the corresponding Git source. If you encounter an error indicating that the system cannot retrieve the source, add the user **obs-user** as a collaborator in your forked repository settings.
+Once you upload the file, the build system will fetch the corresponding Git source. If you encounter an error indicating that the system cannot retrieve the source, please check the access permissions of your Git repository and ensure that it is public.
 
 ### When the source code updates
 

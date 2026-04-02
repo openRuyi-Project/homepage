@@ -102,7 +102,7 @@ pre-commit install
 <services>
   <service name="obs_scm">
     <param name="scm">git</param>
-    <param name="url">ssh://git@git.openruyi.cn:54865/misaka00251/openruyi-repo.git</param>
+    <param name="url">https://github.com/misaka00251/openruyi.git</param>
     <param name="revision">add-cryptsetup</param>
     <param name="extract">core/cryptsetup/*</param>
   </service>
@@ -112,7 +112,7 @@ pre-commit install
 
 其中，`revision` 为分支名称，`extract` 代表从仓库里只抽取某个子目录。因为我们是 mono-repo，所以一定要设置对应的目录。
 
-上传之后，构建系统会拉取对应的 Git 代码。如果遇到无法获取代码的错误，需要在 Fork 仓库的设置中，将用户 **obs-user** 添加为协作者。
+上传之后，构建系统会拉取对应的 Git 代码。如果遇到无法获取代码的错误，请检查 Git 仓库的访问权限，确保它是公开的。
 
 ### 源码有更新的情况
 
