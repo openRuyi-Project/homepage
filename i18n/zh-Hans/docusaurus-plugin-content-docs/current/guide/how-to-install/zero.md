@@ -68,7 +68,7 @@ $ cat /path/to/openruyi-base.cpio.gz /path/to/openRuyi-2026.03-zero.kernel-modul
 
 ```
 [   90.019455] Run /init as init process
-Welcome to openRuyi-validation
+Welcome to openRuyi
 
 Please press Enter to activate this console.
 ```

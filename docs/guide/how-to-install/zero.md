@@ -66,7 +66,7 @@ On successful boot, you will see messages such as:
 
 ```
 [   90.019455] Run /init as init process
-Welcome to openRuyi-validation
+Welcome to openRuyi
 
 Please press Enter to activate this console.
 ```
