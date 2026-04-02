@@ -117,6 +117,10 @@ const config: Config = {
               href: 'https://build.openruyi.cn',
             },
             {
+              label: 'openRuyi Repository',
+              href: 'https://boat.openruyi.cn',
+            },
+            {
               label: 'openRuyi Releases',
               href: 'https://releases.openruyi.cn',
             },
