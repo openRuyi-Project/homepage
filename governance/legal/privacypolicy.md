@@ -37,4 +37,4 @@ We promise that we never sell, rent, or share your access data with any third-pa
 
 ## Contact Us
 
-If you have any questions about this Privacy Policy or our data practices, please feel free to contact us at: [wangjingwei@iscas.ac.cn](mailto:wangjingwei@iscas.ac.cn)
+If you have any questions about this Privacy Policy or our data practices, please feel free to contact us at: [contact@openruyi.cn](mailto:contact@openruyi.cn)
