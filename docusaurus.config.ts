@@ -110,7 +110,7 @@ const config: Config = {
           items: [
             {
               label: 'Docs Portal',
-              to: '/docs/intro',
+              to: '/docs/',
             },
             {
               label: 'openRuyi Build',
