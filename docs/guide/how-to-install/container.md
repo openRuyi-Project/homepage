@@ -7,7 +7,17 @@ slug: /guide/how-to-install/container
 
 # How to use openRuyi in Container
 
-It's really simple! Just pull our latest docker image:
+## Prerequisites
+
+For non-RISC-V architectures, you must run the registration tool via Docker or Podman.
+
+```bash
+$ docker run --privileged --rm tonistiigi/binfmt --install all
+```
+
+## Running with Docker or Podman
+
+It's really simple! Just pull our latest docker image, Podman users can simply replace docker with podman.
 
 ```bash
 $ docker pull ghcr.io/openruyi-project/creek:latest
@@ -19,7 +29,31 @@ Then run it. And voila, welcome to openRuyi!
 $ docker run -it ghcr.io/openruyi-project/creek:latest
 ```
 
+We recommend adding the --rm flag to automatically remove the container upon exit, saving disk space.
+
 ![Container Image](/img/how-to-run/container/image.jpg)
+
+## Running with systemd-nspawn
+
+Create the target directory.
+
+```bash
+$ mkdir -p openruyi-nspawn
+```
+
+Extract the rootfs archive.
+
+```bash
+$ tar -xf openRuyi-2026.03-rootfs.tar.zst -C openruyi-nspawn --numeric-owner
+```
+
+Start with systemd-nspawn.
+
+```bash
+$ systemd-nspawn -D openruyi-nspawn
+```
+
+![nspawn Image](/img/how-to-run/container/nspawn.png)
 
 ## Need the Rootfs Instead?
 
