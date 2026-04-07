@@ -166,7 +166,7 @@ const config: Config = {
           src: '/img/iscas.svg',
           href: 'https://www.iscas.ac.cn',
       },
-      copyright: `Copyright © ${new Date().getFullYear()} openRuyi Project Contributors. | <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">京ICP备05046678号-71</a>`,
+      copyright: `Copyright © ${new Date().getFullYear()} openRuyi Project Contributors. | <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">京ICP备05046678号-71</a> | <a href="https://beian.mps.gov.cn/" target="_blank" rel="noopener noreferrer">京公网安备11010802048007号</a>`,
     },
     prism: {
       theme: prismThemes.github,
