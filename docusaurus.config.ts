@@ -139,7 +139,7 @@ const config: Config = {
             },
             {
               label: 'Contact',
-              href: 'mailto:contact@openruyi.cn',
+              href: 'mailto:wangjingwei@iscas.ac.cn',
             }
           ],
         },
