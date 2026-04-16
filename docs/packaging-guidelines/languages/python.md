@@ -13,6 +13,50 @@ This document describes the Python module packaging guidelines for openRuyi.
 
 Packages for Python libraries must use the `python-` prefix.
 
+For the package name (`DISTNAME`), use the name the upstream project uses on PyPI. You must add the following macro at the top of the spec file:
+
+```specfile
+%global srcname DISTNAME
+```
+
+In short, the `srcname` macro represents the project’s name on PyPI.
+
+## Source URL
+
+Whenever possible, you should use the source archive published by the upstream project on PyPI as the source URL, except for packages that do not provide source archives on PyPI or are otherwise unavailable there. For example, `python-pyperclip`:
+
+```specfile
+%global srcname pyperclip
+
+Source0:        https://files.pythonhosted.org/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz
+```
+
+If the package name (`DISTNAME`) differs from the name used in the download URL, you should define the `pypi_name` macro at the top of the spec file. For example, `python-aiohttp-socks`:
+
+```specfile
+%global srcname aiohttp-socks
+%global pypi_name aiohttp_socks
+
+Source0:        https://files.pythonhosted.org/packages/source/a/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
+```
+
+:::warning Warning
+
+The `pypi_name` macro specifies the filename of **the project’s downloadable source archive on PyPI**; It does **not** represent **the actual project name on PyPI**. For that purpose, you should use the `srcname` macro.
+
+:::
+
+Another example is `python-pytest-rerunfailures`:
+
+```specfile
+%global srcname pytest-rerunfailures
+%global pypi_name pytest_rerunfailures
+
+Source0:        https://files.pythonhosted.org/packages/source/p/%{srcname}/%{pypi_name}-%{version}.tar.gz
+```
+
+the `pypi_name` macro specifies the filename of the project’s downloadable source archive on PyPI.
+
 ## Dependencies
 
 Packages should not declare an explicit runtime dependency on `python3`, because the following dependencies are added automatically in the corresponding cases:
@@ -30,9 +74,11 @@ Every package that uses Python and/or installs Python modules must include `Buil
 Since openRuyi does not split `python3` into a separate subpackage, but instead provides it directly from the main package, you should add the following entries to the spec file:
 
 ```specfile
-Provides:       python3-DISTNAME
+Provides:       python3-DISTNAME = %{version}-%{release}
 %python_provide python3-DISTNAME
 ```
+
+Here, you can replace `DISTNAME` with the previously defined macro, which is typically `%{srcname}`.
 
 ## RPM Macros for Python Modules
 

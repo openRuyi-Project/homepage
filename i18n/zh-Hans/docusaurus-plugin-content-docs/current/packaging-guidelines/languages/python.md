@@ -13,6 +13,48 @@ slug: /guide/packaging-guidelines/languages/Python
 
 Python 库的软件包，其名称必须以 `python-` 为前缀。
 
+对于软件包的名称 (`DISTNAME`)，应该以上游项目在 PyPi 上的名称为准。我们必须在 SPEC 顶部添加以下宏:
+
+```specfile
+%global srcname DISTNAME
+```
+
+简言之，`srcname` 宏代表项目在 PyPi 上的名称。
+
+## 源码链接
+
+在任何时候，都应该优先考虑使用发布在 PyPi 上的源码包作为源码链接。在 PyPi 上并没有提供源码下载的库，或者 PyPi 上不存在的库除外，例如 `python-pyperclip`:
+
+```specfile
+%global srcname pyperclip
+
+Source0:        https://files.pythonhosted.org/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz
+```
+
+对于软件包的名称 (`DISTNAME`) 和下载链接的名称不同的情况，需要在 SPEC 顶部添加 `pypi_name` 宏，例如 `python-aiohttp-socks`:
+
+```specfile
+%global srcname aiohttp-socks
+%global pypi_name aiohttp_socks
+
+Source0:        https://files.pythonhosted.org/packages/source/a/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
+```
+
+:::warning 注意
+
+`pypi_name` 宏代表**项目在 PyPi 上下载链接的文件名称**，并不代表**项目本身在 PyPi 上的名称**。后者必须用 `srcname` 宏表示。
+
+:::
+
+我们再举一个例子，例如 `python-pytest-rerunfailures`:
+
+```specfile
+%global srcname pytest-rerunfailures
+%global pypi_name pytest_rerunfailures
+
+Source0:        https://files.pythonhosted.org/packages/source/p/%{srcname}/%{pypi_name}-%{version}.tar.gz
+```
+
 ## 依赖关系
 
 软件包不应该对 `python3` 有显式的运行时依赖，在以下情况会自动依赖:
@@ -30,9 +72,11 @@ Python 库的软件包，其名称必须以 `python-` 为前缀。
 因为在 openRuyi 中，不将 python3 作为子包拆分，而是直接在主包中提供，故应该在 spec 中加入:
 
 ```specfile
-Provides:       python3-DISTNAME
+Provides:       python3-DISTNAME = %{version}-%{release}
 %python_provide python3-DISTNAME
 ```
+
+可以将这里的 DISTNAME 替换为上述已定义的宏，通常为 `%{srcname}`。
 
 ## 用于 Python 模块的 RPM 宏
 
