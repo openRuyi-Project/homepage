@@ -56,14 +56,14 @@ Assume the original preparation section (`%prep`) looks like the following snipp
 
 ```specfile
 %prep
-%autosetup -p0 -n %{name}%{version}
+%autosetup -p0 -n %{name}-%{version}
 cp {SOURCE1} .
 ```
 
 Here, you unpack the source archive, apply patches first, and then copy `Source1` into the current directory. After switching to the `autotools` build system, you can rewrite the preparation section as follows:
 
 ```specfile
-BuildOptin(prep): -p0 -n %{name}%{version}
+BuildOptin(prep): -p0
 
 # ...
 
@@ -72,6 +72,19 @@ cp {SOURCE1} .
 ```
 
 You must move the arguments that originally followed `%autosetup` into `BuildOption(prep)`, while you should move any commands after `%autosetup` into `%prep -a` as needed.
+
+In this example, however, we omit `-n %{name}-%{version}`. We omit this flag because RPM assumes by default that the top-level directory it creates after extracting the source archive follows that naming convention. You only need to specify the `-n` option explicitly when the extracted directory name does not match that pattern. For example:
+
+```specfile
+# Suppose that after you extract the upstream archive, the second component is not the version number
+# but %%{short_commit_id}
+BuildOptin(prep): -p0 -n %{name}-%{short_commit_id}
+
+# ...
+
+%prep -a
+cp {SOURCE1} .
+```
 
 Likewise, assume the original build section (`%build`) is as follows:
 
@@ -97,7 +110,7 @@ BuildOption(conf):  --with-tclinclude=%{_includedir}
 BuildOption(conf):  --enable-shared
 BuildOption(build):  CFLAGS="%{optflags} -fPIC -pie -std=gnu89"
 BuildOption(build):  SHLIB_LD="gcc -shared"
-BuildOption(build):  pkglibdir=%{_libdir}/tcl/%{name}%{version}
+BuildOption(build):  pkglibdir=%{_libdir}/tcl/%{name}-%{version}
 
 %conf -p
 autoreconf -fiv
@@ -122,7 +135,7 @@ rm -f %{buildroot}%{_bindir}/autopasswd
 You can rewrite the install section as:
 
 ```specfile
-BuildOption(install): pkglibdir=%{_libdir}/tcl/%{name}%{version}
+BuildOption(install): pkglibdir=%{_libdir}/tcl/%{name}-%{version}
 
 %install -a
 ln -s libexpect%{majorver}.so %{buildroot}%{_libdir}/libexpect.so

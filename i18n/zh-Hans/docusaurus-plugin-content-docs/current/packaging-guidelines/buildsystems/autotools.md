@@ -56,14 +56,14 @@ autoreconf -fiv
 
 ```specfile
 %prep
-%autosetup -p0 -n %{name}%{version}
+%autosetup -p0 -n %{name}-%{version}
 cp {SOURCE1} .
 ```
 
 可以看到，首先我们指定解压源码并加载补丁，最后再将定义的 Source1 复制到当前目录下。通过使用 `autotools` 构建系统，可以修改为如下:
 
 ```specfile
-BuildOptin(prep): -p0 -n %{name}%{version}
+BuildOptin(prep): -p0
 
 # ...
 
@@ -72,6 +72,19 @@ cp {SOURCE1} .
 ```
 
 其中，`%autosetup` 后面的参数移到前面，它之后的指令，根据需要该移动到 `%prep -a` 区段去。
+
+不过在这里，我们省略了 `-n %{name}-%{version}`。因为，RPM 默认会认为下载的源码压缩包解压后，生成的顶级目录名一定是这样的格式。只有当目录名不符合这种命名规范时，才需要自定义，例如:
+
+```specfile
+# 假设上游的压缩包解压之后，第二部分不是版本号，而是 %%{short_commit_id}
+BuildOptin(prep): -p0 -n %{name}-%{short_commit_id}
+
+# ...
+
+%prep -a
+cp {SOURCE1} .
+```
+
 
 同样的，假设原有的编译 (`%build`) 配置如下:
 
@@ -97,7 +110,7 @@ BuildOption(conf):  --with-tclinclude=%{_includedir}
 BuildOption(conf):  --enable-shared
 BuildOption(build):  CFLAGS="%{optflags} -fPIC -pie -std=gnu89"
 BuildOption(build):  SHLIB_LD="gcc -shared"
-BuildOption(build):  pkglibdir=%{_libdir}/tcl/%{name}%{version}
+BuildOption(build):  pkglibdir=%{_libdir}/tcl/%{name}-%{version}
 
 %conf -p
 autoreconf -fiv
@@ -122,7 +135,7 @@ rm -f %{buildroot}%{_bindir}/autopasswd
 修改后的配置如下:
 
 ```specfile
-BuildOption(install): pkglibdir=%{_libdir}/tcl/%{name}%{version}
+BuildOption(install): pkglibdir=%{_libdir}/tcl/%{name}-%{version}
 
 %install -a
 ln -s libexpect%{majorver}.so %{buildroot}%{_libdir}/libexpect.so
