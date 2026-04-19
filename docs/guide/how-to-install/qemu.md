@@ -16,14 +16,14 @@ To use openRuyi in QEMU, install the following packages:
 
 ## Download the image
 
-[openRuyi-2026.03-Server-cloud.qcow2](https://releases.openruyi.cn/creek/2026.03/rva23/openRuyi-2026.03-Server-cloud.qcow2)
+You will first need to obtain the openRuyi image files and the corresponding checksum files. Please visit our news site and refer to the latest release article, where you can find the qcow2 image and the checksums for the installation media.
 
 We provide SHA256 checksums for all image files. You may use any tool that supports the SHA256 algorithm to verify the integrity of the downloaded files.
 
 If the sha256sum command is available on your current system, place the checksum file in the same directory as the installation image and run the following command:
 
 ```sh
-$ sha256sum openRuyi-2026.03-Server-cloud.qcow2
+$ sha256sum openRuyi-xxxx.xx-Server-cloud.qcow2
 ```
 
 ## Run via QEMU
