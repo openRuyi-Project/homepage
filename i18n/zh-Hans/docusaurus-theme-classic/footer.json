@@ -25,7 +25,7 @@
   },
   "link.item.label.Docs Portal": {
     "message": "文档门户",
-    "description": "The label of footer link with label=Docs Portal linking to /docs/intro"
+    "description": "The label of footer link with label=Docs Portal linking to /docs/"
   },
   "link.item.label.openRuyi Build": {
     "message": "openRuyi 构建平台",
@@ -54,5 +54,9 @@
   "link.item.label.Contact": {
     "message": "联系我们",
     "description": "The label of footer link with label=Contact linking to mailto:wangjingwei@iscas.ac.cn"
+  },
+  "link.item.label.openRuyi Repository": {
+    "message": "openRuyi Repository",
+    "description": "The label of footer link with label=openRuyi Repository linking to https://boat.openruyi.cn"
   }
 }
