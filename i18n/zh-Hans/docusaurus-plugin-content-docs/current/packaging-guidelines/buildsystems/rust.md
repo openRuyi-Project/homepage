@@ -22,7 +22,7 @@ BuildRequires:  rust-rpm-macros
 
 ## 必需宏
 
-对于使用 `rustcrates` 构建系统的软件包，你应当在 spec 文件顶部附近定义以下宏：
+对于使用 `rustcrates` 构建系统的软件包，你应当在 spec 文件顶部附近定义以下宏:
 
 ```specfile
 # Cargo.toml 中的原始 crate 名称。
@@ -42,13 +42,13 @@ Name:           rust-%{pkgname}
 Version:        0.1.6
 ```
 
-在大多数情况下：
+在大多数情况下:
 
 - `crate_name` 是 `Cargo.toml` 中的原始 crate 名称
 - `full_version` 是精确的上游 crate 版本
 - `pkgname` 是用于依赖解析的兼容性名称
 
-对于兼容性规则更严格的 crate，`pkgname` 可能需要包含更具体的版本段。例如：
+对于兼容性规则更严格的 crate，`pkgname` 可能需要包含更具体的版本段。例如:
 
 ```specfile
 %global crate_name toml
@@ -59,7 +59,7 @@ Name:           rust-%{pkgname}
 Version:        0.9.11
 ```
 
-如果你修改了 `pkgname`，请确保所有相关的依赖声明也同步更新，例如：
+如果你修改了 `pkgname`，请确保所有相关的依赖声明也同步更新，例如:
 
 ```
 BuildRequires:  crate(toml-0.9.11)
@@ -69,7 +69,7 @@ BuildRequires:  crate(toml-0.9.11)
 
 ## 何时需要手动调整
 
-大多数 Rust 库软件包都可以自动生成，几乎不需要或只需要极少量手动编辑。通常只有在以下情况下才需要手动修改：
+大多数 Rust 库软件包都可以自动生成，几乎不需要或只需要极少量手动编辑。通常只有在以下情况下才需要手动修改:
 
 1. **依赖约束过于严格**
     有些 crate 会在 `Cargo.toml` 中把依赖版本钉得过死。这种情况下，你可能需要给 crate 打补丁，以放宽版本约束。
@@ -84,9 +84,9 @@ BuildRequires:  crate(toml-0.9.11)
 
 如果确实需要额外准备步骤，尽量使用 `%prep -a`。这是更推荐的方式，因为默认的 `%prep` 逻辑还会为 Cargo 配置系统注册表。
 
-如果你必须在使用 `rust` 构建系统时完全覆盖 `%prep`，请务必保留 Cargo 注册表配置。一个典型的替代写法如下：
+如果你必须在使用 `rust` 构建系统时完全覆盖 `%prep`，请务必保留 Cargo 注册表配置。一个典型的替代写法如下:
 
-```
+```sh
 %prep -a
 mkdir -p ~/.cargo
 cat > ~/.cargo/config.toml <<EOF

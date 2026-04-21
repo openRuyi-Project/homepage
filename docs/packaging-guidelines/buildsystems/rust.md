@@ -108,7 +108,7 @@ This is the usual choice for packaging Rust libraries.
 
 At present, the Rust build system wraps the common `cargo build --release` workflow. If your package needs additional build steps or different Cargo commands, override `%build` or extend it with `%build -a`.
 
-For `rustcrates`, library packages often need less customization than application packages.
+For `rustcrates`, library packages often need require less customization customisation than application packages.
 
 ## Build system macro files
 
