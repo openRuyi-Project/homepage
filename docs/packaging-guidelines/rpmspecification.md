@@ -209,7 +209,7 @@ Example:
 #!RemoteAsset:  sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 Source0:        https://example.org/example-%{version}.tar.gz
 #!RemoteAsset:  sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
-Source1:        https://example.org/example-%{version}.tar.gz.sha256
+Source1:        https://example.org/example-%{version}-additional.tar.gz
 ```
 
 For details regarding source URLs, see the [Source Packages](/docs/guide/packaging-guidelines/SourceURL) supplementary specification.

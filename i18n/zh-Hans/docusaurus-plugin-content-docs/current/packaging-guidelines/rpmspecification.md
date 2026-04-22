@@ -209,7 +209,7 @@ VCS:            git:https://git.example.org/project.git
 #!RemoteAsset:  sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 Source0:        https://example.org/example-%{version}.tar.gz
 #!RemoteAsset:  sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
-Source1:        https://example.org/example-%{version}.tar.gz.sha256
+Source1:        https://example.org/example-%{version}-additional.tar.gz
 ```
 
 源码 URL 的细节，请见补充规范[源码包](/docs/guide/packaging-guidelines/SourceURL)。
