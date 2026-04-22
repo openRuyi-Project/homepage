@@ -55,7 +55,7 @@ In this case, RPM will treat `%{name}-%{version}.tar.gz` as the archive filename
 When building packages with Open Build Service (OBS), you can use the Remote Assets feature so that OBS automatically downloads the source code during the build process:
 
 ```specfile
-#!RemoteAsset
+#!RemoteAsset:  sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 Source:         https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 ```
 

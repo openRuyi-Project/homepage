@@ -206,9 +206,9 @@ VCS:            git:https://git.example.org/project.git
 Example:
 
 ```specfile
-#!RemoteAsset
+#!RemoteAsset:  sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 Source0:        https://example.org/example-%{version}.tar.gz
-#!RemoteAsset
+#!RemoteAsset:  sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 Source1:        https://example.org/example-%{version}.tar.gz.sha256
 ```
 

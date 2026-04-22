@@ -49,7 +49,7 @@ Source:         https://example.com/foo/1.0/download.cgi#/%{name}-%{version}.tar
 我们可以搭配 Open Build Service 的远程资产 (Remote Assets) 功能，这样源码可以在构建过程中被自动下载:
 
 ```specfile
-#!RemoteAsset
+#!RemoteAsset:  sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 Source:         https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 ```
 
