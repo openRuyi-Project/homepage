@@ -195,21 +195,23 @@ VCS:            git:https://git.example.org/project.git
 
 2. 若 `URL` 可复用为 `Source` 的前缀，`Source` 可以复用 `%{url}`。
 
-3. 对于网络来源的 `Source`，其行前必须添加 `#!RemoteAsset` 注释；存在多条网络来源 `Source` 时，每条均必须标识；在 `#!RemoteAsset` 注释后，应当添加来源文件的 sha256 值。
+3. 对于网络来源的 `Source`，其行前必须添加 `#!RemoteAsset` 注释；存在多条网络来源 `Source` 时，每条均必须标识。
 
-4. 对于无法从 URL 解析出 tarball 文件名的情形，`Source` 应当使用 URL 片段显式给出 tarball 名称，以保证源文件命名可预测。
+4. 对于 HTTP 和 HTTPS 协议来源的 `Source`，在 `#!RemoteAsset` 注释后，必须添加来源文件的 sha256 值。
 
-5. `Source` 编号规则:
+5. 对于无法从 URL 解析出 tarball 文件名的情形，`Source` 应当使用 URL 片段显式给出 tarball 名称，以保证源文件命名可预测。
+
+6. `Source` 编号规则:
    1. 默认编号为 `0`，每增加一条递增 1。
    2. 若仅有一条源代码文件，编号可以省略。
 
 示例:
 
 ```specfile
-#!RemoteAsset
+#!RemoteAsset:  sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 Source0:        https://example.org/example-%{version}.tar.gz
-#!RemoteAsset
-Source1:        https://example.org/example-%{version}.tar.gz.sha256
+#!RemoteAsset:  sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+Source1:        https://example.org/example-%{version}-additional.tar.gz
 ```
 
 源码 URL 的细节，请见补充规范[源码包](/docs/guide/packaging-guidelines/SourceURL)。
