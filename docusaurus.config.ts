@@ -1,6 +1,7 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import eastAsianLineBreaks from './src/utils/eastAsianLineBreaks';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -35,6 +36,7 @@ const config: Config = {
           editUrl:
             'https://github.com/openRuyi-Project/homepage/edit/main/',
           editLocalizedFiles: true,
+          beforeDefaultRemarkPlugins: [eastAsianLineBreaks],
         },
         blog: {
           path: 'news',
@@ -50,6 +52,7 @@ const config: Config = {
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
           onUntruncatedBlogPosts: 'warn',
+          beforeDefaultRemarkPlugins: [eastAsianLineBreaks],
         },
         theme: {
           customCss: './src/css/custom.css',
