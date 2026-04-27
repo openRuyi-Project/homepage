@@ -90,6 +90,10 @@ Requires:
 %changelog
 ```
 
+其他情况可以按照 A-Z 的顺序排列。
+
+段落与段落之间必须用空行隔开。
+
 ### 最小骨架示例
 
 TODO
@@ -234,6 +238,7 @@ Source1:        https://example.org/example-%{version}-additional.tar.gz
    - `meson`
    - `golang`
    - `golangmodules`
+   - `pyproject`
 
 3. 当软件包不适用上述类型或不需要配置阶段时，`BuildSystem` 可以为空，但必须以注释说明原因。
 
@@ -274,6 +279,13 @@ Source1:        https://example.org/example-%{version}-additional.tar.gz
 3. 多个参数必须按行分别声明。
 
 4. 若使用 `BuildOption`，其位置应当位于 `BuildSystem` 与 `BuildRequires` 之间。
+
+5. `BuildOption` 应当按照如下顺序书写：
+```
+%build
+%install
+%check
+```
 
 ### BuildRequires
 
