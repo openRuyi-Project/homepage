@@ -90,6 +90,10 @@ Requires:
 %changelog
 ```
 
+Other tags MAY be ordered alphabetically from A to Z, unless a specific order is required.
+
+Blank lines MUST be used to separate sections.
+
 ### Minimal Skeleton Example
 
 TODO
@@ -234,6 +238,7 @@ For details regarding source URLs, see the [Source Packages](/docs/guide/packagi
    - `meson`
    - `golang`
    - `golangmodules`
+   - `pyproject`
 
 3. If the package utilizes an unsupported build system, or requires no configuration phase whatsoever, `BuildSystem` MAY be left blank. However, the Spec MUST include an adjacent comment explicitly justifying this omission.
 
@@ -262,6 +267,13 @@ For system-specific build patterns, see the [Declarative Build Systems](/docs/gu
    - If the Spec utilizes `BuildOption`, patches SHOULD be inserted between `BuildSystem` and `BuildOption`.
 
    - If `BuildOption` is absent, patches SHOULD be located between `BuildSystem` and `BuildRequires`.
+
+5. `BuildOption` entries SHOULD be written in the same order as the RPM build process, namely:
+```specfile
+%build
+%install
+%check
+```
 
 For the comprehensive patch strategy, see the [Patches](/docs/guide/packaging-guidelines/Patch) supplementary specification.
 
