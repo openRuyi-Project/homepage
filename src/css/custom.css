@@ -26,3 +26,9 @@
   --ifm-color-primary-lightest: #b8ccff;
   --docusaurus-highlighted-code-line-bg: rgba(126, 160, 255, 0.18);
 }
+
+/* We need to display graph at the center */
+.docusaurus-mermaid-container {
+  display: flex;
+  justify-content: center;
+}

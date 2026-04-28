@@ -22,6 +22,10 @@ const config: Config = {
 
   onBrokenLinks: 'throw',
 
+  markdown: {
+    mermaid: true,
+  },
+
   i18n: {
     defaultLocale: 'en',
     locales: ['zh-Hans', 'en'],
@@ -60,7 +64,8 @@ const config: Config = {
       } satisfies Preset.Options,
     ],
   ],
-    plugins: [
+  themes: ['@docusaurus/theme-mermaid'],
+  plugins: [
     [
       '@docusaurus/plugin-content-docs',
       {
