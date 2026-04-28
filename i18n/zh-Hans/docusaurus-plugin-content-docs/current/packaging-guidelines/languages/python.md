@@ -63,18 +63,26 @@ Source0:        https://files.pythonhosted.org/packages/source/p/%{srcname}/%{py
 
 * 如果它们有可执行的 Python 脚本，会自动依赖 `/usr/bin/python3`。
 
-### BuildRequires: python3-devel
+### BuildRequires: pkgconfig(python3)
 
 使用 Python 和/或安装 Python 模块的每一个软件包，必须在 spec 内添加 `BuildRequires: pkgconfig(python3)`，即使在构建时并未实际调用 Python。
 
 ### Provides: python3-DISTNAME
 
-因为在 openRuyi 中，不将 python3 作为子包拆分，而是直接在主包中提供，故应该在 spec 中加入:
+因为在 openRuyi 中，不将 python3 作为子包拆分，而是直接在主包中提供。故如果软件包为架构无关，应该在 spec 中加入:
 
 ```specfile
 Provides:       python3-DISTNAME = %{version}-%{release}
 %python_provide python3-DISTNAME
 ```
+
+如果软件包为架构相关，则应该在 spec 中加入:
+
+```specfile
+Provides:       python3-%{srcname} = %{version}-%{release}
+Provides:       python3-%{srcname}%{?_isa} = %{version}-%{release}
+%python_provide python3-%{srcname}
+````
 
 可以将这里的 DISTNAME 替换为上述已定义的宏，通常为 `%{srcname}`。
 
@@ -100,10 +108,14 @@ Provides:       python3-DISTNAME = %{version}-%{release}
 
 此宏用于生成与给定可导入模块相对应的文件列表，并将其保存为 `%{pyproject_files}`。生成的列表不包括 README 文件。当 LICENSE 文件在 metadata 中指定时，它会被包含在内。
 
+#### %pyproject_check_import
+
+此宏用于读取 `%pyproject_save_files` 生成的可导入 Python 模块列表。它作为可以快速发现缺少运行时依赖、安装路径错误、扩展模块加载失败等问题的冒烟测试。
+
 #### %pyproject_files
 
 此宏为由 `%pyproject_save_files` 写入的文件的路径。使用范例:
 
 ```specfile
-%files -n python3-DISTNAME -f %{pyproject_files}
+%files -n python-DISTNAME -f %{pyproject_files}
 ```
