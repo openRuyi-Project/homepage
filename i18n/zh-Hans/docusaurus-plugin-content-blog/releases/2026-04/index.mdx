@@ -1,0 +1,35 @@
+---
+title: openRuyi 2026.04 发布
+authors: [misaka00251]
+tags: [release]
+image: /img/openRuyi-social-card.png
+date: 2026-04-30
+---
+
+我们很高兴宣布 openRuyi 2026 年 4 月版本正式发布。
+
+openRuyi 本月持续面向 RISC-V 平台完善发行版能力，并在内核、启动链路、软件包生态和构建基础设施等方面稳步推进。
+
+{/* truncate */}
+
+## 亮点
+
+* **内核与底层平台更新**：主线内核更新至 7.0.2，将 LTS 内核更新至 6.18.25，并且还同步更新了大量与 RISC-V 相关的补丁和配置。
+
+* **Secure Boot / UEFI 能力增强**：继续推进 `shim`、`ovmf` 和 `grub` 等关键组件的相关工作，进一步完善了启动链路，并增强了整体的 Secure Boot 与 UEFI 支持。
+
+* **生态扩展持续加快**：在桌面、多媒体、容器、AI 和服务端开发等方向新增并更新了多款软件包，其中具有代表性的包括 `vlc`、`opencv`、`buildah` 和 `fastapi`。
+
+## 其他改进
+
+* 持续改善构建兼容性与工具链集成，包括修复与 `glibc 2.43` / C23 迁移相关的问题。
+
+## 安全更新
+
+本月完成了多项安全更新，包括对 Ruby [CVE-2026-41316](https://www.cve.org/CVERecord?id=CVE-2026-41316) 的修复，以及对 OpenSSH [CVE-2025-26465](https://www.cve.org/CVERecord?id=CVE-2025-26465) 和 [CVE-2025-26466](https://www.cve.org/CVERecord?id=CVE-2025-26466) 的修复。与此同时，还更新了多个其他重要组件，包括 `openssl`、`openjdk` 和 `vim`。
+
+openRuyi 提供四种面向不同场景的版本：**Server**、**Container**、**Desktop** 和 **Zero (BSP 验证)**。你可以在[这里](https://releases.openruyi.cn/creek/2026.04/rva23/)下载。
+
+***
+
+欢迎社区对本次发布进行测试，并向我们反馈意见。
