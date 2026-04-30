@@ -7,7 +7,7 @@ slug: /guide/packaging-guidelines/languages/Python
 
 # Python Packaging Guidelines
 
-This document describes the Python module packaging guidelines for openRuyi.
+This document describes the Python module packaging guidelines for openRuyi. For the relevant build system, please refer to [Pyproject](/docs/guide/packaging-guidelines/BuildSystems/pyproject).
 
 ## Naming
 

@@ -7,7 +7,7 @@ slug: /guide/packaging-guidelines/languages/Python
 
 # Python 打包指南
 
-这个文档讲述了 openRuyi 的 Python 模块打包指南。
+这个文档讲述了 openRuyi 的 Python 模块打包指南。对于相关的构建系统，请参阅 [Pyproject](/docs/guide/packaging-guidelines/BuildSystems/pyproject).
 
 ## 命名
 
