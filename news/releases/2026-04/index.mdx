@@ -1,0 +1,35 @@
+---
+title: openRuyi 2026.04 Release
+authors: [misaka00251]
+tags: [release]
+image: /img/openRuyi-social-card.png
+date: 2026-04-30
+---
+
+We are pleased to announce the April 2026 release of openRuyi.
+
+openRuyi made steady progress across the kernel, boot stack, package ecosystem, and build infrastructure for RISC-V platforms in this release.
+
+{/* truncate */}
+
+## Highlights
+
+* **Kernel and platform updates**: We updated mainline kernel to 7.0.2, and LTS kernel to 6.18.25. We also refreshed a large set of RISC-V related patches and configurations.
+
+* **Secure Boot / UEFI enablement**: We expanded the boot chain by continuing work on key components such as `shim`, `ovmf`, and `grub`, thereby improving overall Secure Boot and UEFI support.
+
+* **Faster ecosystem growth**: We added and updated packages across desktop, multimedia, containers, AI, and server-side development. Representative additions and updates include `vlc`, `opencv`, `buildah`, and `fastapi`.
+
+## Other Improvements
+
+* We improved build compatibility and toolchain integration, including fixes related to the `glibc 2.43` / C23 transition.
+
+## Security Updates
+
+We delivered multiple security updates this month, including a fix for Ruby [CVE-2026-41316](https://www.cve.org/CVERecord?id=CVE-2026-41316) and fixes for OpenSSH [CVE-2025-26465](https://www.cve.org/CVERecord?id=CVE-2025-26465) and [CVE-2025-26466](https://www.cve.org/CVERecord?id=CVE-2025-26466). We also updated several other important components, including `openssl`, `openjdk`, and `vim`.
+
+We continue to provide four editions for different scenarios: **Server**, **Container**, **Desktop**, and **Zero (BSP validation)**. You can download it from [here](https://releases.openruyi.cn/creek/2026.04/rva23/).
+
+***
+
+We welcome the community to test, integrate, and provide feedback on this release.
