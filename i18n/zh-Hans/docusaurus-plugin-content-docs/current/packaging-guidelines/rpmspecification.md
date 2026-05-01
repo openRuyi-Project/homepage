@@ -198,6 +198,7 @@ VCS:            git:https://git.example.org/project.git
 3. 对于网络来源的 `Source`，其行前必须添加 `#!RemoteAsset` 注释；存在多条网络来源 `Source` 时，每条均必须标识。
 
 4. 对于 HTTP 和 HTTPS 协议来源的 `Source`，在 `#!RemoteAsset` 注释后，必须添加来源文件的 sha256 值。
+   为了方便，可以使用 [remoteassetify](/docs/guide/remoteassetify-usage-guide) 自动生成。
 
 5. 对于无法从 URL 解析出 tarball 文件名的情形，`Source` 应当使用 URL 片段显式给出 tarball 名称，以保证源文件命名可预测。
 
