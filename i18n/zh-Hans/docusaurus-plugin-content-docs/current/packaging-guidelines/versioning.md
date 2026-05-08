@@ -78,7 +78,7 @@ slug: /guide/packaging-guidelines/Versioning
 
 * `<date>` 是一个八位数字 `YYYYMMDD` 格式的日期 (代表当前软件包的打包日期) 。
 
-* `<revision>` 是一个简短的 git 提交哈希 (commit hash) 、subversion 修订号，或有助于识别该快照在 VCS 中精确位置的其他标识符。如果 VCS 不提供此类标识符 (例如 CVS) ，则应省略此部分。
+* `<revision>` 是一个简短的 Git 提交哈希 (commit hash) 、subversion 修订号，或有助于识别该快照在 VCS 中精确位置的其他标识符。如果 VCS 不提供此类标识符 (例如 CVS) ，则应省略此部分。
 
 :::info 注意
 
@@ -96,7 +96,7 @@ slug: /guide/packaging-guidelines/Versioning
 
 * `<date>` 是一个八位数字 `YYYYMMDD` 格式的日期 (代表当前软件包的打包日期) 。
 
-* `<revision>` 是一个简短的 git 提交哈希 (commit hash) 、subversion 修订号，或有助于识别该快照在 VCS 中精确位置的其他标识符。如果 VCS 不提供此类标识符 (例如 CVS) ，则应省略此部分。
+* `<revision>` 是一个简短的 Git 提交哈希 (commit hash) 、subversion 修订号，或有助于识别该快照在 VCS 中精确位置的其他标识符。如果 VCS 不提供此类标识符 (例如 CVS) ，则应省略此部分。
 
 :::info 注意
 

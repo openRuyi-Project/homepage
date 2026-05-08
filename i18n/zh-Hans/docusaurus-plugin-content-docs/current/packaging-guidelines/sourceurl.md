@@ -26,7 +26,7 @@ Source:         %{url}/archive/refs/tags/%{version}.tar.gz
 
 ## SourceForge.net
 
-对于托管在 sourceForge 上的软件包，请使用:
+对于托管在 SourceForge 上的软件包，请使用:
 
 ```specfile
 Source:         https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
@@ -36,7 +36,7 @@ Source:         https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar
 
 ## Google Open Source
 
-对于托管在 Google Open Source（即域名为 `*.googlesource.com`）上的软件包，因为其提供的源码压缩包为动态生成，不具有固定的 SHA256 值，所以应当参考本文的最后一部分，从 git 标签中获取源码。
+对于托管在 Google Open Source（即域名为 `*.googlesource.com`）上的软件包，因为其提供的源码压缩包为动态生成，不具有固定的 SHA256 值，所以应当参考本文的最后一部分，从 Git 标签中获取源码。
 
 ## 奇奇怪怪的 URL
 
@@ -59,7 +59,7 @@ Source:         https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar
 
 如果在 `Source:` 字段前添加 `#!CreateArchive`，则可以在构建时自动创建一个 tarball 压缩包。该字段在当上游项目从未指定过任何版本号时非常实用。
 
-例如，打包者打包 `rpmpgp_legacy` 的时候发现上游没有发布任何源码压缩包，故只能从 git 标签中获取源码:
+例如，打包者打包 `rpmpgp_legacy` 的时候发现上游没有发布任何源码压缩包，故只能从 Git 标签中获取源码:
 
 ```specfile
 #!RemoteAsset:  git+https://github.com/rpm-software-management/rpmpgp_legacy#1.1

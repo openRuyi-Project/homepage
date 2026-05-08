@@ -15,7 +15,7 @@ In general, TakoPack is used to:
 - Prepare crate dependencies for a Rust project
 - Help bootstrap Rust packaging before manual review and adjustment
 
-In most cases, the generated result is only a starting point. For crates with strict version constraints, patched `Cargo.toml`, git dependencies, workspace layouts, or complex feature relationships, manual fixes are still required.
+In most cases, the generated result is only a starting point. For crates with strict version constraints, patched `Cargo.toml`, Git dependencies, workspace layouts, or complex feature relationships, manual fixes are still required.
 
 ## Packaging a Single Crate
 
@@ -133,14 +133,14 @@ This helps reduce repeated work, but it is not a full dependency management syst
 
 ### Git dependencies
 
-Not all Rust dependencies come from crates.io. Some packages depend on git repositories.
+Not all Rust dependencies come from crates.io. Some packages depend on Git repositories.
 
-If the git repository structure matches a single crate, you can often:
+If the Git repository structure matches a single crate, you can often:
 
 1. Clone the repository manually
 2. Use `localpkg` on its `Cargo.toml`
 3. Adjust the source hash
-4. Replace the source URL in the generated spec with the appropriate git archive URL
+4. Replace the source URL in the generated spec with the appropriate Git archive URL
 
 If the repository uses a workspace layout, packaging becomes much more complicated. In that case you may need to patch `Cargo.toml`, package the whole repository as a source, and rewrite workspace dependency versions manually.
 
@@ -185,7 +185,7 @@ In practice, the commands are usually used like this:
 - Use **`localpkg`** for a crate with a patched or manually edited `Cargo.toml`
 - Use **`track`** when you need to prepare a full dependency set from `Cargo.lock`
 
-For simple crates, TakoPack is often enough to generate a good initial spec. For applications, workspaces, git dependencies, strict version constraints, and complex feature sets, expect to perform manual review and adjustment.
+For simple crates, TakoPack is often enough to generate a good initial spec. For applications, workspaces, Git dependencies, strict version constraints, and complex feature sets, expect to perform manual review and adjustment.
 
 ## Origin
 
