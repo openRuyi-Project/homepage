@@ -38,6 +38,10 @@ Replace `.tar.gz` with the archive format that upstream actually provides.
 
 Note that the correct hostname is **`downloads.sourceforge.net`**, not `download.sourceforge.net`, and not an arbitrary mirror.
 
+## Google Open Source
+
+For software hosted on Google Open Source (i.e., the domain name `*.googlesource.com`), since the tarball provided is dynamically generated and does not have a fixed SHA256 value, you should refer to the last section of this article to obtain the source from the Git tag.
+
 ## Non-standard Download URLs
 
 Sometimes upstream provides download URLs that do not end with the tarball filename. In such cases, RPM cannot automatically determine the source archive name from the URL.

@@ -34,6 +34,10 @@ Source:         https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar
 
 将 `.tar.gz` 更改为与上游发行版匹配的任何格式。请注意，正确的 URL 是 `downloads.sourceforge.net`，而不是 `download.sourceforge.net`，也不是任意选择的镜像。
 
+## Google Open Source
+
+对于托管在 Google Open Source（即域名为 `*.googlesource.com`）上的软件包，因为其提供的源码压缩包为动态生成，不具有固定的 SHA256 值，所以应当参考本文的最后一部分，从 git 标签中获取源码。
+
 ## 奇奇怪怪的 URL
 
 当上游的下载 URL 不以 tarball 名称结尾时，rpm 将无法从源码 URL 中解析出 tarball。一种适用于多种情况的变通方法是构建一个 URL，将 tarball 列在 "URL 片段" 中:
