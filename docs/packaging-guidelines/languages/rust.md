@@ -137,10 +137,10 @@ Not all Rust dependencies come from crates.io. Some packages depend on Git repos
 
 If the Git repository structure matches a single crate, you can often:
 
-1. Clone the repository manually
-2. Use `localpkg` on its `Cargo.toml`
-3. Adjust the source hash
-4. Replace the source URL in the generated spec with the appropriate Git archive URL
+1. Clone the repository manually.
+2. Use `localpkg` on its `Cargo.toml`.
+3. Adjust the source hash.
+4. Replace the source URL in the generated spec with the appropriate Git archive URL.
 
 If the repository uses a workspace layout, packaging becomes much more complicated. In that case you may need to patch `Cargo.toml`, package the whole repository as a source, and rewrite workspace dependency versions manually.
 
@@ -150,10 +150,10 @@ TakoPack works best for packaging individual crates.
 
 For full Rust applications, dependency handling is much harder:
 
-- `Cargo.lock` may produce a very large dependency list
-- Some listed dependencies are not actually needed for the final build
-- Feature relationships are not always easy to infer automatically
-- Strict version constraints often only become visible during the real application build
+- `Cargo.lock` may produce a very large dependency list.
+- Some listed dependencies are not actually needed for the final build.
+- Feature relationships are not always easy to infer automatically.
+- Strict version constraints often only become visible during the real application build.
 
 A common workflow is to use `localpkg` to generate an initial spec, then manually refine the dependency list and packaging structure.
 
@@ -163,9 +163,9 @@ Some crates do not follow Rust version compatibility rules very well, or they pi
 
 In those cases, packaging may require:
 
-- Patching `Cargo.toml`
-- Relaxing dependency version ranges
-- Regenerating the spec from the patched local source
+- Patching `Cargo.toml`.
+- Relaxing dependency version ranges.
+- Regenerating the spec from the patched local source.
 
 This is one of the most common reasons to use `localpkg`.
 
@@ -181,9 +181,9 @@ When this happens, additional crates may need to be packaged separately afterwar
 
 In practice, the commands are usually used like this:
 
-- Use **`pkg`** for a normal single crate from crates.io
-- Use **`localpkg`** for a crate with a patched or manually edited `Cargo.toml`
-- Use **`track`** when you need to prepare a full dependency set from `Cargo.lock`
+- Use **`pkg`** for a normal single crate from crates.io.
+- Use **`localpkg`** for a crate with a patched or manually edited `Cargo.toml`.
+- Use **`track`** when you need to prepare a full dependency set from `Cargo.lock`.
 
 For simple crates, TakoPack is often enough to generate a good initial spec. For applications, workspaces, Git dependencies, strict version constraints, and complex feature sets, expect to perform manual review and adjustment.
 

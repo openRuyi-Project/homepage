@@ -44,9 +44,9 @@ Version:        0.1.6
 
 In most cases:
 
-- `crate_name` is the original crate name from `Cargo.toml`
-- `full_version` is the exact upstream crate version
-- `pkgname` is the compatibility name used for dependency resolution
+- `crate_name` is the original crate name from `Cargo.toml`.
+- `full_version` is the exact upstream crate version.
+- `pkgname` is the compatibility name used for dependency resolution.
 
 For crates with stricter compatibility rules, `pkgname` may need to include a more specific version segment. For example:
 
@@ -112,7 +112,7 @@ For `rustcrates`, library packages often need require less customization customi
 
 ## Build system macro files
 
-The macro files for the two Go build systems are:
+The macro files for the two Rust build systems are:
 
 * `/usr/lib/rpm/macros.d/macros.buildsystem.rust`
 
