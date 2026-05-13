@@ -63,7 +63,7 @@ cp {SOURCE1} .
 Here, you unpack the source archive, apply patches first, and then copy `Source1` into the current directory. After switching to the `autotools` build system, you can rewrite the preparation section as follows:
 
 ```specfile
-BuildOptin(prep): -p0
+BuildOption(prep): -p0
 
 # ...
 
@@ -78,7 +78,7 @@ In this example, however, we omit `-n %{name}-%{version}`. We omit this flag bec
 ```specfile
 # Suppose that after you extract the upstream archive, the second component is not the version number
 # but %%{short_commit_id}
-BuildOptin(prep): -p0 -n %{name}-%{short_commit_id}
+BuildOption(prep): -p0 -n %{name}-%{short_commit_id}
 
 # ...
 
