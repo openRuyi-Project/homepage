@@ -198,6 +198,7 @@ VCS:            git:https://git.example.org/project.git
 3. For any network-fetched `Source`, a `#!RemoteAsset` comment MUST immediately precede the `Source` declaration. If multiple external sources exist, each MUST be individually annotated.
 
 4. For any `Source` fetched using the HTTP or HTTPS protocol, the SHA-256 checksum of the source archive MUST be documented on the line following the `#!RemoteAsset` comment.
+   For conveience, it can be generated automatically with [remoteassetify](/docs/guide/remoteassetify-usage-guide).
 
 5. If the tarball filename is obscured or cannot be algorithmically inferred from the URL, `Source` SHOULD explicitly dictate the desired tarball name via a URL fragment (e.g., `#/name.tar.gz`) to guarantee predictable local file naming.
 
