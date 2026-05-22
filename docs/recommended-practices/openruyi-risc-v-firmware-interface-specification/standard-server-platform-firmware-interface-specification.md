@@ -33,7 +33,7 @@ The terms used in this specification are defined as follows:
 4. UEFI：Unified Extensible Firmware Interface Specification.
 5. ACPI：Advanced Configuration and Power Interface Specification.
 6. SMBIOS：System Management BIOS (SMBIOS) Reference Specification.
-7. BRS：RISC-V Boot and Runtime Services Specification
+7. BRS：RISC-V Boot and Runtime Services Specificatio is designed to provide unified, open support for boot and runtime services on the RISC-V platform.
 8. SoC：System on Chip. A single chip encapsulates the processor and some on-chip peripherals.
 
 ## 3. Processor
