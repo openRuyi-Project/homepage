@@ -54,3 +54,17 @@ Patch0:         0001-adjusts-tests-for-setuptools-78.patch
 # covscan issues
 0020-unzip-6.0-COVSCAN-fix-unterminated-string.patch
 ```
+
+## 应用补丁
+
+在 openRuyi 的构建系统中。通常不需要手动应用补丁，构建系统会在 `prep` 阶段**自动应用**补丁。
+
+默认情况下，补丁路径剥离层级为 `-p1`，通常适用于 `git format-patch` 生成的补丁。这类补丁通常包含 `a/` 和 `b/` 路径前缀。
+
+只有当默认准备阶段不能满足需要时，才应使用 `BuildOption(prep)` 传入额外参数。例如，补丁路径已经以源码根目录下的相对路径开头时，应显式使用 `-p0`：
+
+```specfile
+BuildOption(prep):  -p0
+```
+
+只有在补丁必须以特殊方式处理，且无法用声明式字段表达时，才应手写 `%prep` 并手动应用补丁。并且必须在 spec 中注释原因。
