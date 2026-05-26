@@ -1,0 +1,1078 @@
+---
+title: openRuyi 2026.05 发布
+authors: [misaka00251]
+tags: [release]
+image: /img/openRuyi-social-card.png
+date: 2026-05-29
+---
+
+我们很高兴宣布 openRuyi 2026 年 5 月版本正式发布。
+
+openRuyi 本月持续扩展面向 RISC-V 平台的桌面体验、核心系统栈与软件包生态。
+
+{/* truncate */}
+
+## 亮点
+
+* **KDE 桌面环境**：本次发布为 openRuyi 引入了基于 KDE 的桌面体验。相关软件包现已包含必要的 Plasma 组件和基础 KDE 应用，为用户提供了更加完整的图形桌面环境，可满足日常使用与开发需求。
+
+* **现代化网页浏览器**：openRuyi 新增了 Firefox，为桌面镜像提供了现代化网页浏览器选择，进一步提升了 openRuyi 作为日常工作站系统的可用性。
+
+* **内核与平台更新**：主线内核从 `7.0.2` 更新到 `7.0.10`，LTS 内核从 `6.18.25` 更新到 `6.18.33`。同时，`linux-tools` 和内核头文件也进行了同步更新；内核配置将 `NR_CPUS` 提高到 `256`，以更好支持高核心数 RISC-V 服务器平台，并对内存管理相关配置进行了调优，改善进程管理和内存管理性能。
+
+* **工具链更新**：GCC 从 `15` 更新到 `16`，binutils 从 `2.45` 更新到 `2.46`。本次发布还新增了 LLVM `22`，为软件包维护者和开发者提供了更完善的编译器选择。
+
+* **存储、虚拟化与服务器栈改进**：Ceph 更新到 `20.2.1`，并应用了用于解决完整测试套问题的补丁。本次发布还新增了 `libvirt`、`corosync`、`pacemaker` 及相关软件包，增强了 openRuyi 在虚拟化、集群和服务器场景中的能力。
+
+## 安全更新
+
+本月 openRuyi 交付了多项安全更新。
+
+* `curl` 更新到 8.20.0，包含多个新披露漏洞的修复。
+
+* `expat` 更新到 2.8.1，修复 [CVE-2026-45186]，解决特制 XML 输入可能导致拒绝服务的问题。
+
+* `python-django` 更新到 5.2.13，修复多个 Django 安全问题，包括 [CVE-2026-3902]、[CVE-2026-4277]、[CVE-2026-4292]、[CVE-2026-33033] 和 [CVE-2026-33034]。
+
+* `libarchive` 更新到 3.8.7，带来了多个归档格式解析路径中的安全修复和缺陷修复。
+
+* `freerdp` 更新到 3.26.0，包含多个高严重性 CVE 的修复。
+
+* `nginx` 更新到 1.31.1，包含 [CVE-2026-9256]、[CVE-2026-42926]、[CVE-2026-42945]、[CVE-2026-42946]、[CVE-2026-40460] 和 [CVE-2026-40701] 的修复。
+
+* `rsync` 更新到 3.4.3，包含 [CVE-2026-43617]、[CVE-2026-43618]、[CVE-2026-43619]、[CVE-2026-43620]、[CVE-2026-45232] 和 [CVE-2026-29518] 的修复。
+
+* `unbound` 更新到 1.25.1，包含 [CVE-2026-33278]、[CVE-2026-42944]、[CVE-2026-42959]、[CVE-2026-32792]、[CVE-2026-40622]、[CVE-2026-41292]、[CVE-2026-42534]、[CVE-2026-42923]、[CVE-2026-42960]、[CVE-2026-44390] 和 [CVE-2026-44608] 的修复。
+
+* `postgresql` 更新到 18.4，包含 [CVE-2026-6476]、[CVE-2026-6638]、[CVE-2026-6637]、[CVE-2026-6473]、[CVE-2026-6474]、[CVE-2026-6479]、[CVE-2026-6475]、[CVE-2026-6478]、[CVE-2026-6477]、[CVE-2026-6575] 和 [CVE-2026-6472] 的修复。
+
+* Linux 内核更新包含多个值得关注的 CVE 修复，包括 [CVE-2026-31431]、[CVE-2026-43284]、[CVE-2026-43494]、[CVE-2026-43500]、[CVE-2026-43503] 和 [CVE-2026-46333]。
+
+* 此外，openRuyi 还更新了 `gnutls`、`nss`、`libtasn1`、`openldap`、`nghttp2`、`ruby` 和 `vim` 等组件，纳入了相关安全修复与改进。
+
+openRuyi 继续提供面向不同场景的四个版本：**Server**、**Container**、**Desktop** 和 **Zero（BSP validation）**。你可以前往 [openRuyi release site](https://releases.openruyi.cn/creek/2026.05/rva23/) 下载到本次发布。
+
+***
+
+欢迎社区对本次发布进行测试，并向我们反馈意见。
+
+***
+
+## Changelog
+
+如需查看完整的软件包级别变更详情，可以参考下方按更新和新增软件包分类整理的完整更新日志。
+
+
+<details>
+<summary>已更新软件包列表</summary>
+
+- aide: 0.19.2 -> 0.19.3
+- binutils: 2.45 -> 2.46.0
+- blake3: 1.8.4 -> 1.8.5
+- bluez: 5.84 -> 5.86
+- bubblewrap: 0.11.0 -> 0.11.2
+- buildah: 1.43.0 -> 1.43.1
+- byacc: 2.0.20241231 -> 2.0.20260126
+- ccache: 4.13.1 -> 4.13.6
+- ceph: 20.2.0 -> 20.2.1
+- chafa: 1.18.0 -> 1.18.2
+- cifs-utils: 7.4 -> 7.5
+- cloud-hypervisor: 50.0.0 -> 51.0.0
+- clzip: 1.15 -> 1.16
+- cmake: 4.3.1 -> 4.3.2
+- concurrentqueue: 1.0.4 -> 1.0.5
+- cpp-httplib: 0.30.1 -> 0.45.0
+- crun: 1.26 -> 1.27.1
+- cryptsetup: 2.8.2 -> 2.8.6
+- curl: 8.15.0 -> 8.20.0
+- ddcutil: 2.2.6 -> 2.2.7
+- dhcpcd: 10.2.4 -> 10.3.2
+- diffstat: 1.68 -> 1.69
+- dnf5: 5.3.0.0 -> 5.4.2.0
+- dnsmasq: 2.91 -> 2.92
+- doctest: 2.4.12 -> 2.5.2
+- dos2unix: 7.5.3 -> 7.5.5
+- double-conversion: 3.3.1 -> 3.4.0
+- dracut: 108 -> 110
+- dwarfs: 0.14.1 -> 0.15.3
+- e2fsprogs: 1.47.3 -> 1.47.4
+- ed: 1.21.1 -> 1.22.5
+- ell: 0.80 -> 0.83
+- enchant: 2.8.12 -> 2.8.16
+- erofs-utils: 1.8.10 -> 1.9.1
+- exfatprogs: 1.2.9 -> 1.3.2
+- exiv2: 0.28.7 -> 0.28.8
+- expat: 2.7.1 -> 2.8.1
+- fast_float: 8.1.0 -> 8.2.5
+- fastfetch: 2.61.0 -> 2.63.1
+- ffmpeg: 8.0.1 -> 8.1.1
+- fftw: 3.3.10 -> 3.3.11
+- file: 5.46 -> 5.47
+- fio: 3.41 -> 3.42
+- fltk: 1.4.4 -> 1.4.5
+- fmt: 12.0.0 -> 12.1.0
+- font-util: 1.4.1 -> 1.4.2
+- freerdp: 3.22.0 -> 3.26.0
+- freetype: 2.13.3 -> 2.14.3
+- gawk: 5.3.2 -> 5.4.0
+- gc: 8.2.8 -> 8.2.12
+- gcc: 15 -> 16
+- gdk-pixbuf: 2.44.4 -> 2.44.6
+- gflags: 2.2.2 -> 2.3.0
+- git: 2.51.0 -> 2.54.0
+- gnutls: 3.8.10 -> 3.8.13
+- graphviz: 14.0.4 -> 14.1.5
+- grpc: 1.76.0 -> 1.80.0
+- gsettings-desktop-schemas: 49.1 -> 50.1
+- gsm: 1.0.23 -> 1.0.24
+- gtk-layer-shell: 0.10.0 -> 0.10.1
+- haveged: 1.9.19 -> 1.9.20
+- highway: 1.3.0 -> 1.4.0
+- htop: 3.4.1 -> 3.5.1
+- hunspell: 1.7.2 -> 1.7.3
+- hwdata: 0.398 -> 0.407
+- inih: 61 -> 62
+- iwd: 3.10 -> 3.12
+- jansson: 2.14.1 -> 2.15.0
+- jasper: 4.2.8 -> 4.2.9
+- jsoncpp: 1.9.6 -> 1.9.7
+- kbd: 2.8.0 -> 2.9.0
+- labwc: 0.9.6 -> 0.9.7
+- ldns: 1.8.4 -> 1.9.0
+- less: 679 -> 692
+- libaec: 1.1.4 -> 1.1.6
+- libarchive: 3.8.1 -> 3.8.7
+- libcbor: 0.11.0 -> 0.14.0
+- libdrm: 2.4.125 -> 2.4.131
+- libproxy: 0.5.11 -> 0.5.12
+- libraw: 0.22.0 -> 0.22.1
+- libsolv: 0.7.35 -> 0.7.37
+- libtasn1: 4.20.0 -> 4.21.0
+- libuv: 1.51.0 -> 1.52.1
+- libX11: 1.8.12 -> 1.8.13
+- libXcomposite: 0.4.6 -> 0.4.7
+- libXdamage: 1.1.6 -> 1.1.7
+- libXext: 1.3.6 -> 1.3.7
+- libXinerama: 1.1.5 -> 1.1.6
+- linux: 7.0.2 -> 7.0.10
+- linux-firmware: 20260410 -> 20260519
+- linux-headers: 6.18.18 -> 6.18.32
+- linux-lts: 6.18.25 -> 6.18.33
+- linux-lts-kmhv2: 6.18.25 -> 6.18.33
+- linux-tools: 7.0.2 -> 7.0.10
+- llhttp: 9.3.0 -> 9.4.1
+- lzip: 1.25 -> 1.26
+- magic_enum: 0.9.7 -> 0.9.8
+- md4c: 0.5.2 -> 0.5.3
+- mdadm: 4.4 -> 4.6
+- mold: 2.40.4 -> 2.41.0
+- mpc: 1.3.1 -> 1.4.1
+- nano: 8.7.1 -> 9.0
+- nghttp2: 1.66.0 -> 1.69.0
+- nginx: 1.28.0 -> 1.31.0
+- nss: 3.115 -> 3.123.1
+- openldap: 2.6.12 -> 2.6.13
+- openresolv: 3.17.0 -> 3.17.4
+- passt: 0+git20260328.f758d93 -> 0+git20260424.ec96f01
+- pciutils: 3.14.0 -> 3.15.0
+- perl-Clone: 0.47 -> 0.50
+- perl-Compress-Raw-Bzip2: 2.214 -> 2.218
+- perl-Compress-Raw-Lzma: 2.214 -> 2.221
+- perl-Compress-Raw-Zlib: 2.214 -> 2.218
+- perl-Crypt-URandom: 0.54 -> 0.55
+- perl-Encode: 3.21 -> 3.24
+- perl-GD: 2.83 -> 2.84
+- perl-Net-SSLeay: 1.94 -> 1.96
+- perl-Socket: 2.040 -> 2.041
+- perl-Text-CSV_XS: 1.61 -> 1.62
+- perl-Unicode-UTF8: 0.62 -> 0.64
+- pkgconf: 2.2.0 -> 2.5.1
+- podman: 5.8.1 -> 5.8.2
+- postgresql: 18.1 -> 18.4
+- pv: 1.10.3 -> 1.10.5
+- python-altair: 6.0.0 -> 6.1.0
+- python-aniso8601: 9.0.1 -> 10.0.1
+- python-anyio: 4.11.0 -> 4.13.0
+- python-archinfo: 9.2.193 -> 9.2.214
+- python-asgiref: 3.8.1 -> 3.11.1
+- python-asyncssh: 2.22.0 -> 2.23.0
+- python-attrs: 25.4.0 -> 26.1.0
+- python-azure-core: 1.38.0 -> 1.41.0
+- python-beniget: 0.4.2.post1 -> 0.5.0
+- python-boto3: 1.42.89 -> 1.43.6
+- python-botocore: 1.42.89 -> 1.43.11
+- python-cachetools: 6.2.2 -> 7.1.1
+- python-certifi: 2025.11.12 -> 2026.4.22
+- python-chardet: 5.2.0 -> 7.4.3
+- python-click: 8.1.7 -> 8.3.3
+- python-cloudpathlib: 0.23.0 -> 0.24.0
+- python-confection: 0.1.5 -> 1.3.3
+- python-csvw: 3.7.0 -> 4.0.0
+- python-curl_cffi -> python-curl-cffi: 0.14.0 -> 0.14.0
+- python-cycler: 0.11.0 -> 0.12.1
+- python-Cython -> python-cython: 3.2.4 -> 3.2.4
+- python-datasets: 4.8.3 -> 4.8.5
+- python-distlib: 0.3.7 -> 0.4.0
+- python-django: 5.2.4 -> 5.2.13
+- python-docutils: 0.21.2 -> 0.22.4
+- python-editables: 0.5 -> 0.6
+- python-environs: 14.5.0 -> 15.0.1
+- python-fastapi: 0.135.3 -> 0.136.1
+- python-cchardet -> python-faust-cchardet: 2.1.19 -> 2.1.19
+- python-filelock: 3.20.0 -> 3.29.0
+- python-flask: 3.1.2 -> 3.1.3
+- python-flit_scm -> python-flit-scm: 1.7.0 -> 1.7.0
+- python-fsspec: 2026.2.0 -> 2026.4.0
+- python-gast: 0.6.0 -> 0.7.0
+- python-gitdb: 4.0.11 -> 4.0.12
+- python-GitPython -> python-gitpython: 3.1.46 -> 3.1.50
+- python-gunicorn: 25.3.0 -> 26.0.0
+- python-hatch_fancy_pypi_readme -> python-hatch-fancy-pypi-readme: 25.1.0 -> 25.1.0
+- python-hypothesis: 6.148.6 -> 6.152.4
+- python-idna: 3.10 -> 3.13
+- python-iniconfig: 2.1.0 -> 2.3.0
+- python-invoke: 2.2.1 -> 3.0.3
+- python-ipython: 9.10.0 -> 9.13.0
+- python-jedi: 0.19.2 -> 0.20.0
+- python-joblib: 1.5.2 -> 1.5.3
+- python-jsonpath-ng: 1.7.0 -> 1.8.0
+- python-jsonpointer: 2.4 -> 3.1.1
+- python-language-tags: 1.2.0 -> 1.3.1
+- python-libarchive_c -> python-libarchive-c: 5.3 -> 5.3
+- python-linkify-it-py: 2.0.3 -> 2.1.0
+- python-mako: 1.3.10 -> 1.3.12
+- python-markdown: 3.8.2 -> 3.10.2
+- python-markdown-it-py: 4.0.0 -> 4.2.0
+- python-marshmallow: 4.2.1 -> 4.3.0
+- python-matplotlib-inline: 0.2.1 -> 0.2.2
+- python-meson-python: 0.18.0 -> 0.19.0
+- python-mitogen: 0.3.37 -> 0.3.47
+- python-nanobind: 2.10.2 -> 2.12.0
+- python-nibabel: 5.3.3 -> 5.4.2
+- python-nipype: 1.10.0 -> 1.11.0
+- python-oauthlib: 3.2.2 -> 3.3.1
+- python-opentelemetry-api: 1.41.0 -> 1.41.1
+- python-opentelemetry-semantic-conventions: 0.62b0 -> 0.62b1
+- python-paramiko: 4.0.0 -> 5.0.0
+- python-parso: 0.8.5 -> 0.8.7
+- python-pathspec: 0.12.1 -> 1.1.1
+- python-pdm_backend -> python-pdm-backend: 2.4.3 -> 2.4.8
+- python-pkgconfig: 1.5.5 -> 1.6.0
+- python-platformdirs: 4.4.0 -> 4.9.6
+- python-poetry_core -> python-poetry-core: 2.1.2 -> 2.4.0
+- python-psycopg: 3.3.3 -> 3.3.4
+- python-puccinialin: 0.1.8 -> 0.1.11
+- python-pyasn1: 0.6.1 -> 0.6.3
+- python-pycdlib: 1.14.0 -> 1.16.0
+- python-pycparser: 2.21 -> 3.0
+- python-pydantic-settings: 2.13.1 -> 2.14.1
+- python-pyenchant: 3.2.2 -> 3.3.0
+- python-pygments: 2.15.1 -> 2.20.0
+- python-PyGObject -> python-pygobject: 3.56.0 -> 3.56.0
+- python-pyjwt: 2.10.1 -> 2.12.1
+- python-PyMySQL -> python-pymysql: 1.1.2 -> 1.1.3
+- python-PyNaCl -> python-pynacl: 1.5.0 -> 1.6.2
+- python-pyopenssl: 25.3.0 -> 26.2.0
+- python-pyparsing: 3.2.1 -> 3.3.2
+- python-pyproject_hooks -> python-pyproject-hooks: 1.2.0 -> 1.2.0
+- python-PyQt-builder -> python-pyqt-builder: 1.19.1 -> 1.19.1
+- python-PyQt6 -> python-pyqt6: 6.10.1 -> 6.10.1
+- pytest -> python-pytest: 9.0.1 -> 9.0.3
+- python-pytest-cov: 7.0.0 -> 7.1.0
+- python-pytest-order: 1.3.0 -> 1.4.0
+- python-pytest-randomly: 4.0.1 -> 4.1.0
+- python-debian -> python-python-debian: 1.0.1 -> 1.1.0
+- python-python-dotenv: 1.1.1 -> 1.2.2
+- python-python-multipart: 0.0.22 -> 0.0.28
+- python-socks -> python-python-socks: 2.8.0 -> 2.8.1
+- python-utils -> python-python-utils: 3.9.1 -> 3.9.1
+- python-pyudev: 0.24.3 -> 0.24.4
+- python-pyvex: 9.2.193 -> 9.2.214
+- python-PyYAML -> python-pyyaml: 6.0.2 -> 6.0.2
+- python-qemu-qmp: 0.0.5 -> 0.0.6
+- python-requests: 2.32.5 -> 2.33.1
+- python-resolvelib: 1.1.0 -> 1.2.1
+- python-responses: 0.25.8 -> 0.26.0
+- python-rich: 14.2.0 -> 15.0.0
+- python-s3transfer: 0.16.0 -> 0.17.0
+- python-scikit-build-core: 0.11.6 -> 0.12.2
+- python-setuptools-rust: 1.11.1 -> 1.12.1
+- python-setuptools_scm -> python-setuptools-scm: 8.3.1 -> 10.0.5
+- python-smart-open: 7.5.0 -> 7.6.1
+- python-smmap: 5.0.2 -> 5.0.3
+- python-spacy: 3.8.11 -> 3.8.14
+- python-sqlparse: 0.5.3 -> 0.5.5
+- python-srsly: 2.5.2 -> 2.5.3
+- python-tensorizer: 2.12.0 -> 2.12.1
+- python-thinc: 8.3.10 -> 8.3.13
+- python-threadpoolctl: 3.5.0 -> 3.6.0
+- python-tomlkit: 0.13.2 -> 0.15.0
+- python-tqdm: 4.67.1 -> 4.67.3
+- python-traitlets: 5.14.3 -> 5.15.0
+- python-trio: 0.31.0 -> 0.33.0
+- python-typer-slim -> python-typer: 0.21.1 -> 0.25.1
+- python-uc-micro-py: 1.0.3 -> 2.0.0
+- python-urllib3: 2.5.0 -> 2.7.0
+- python-uvicorn: 0.44.0 -> 0.46.0
+- python-w3lib: 2.3.1 -> 2.4.1
+- python-wcwidth: 0.2.13 -> 0.7.0
+- python-weasel: 0.4.3 -> 1.0.0
+- python-werkzeug: 3.1.3 -> 3.1.8
+- python-zipp: 3.23.0 -> 3.23.1
+- python-zope-event: 6.1 -> 6.2
+- rsync: 3.4.1 -> 3.4.3
+- ruby: 4.0.3 -> 4.0.4
+- rust-rpm-macros: 0.3 -> 0.4.1
+- samurai: 1.2 -> 1.3
+- simdutf: 7.4.0 -> 9.0.0
+- spirv-headers: 1.4.335.0 -> 1.4.350.0
+- spirv-tools: 1.4.335.0 -> 1.4.350.0
+- systemtap: 5.3 -> 5.5
+- time: 1.9 -> 1.10
+- tree: 2.2.1 -> 2.3.2
+- unbound: 1.24.2 -> 1.25.1
+- valgrind: 3.26.0 -> 3.27.0
+- vim: 9.2.0390 -> 9.2.0481
+- wlroots: 0.19.2 -> 0.19.3
+- xapian: 1.4.29 -> 1.4.31
+- Xwayland: 24.1.10 -> 24.1.11
+
+</details>
+
+<details>
+<summary>新增软件包列表</summary>
+- aom: 3.13.3
+- baloo-widgets: 25.12.3
+- breeze: 6.5.5
+- cargo-c: 0.10.16
+- corosync: 3.1.10
+- csmith: 2.3.0
+- dolphin: 25.12.3
+- dolphin-plugins: 25.12.3
+- falkon: 25.12.3
+- firefox: 151.0.1
+- gcc16: 16.1.0
+- gperftools: 2.18.1
+- grim: 1.5.0
+- kaccounts-integration: 25.12.3
+- kaccounts-providers: 25.12.3
+- kactivitymanagerd: 6.5.5
+- kate: 25.12.3
+- kde-cli-tools: 6.5.5
+- kde-gtk-config: 6.5.5
+- kdecoration: 6.5.5
+- kdialog: 25.12.3
+- kf6-attica: 6.22.0
+- kf6-baloo: 6.22.0
+- kf6-frameworkintegration: 6.22.0
+- kf6-kdeclarative: 6.22.0
+- kf6-kdesu: 6.22.0
+- kf6-kdnssd: 6.22.0
+- kf6-kfilemetadata: 6.22.0
+- kf6-kholidays: 6.22.0
+- kf6-kidletime: 6.22.0
+- kf6-kimageformats: 6.22.0
+- kf6-kitemmodels: 6.22.0
+- kf6-knewstuff: 6.22.0
+- kf6-knotifyconfig: 6.22.0
+- kf6-kpty: 6.22.0
+- kf6-kquickcharts: 6.22.0
+- kf6-krunner: 6.22.0
+- kf6-kstatusnotifieritem: 6.22.0
+- kf6-ktexteditor: 6.22.0
+- kf6-kunitconversion: 6.22.0
+- kf6-kuserfeedback: 6.22.0
+- kf6-modemmanager-qt: 6.22.0
+- kf6-networkmanager-qt: 6.22.0
+- kf6-prison: 6.22.0
+- kf6-purpose: 6.22.0
+- kf6-qqc2-desktop-style: 6.22.0
+- kf6-syndication: 6.22.0
+- kf6-syntax-highlighting: 6.22.0
+- kf6-threadweaver: 6.22.0
+- kglobalacceld: 6.5.5
+- kinfocenter: 6.5.5
+- kio-extras: 25.12.3
+- kirigami-addons: 1.10.0
+- kmenuedit: 6.5.5
+- knighttime: 6.5.5
+- konqueror: 25.12.3
+- konsole: 25.12.3
+- kpipewire: 6.5.5
+- kronosnet: 1.33
+- kscreen: 6.5.5
+- kscreenlocker: 6.5.5
+- ksystemstats: 6.5.5
+- kwin: 6.5.5
+- libiconv: 1.19
+- libkscreen: 6.5.5
+- libksysguard: 6.5.5
+- libqb: 2.0.9
+- librabbitmq: 0.15.0
+- librdkafka: 2.14.1
+- libslirp: 4.9.1
+- libvirt: 12.2.0
+- libvirt-glib: 5.0.0
+- llvm22: 22.1.5
+- luarocks: 3.13.0
+- milou: 6.5.5
+- openntpd: 6.8p1
+- openruyi-desktop-setup-kde: 202603
+- pacemaker: 3.0.1
+- perl-rpm-macros: 0.1
+- plasma-activities-stats: 6.5.5
+- plasma-desktop: 6.5.5
+- plasma-integration: 6.5.5
+- plasma-nm: 6.5.5
+- plasma-systemmonitor: 6.5.5
+- plasma-workspace: 6.5.5
+- plasma5support: 6.5.5
+- polkit-kde-agent-1: 6.5.5
+- powerdevil: 6.5.5
+- python-absl-py: 2.4.0
+- python-aiobotocore: 3.7.0
+- python-aioitertools: 0.13.0
+- python-alabaster: 1.0.0
+- python-antlr4-python3-runtime: 4.9.3
+- python-async-timeout: 5.0.1
+- python-audioop-lts: 0.2.2
+- python-audioread: 3.1.0
+- python-authlib: 1.6.10
+- python-av: 17.0.1
+- python-brotli: 1.2.0
+- python-cfgv: 3.5.0
+- python-chameleon: 4.6.0
+- python-claripy: 9.2.214
+- python-codecarbon: 3.2.6
+- python-cohere: 6.1.0
+- python-compressed-tensors: 0.15.0.1
+- python-concurrent-log-handler: 0.9.29
+- python-deepdiff: 9.0.0
+- python-depyf: 0.20.0
+- python-diffusers: 0.37.1
+- python-discord: 2.7.1
+- python-docopt: 0.6.2
+- python-docstring-parser: 0.18.0
+- python-einops: 0.8.2
+- python-evaluate: 0.4.6
+- python-fakeredis: 2.35.1
+- python-ffmpy: 1.0.0
+- python-fonttools: 4.62.1
+- python-gcloud-aio-auth: 5.4.4
+- python-gcloud-aio-storage: 9.6.4
+- python-geventhttpclient: 2.3.9
+- python-gguf: 0.19.0
+- python-google-auth: 2.49.2
+- python-gradio: 6.14.0
+- python-gradio-client: 2.5.0
+- python-graphene: 3.4.3
+- python-graphql-core: 3.2.8
+- python-graphql-relay: 3.2.0
+- python-groovy: 0.1.2
+- python-grpcio-reflection: 1.80.0
+- python-hf-gradio: 0.4.1
+- python-httpx-sse: 0.4.3
+- python-identify: 2.6.19
+- python-imagesize: 2.0.0
+- python-joserfc: 1.6.4
+- python-json5: 0.14.0
+- python-jsonpath-python: 1.1.5
+- python-lark: 1.3.1
+- python-lazy-loader: 0.5
+- python-libvirt: 12.2.0
+- python-lingua: 4.16.2
+- python-lupa: 2.8
+- python-mcp: 1.26.0
+- python-mmh3: 5.2.1
+- python-mock: 4.0.3
+- python-model-hosting-container-standards: 0.1.14
+- python-multipart: 0.0.22
+- python-nest-asyncio: 1.6.0
+- python-nltk: 3.9.4
+- python-nodeenv: 1.10.0
+- python-num2words: 0.5.14
+- python-nvidia-ml-py: 13.595.45
+- python-omegaconf: 2.3.0
+- python-optuna: 4.8.0
+- python-orderly-set: 5.5.0
+- python-partial-json-parser: 0.2.1.1~post7
+- python-plac: 1.4.5
+- python-polib: 1.2.0
+- python-pooch: 1.9.0
+- python-pre-commit: 4.6.0
+- python-pycountry: 26.2.16
+- python-pyiceberg: 0.11.1
+- python-pypinyin: 0.55.0
+- python-pyroaring: 1.0.4
+- python-python-rapidjson: 1.23
+- python-pytokens: 0.4.1
+- python-pyxnat: 1.6.4
+- python-pyyaml-ft: 8.0.0
+- python-questionary: 2.1.1
+- python-rapidfuzz: 3.14.5
+- python-roman-numerals: 4.1.0
+- python-rouge-score: 0.1.2
+- python-rsa: 4.9.1
+- python-s3fs: 2026.4.0
+- python-sacrebleu: 2.6.0
+- python-sacremoses: 0.1.1
+- python-safehttpx: 0.1.7
+- python-sagemaker: 3.8.0
+- python-sagemaker-core: 2.12.0
+- python-sagemaker-mlops: 1.8.0
+- python-sagemaker-schema-inference-artifacts: 0.0.4
+- python-sagemaker-serve: 1.8.0
+- python-sagemaker-train: 1.8.0
+- python-schedulefree: 1.4.1
+- python-schema: 0.7.8
+- python-sentence-transformers: 5.4.1
+- python-smdebug-rulesconfig: 1.0.1
+- python-snowballstemmer: 3.0.1
+- python-soxr: 1.0.0
+- python-sphinx: 9.1.0
+- python-sphinxcontrib-applehelp: 2.0.0
+- python-sphinxcontrib-htmlhelp: 2.1.0
+- python-sphinxcontrib-jsmath: 1.0.1
+- python-sphinxcontrib-qthelp: 2.0.0
+- python-sse-starlette: 3.4.2
+- python-standard-aifc: 3.13.0
+- python-standard-chunk: 3.13.0
+- python-standard-sunau: 3.13.0
+- python-strictyaml: 1.7.3
+- python-sudachidict-core: 20260116
+- python-sudachipy: 0.6.10
+- python-supervisor: 4.3.0
+- python-tblib: 3.2.2
+- python-thrift: 0.22.0
+- python-tiktoken: 0.12.0
+- python-timeout-decorator: 0.5.0
+- python-torchaudio: 2.10.0
+- python-tox: 4.24.1
+- python-tox-current-env: 0.0.17
+- python-tritonclient: 2.67.0
+- python-types-dataclasses: 0.6.6
+- python-unidic-lite: 1.0.8
+- python-vcs-versioning: 1.1.1
+- python-xgrammar: 0.1.33
+- qqc2-breeze-style: 6.5.5
+- resource-agents: 4.18.0
+- rust-adler2-2.0: 2.0.1
+- rust-aho-corasick-1.0: 1.1.4
+- rust-allocator-api2-0.2: 0.2.21
+- rust-android-system-properties-0.1: 0.1.5
+- rust-anes-0.1: 0.1.6
+- rust-annotate-snippets-0.11: 0.11.5
+- rust-anstream-0.6: 0.6.21
+- rust-anstyle-lossy-1.0: 1.1.5
+- rust-anstyle-parse-0.2: 0.2.7
+- rust-anstyle-svg-0.1: 0.1.12
+- rust-arc-swap-1.0: 1.9.0
+- rust-arrayref-0.3: 0.3.9
+- rust-arrayvec-0.7: 0.7.6
+- rust-atomic-waker-1.0: 1.1.2
+- rust-autocfg-1.0: 1.5.0
+- rust-base16ct-0.2: 0.2.0
+- rust-base64-0.22: 0.22.1
+- rust-base64ct-1.0: 1.8.3
+- rust-bit-set-0.5: 0.5.3
+- rust-bit-vec-0.6: 0.6.3
+- rust-bitmaps-2.0: 2.1.0
+- rust-bitvec-1.0: 1.0.1
+- rust-blake3-1.0: 1.8.4
+- rust-block-buffer-0.10: 0.10.4
+- rust-block2-0.6: 0.6.2
+- rust-bstr-1.0: 1.12.1
+- rust-bumpalo-3.0: 3.20.2
+- rust-byteorder-1.0: 1.5.0
+- rust-bytes-1.0: 1.11.1
+- rust-cargo-0.91: 0.91.0
+- rust-cargo-credential-0.4: 0.4.9
+- rust-cargo-credential-libsecret-0.5: 0.5.2
+- rust-cargo-credential-macos-keychain-0.4: 0.4.17
+- rust-cargo-credential-wincred-0.4: 0.4.17
+- rust-cargo-platform-0.3: 0.3.2
+- rust-cargo-test-macro-0.4: 0.4.9
+- rust-cargo-test-support-0.8: 0.8.1
+- rust-cargo-util-0.2: 0.2.24
+- rust-cargo-util-schemas-0.10: 0.10.2
+- rust-cast-0.3: 0.3.0
+- rust-cbindgen-0.29: 0.29.2
+- rust-cc-1.0: 1.2.58
+- rust-cfg-aliases-0.2: 0.2.1
+- rust-ciborium-0.2: 0.2.2
+- rust-ciborium-io-0.2: 0.2.2
+- rust-ciborium-ll-0.2: 0.2.2
+- rust-clap-complete-4.0: 4.6.0
+- rust-clap-derive-4.0: 4.6.0
+- rust-clru-0.6: 0.6.3
+- rust-codspeed-2.0: 2.10.1
+- rust-codspeed-criterion-compat-2.0: 2.10.1
+- rust-codspeed-criterion-compat-walltime-2.0: 2.10.1
+- rust-color-print-0.3: 0.3.7
+- rust-color-print-proc-macro-0.3: 0.3.7
+- rust-colored-2.0: 2.2.0
+- rust-const-oid-0.9: 0.9.6
+- rust-constant-time-eq-0.4: 0.4.2
+- rust-content-inspector-0.2: 0.2.4
+- rust-core-foundation-0.10: 0.10.1
+- rust-core-foundation-0.9: 0.9.4
+- rust-core-foundation-sys-0.8: 0.8.7
+- rust-cpufeatures-0.2: 0.2.17
+- rust-cpufeatures-0.3: 0.3.0
+- rust-crates-io-0.40: 0.40.14
+- rust-crc32fast-1.0: 1.5.0
+- rust-criterion-0.7: 0.7.0
+- rust-criterion-plot-0.5: 0.5.0
+- rust-criterion-plot-0.6: 0.6.0
+- rust-crossbeam-channel-0.5: 0.5.15
+- rust-crossbeam-deque-0.8: 0.8.6
+- rust-crossbeam-epoch-0.9: 0.9.18
+- rust-crossbeam-utils-0.8: 0.8.21
+- rust-crunchy-0.2: 0.2.4
+- rust-crypto-bigint-0.5: 0.5.5
+- rust-crypto-common-0.1: 0.1.6
+- rust-csv-1.0: 1.4.0
+- rust-csv-core-0.1: 0.1.13
+- rust-ct-codecs-1.0: 1.1.6
+- rust-curl-0.4: 0.4.49
+- rust-curl-sys-0.4: 0.4.87
+- rust-dashmap-6.0: 6.1.0
+- rust-der-0.7: 0.7.10
+- rust-deranged-0.5: 0.5.8
+- rust-digest-0.10: 0.10.7
+- rust-dispatch2-0.3: 0.3.1
+- rust-displaydoc-0.2: 0.2.5
+- rust-dunce-1.0: 1.0.5
+- rust-ecdsa-0.16: 0.16.9
+- rust-ed25519-compact-2.0: 2.2.0
+- rust-either-1.0: 1.15.0
+- rust-elliptic-curve-0.13: 0.13.8
+- rust-encoding-rs-0.8: 0.8.35
+- rust-erased-serde-0.4: 0.4.10
+- rust-fallible-iterator-0.3: 0.3.0
+- rust-fallible-streaming-iterator-0.1: 0.1.9
+- rust-fancy-regex-0.13: 0.13.0
+- rust-faster-hex-0.10: 0.10.0
+- rust-ff-0.13: 0.13.1
+- rust-fiat-crypto-0.3: 0.3.0
+- rust-filetime-0.2: 0.2.27
+- rust-find-msvc-tools-0.1: 0.1.9
+- rust-flate2-1.0: 1.1.9
+- rust-fnv-1.0: 1.0.7
+- rust-foldhash-0.2: 0.2.0
+- rust-foreign-types-0.3: 0.3.2
+- rust-foreign-types-shared-0.1: 0.1.1
+- rust-form-urlencoded-1.0: 1.2.2
+- rust-funty-2.0: 2.0.0
+- rust-futures-channel-0.3: 0.3.32
+- rust-futures-core-0.3: 0.3.32
+- rust-futures-io-0.3: 0.3.32
+- rust-futures-sink-0.3: 0.3.32
+- rust-futures-task-0.3: 0.3.32
+- rust-futures-util-0.3: 0.3.32
+- rust-generic-array-0.14: 0.14.9
+- rust-getrandom-0.2: 0.2.17
+- rust-getrandom-0.3: 0.3.4
+- rust-git2-0.20: 0.20.4
+- rust-git2-curl-0.21: 0.21.0
+- rust-gix-0.73: 0.73.0
+- rust-gix-actor-0.35: 0.35.6
+- rust-gix-attributes-0.27: 0.27.0
+- rust-gix-bitmap-0.2: 0.2.16
+- rust-gix-chunk-0.4: 0.4.12
+- rust-gix-command-0.6: 0.6.5
+- rust-gix-commitgraph-0.29: 0.29.0
+- rust-gix-config-0.46: 0.46.0
+- rust-gix-config-value-0.15: 0.15.3
+- rust-gix-credentials-0.30: 0.30.0
+- rust-gix-date-0.10: 0.10.7
+- rust-gix-diff-0.53: 0.53.0
+- rust-gix-dir-0.15: 0.15.0
+- rust-gix-discover-0.41: 0.41.0
+- rust-gix-features-0.43: 0.43.1
+- rust-gix-filter-0.20: 0.20.0
+- rust-gix-fs-0.16: 0.16.1
+- rust-gix-glob-0.21: 0.21.0
+- rust-gix-hash-0.19: 0.19.0
+- rust-gix-hashtable-0.9: 0.9.0
+- rust-gix-ignore-0.16: 0.16.0
+- rust-gix-index-0.41: 0.41.0
+- rust-gix-lock-18.0: 18.0.0
+- rust-gix-negotiate-0.21: 0.21.0
+- rust-gix-object-0.50: 0.50.2
+- rust-gix-odb-0.70: 0.70.0
+- rust-gix-pack-0.60: 0.60.0
+- rust-gix-packetline-0.19: 0.19.3
+- rust-gix-packetline-blocking-0.19: 0.19.3
+- rust-gix-path-0.10: 0.10.22
+- rust-gix-pathspec-0.12: 0.12.0
+- rust-gix-prompt-0.11: 0.11.2
+- rust-gix-protocol-0.51: 0.51.0
+- rust-gix-quote-0.6: 0.6.2
+- rust-gix-ref-0.53: 0.53.1
+- rust-gix-refspec-0.31: 0.31.0
+- rust-gix-revision-0.35: 0.35.0
+- rust-gix-revwalk-0.21: 0.21.0
+- rust-gix-sec-0.12: 0.12.2
+- rust-gix-shallow-0.5: 0.5.0
+- rust-gix-status-0.20: 0.20.0
+- rust-gix-submodule-0.20: 0.20.0
+- rust-gix-tempfile-18.0: 18.0.0
+- rust-gix-trace-0.1: 0.1.18
+- rust-gix-transport-0.48: 0.48.0
+- rust-gix-traverse-0.47: 0.47.0
+- rust-gix-url-0.32: 0.32.0
+- rust-gix-utils-0.3: 0.3.1
+- rust-gix-validate-0.10: 0.10.1
+- rust-gix-worktree-0.42: 0.42.0
+- rust-glob-0.3: 0.3.3
+- rust-globset-0.4: 0.4.18
+- rust-group-0.13: 0.13.0
+- rust-h2-0.4: 0.4.13
+- rust-half-2.0: 2.7.1
+- rust-hash32-0.3: 0.3.1
+- rust-hashbrown-0.17: 0.17.0
+- rust-hashlink-0.10: 0.10.0
+- rust-heapless-0.8: 0.8.0
+- rust-hermit-abi-0.5: 0.5.2
+- rust-hex-0.4: 0.4.3
+- rust-hkdf-0.12: 0.12.4
+- rust-hmac-0.12: 0.12.1
+- rust-home-0.5: 0.5.12
+- rust-html-escape-0.2: 0.2.13
+- rust-http-1.0: 1.4.0
+- rust-http-auth-0.1: 0.1.10
+- rust-http-body-1.0: 1.0.1
+- rust-http-body-util-0.1: 0.1.3
+- rust-httparse-1.0: 1.10.1
+- rust-hyper-1.0: 1.9.0
+- rust-hyper-rustls-0.27: 0.27.7
+- rust-hyper-util-0.1: 0.1.20
+- rust-icu-collections-2.0: 2.2.0
+- rust-icu-locale-core-2.0: 2.2.0
+- rust-icu-normalizer-2.0: 2.2.0
+- rust-icu-normalizer-data-2.0: 2.2.0
+- rust-icu-properties-2.0: 2.2.0
+- rust-icu-properties-data-2.0: 2.2.0
+- rust-icu-provider-2.0: 2.2.0
+- rust-idna-1.0: 1.1.0
+- rust-idna-adapter-1.0: 1.2.1
+- rust-ignore-0.4: 0.4.25
+- rust-im-rc-15.0: 15.1.0
+- rust-imara-diff-0.1: 0.1.8
+- rust-implib-0.4: 0.4.0
+- rust-indoc-2.0: 2.0.7
+- rust-ipnet-2.0: 2.12.0
+- rust-iri-string-0.7: 0.7.12
+- rust-is-executable-1.0: 1.0.5
+- rust-is-terminal-0.4: 0.4.17
+- rust-itertools-0.10: 0.10.5
+- rust-itertools-0.13: 0.13.0
+- rust-itertools-0.14: 0.14.0
+- rust-jiff-0.2: 0.2.23
+- rust-jiff-static-0.2: 0.2.23
+- rust-jiff-tzdb-0.1: 0.1.6
+- rust-jiff-tzdb-platform-0.1: 0.1.3
+- rust-jobserver-0.1: 0.1.34
+- rust-js-sys-0.3: 0.3.95
+- rust-kstring-2.0: 2.0.2
+- rust-lazycell-1.0: 1.3.0
+- rust-lexical-parse-float-1.0: 1.0.6
+- rust-lexical-parse-integer-1.0: 1.0.6
+- rust-lexical-util-1.0: 1.0.7
+- rust-libgit2-sys-0.18: 0.18.3
+- rust-libloading-0.8: 0.8.9
+- rust-libloading-0.9: 0.9.0
+- rust-libnghttp2-sys-0.1: 0.1.13
+- rust-libredox-0.1: 0.1.15
+- rust-libsqlite3-sys-0.34: 0.34.0
+- rust-libssh2-sys-0.3: 0.3.1
+- rust-libz-sys-1.0: 1.1.25
+- rust-litemap-0.8: 0.8.2
+- rust-matchers-0.2: 0.2.0
+- rust-maybe-async-0.2: 0.2.10
+- rust-memmap2-0.9: 0.9.10
+- rust-memoffset-0.9: 0.9.1
+- rust-mime-0.3: 0.3.17
+- rust-minimal-lexical-0.2: 0.2.1
+- rust-miniz-oxide-0.8: 0.8.9
+- rust-mio-1.0: 1.2.0
+- rust-miow-0.6: 0.6.1
+- rust-nix-0.30: 0.30.1
+- rust-nom-7.0: 7.1.3
+- rust-normalize-line-endings-0.3: 0.3.0
+- rust-normpath-1.0: 1.5.0
+- rust-nu-ansi-term-0.50: 0.50.3
+- rust-num-bigint-0.4: 0.4.6
+- rust-num-conv-0.2: 0.2.1
+- rust-num-integer-0.1: 0.1.46
+- rust-num-traits-0.2: 0.2.19
+- rust-objc2-0.6: 0.6.4
+- rust-objc2-cloud-kit-0.3: 0.3.2
+- rust-objc2-core-data-0.3: 0.3.2
+- rust-objc2-core-foundation-0.3: 0.3.2
+- rust-objc2-core-graphics-0.3: 0.3.2
+- rust-objc2-core-image-0.3: 0.3.2
+- rust-objc2-core-location-0.3: 0.3.2
+- rust-objc2-core-text-0.3: 0.3.2
+- rust-objc2-encode-4.0: 4.1.0
+- rust-objc2-foundation-0.3: 0.3.2
+- rust-objc2-io-surface-0.3: 0.3.2
+- rust-objc2-quartz-core-0.3: 0.3.2
+- rust-objc2-ui-kit-0.3: 0.3.2
+- rust-objc2-user-notifications-0.3: 0.3.2
+- rust-object-0.37: 0.37.3
+- rust-oorandom-11.0: 11.1.5
+- rust-opener-0.8: 0.8.4
+- rust-openssl-0.10: 0.10.76
+- rust-openssl-macros-0.1: 0.1.1
+- rust-openssl-probe-0.1: 0.1.6
+- rust-openssl-src-300.0: 300.5.5
+- rust-openssl-sys-0.9: 0.9.112
+- rust-ordered-float-2.0: 2.10.1
+- rust-orion-0.17: 0.17.13
+- rust-os-info-3.0: 3.14.0
+- rust-p384-0.13: 0.13.1
+- rust-pasetors-0.7: 0.7.8
+- rust-paste-1.0: 1.0.15
+- rust-pathdiff-0.2: 0.2.3
+- rust-pem-rfc7468-0.7: 0.7.0
+- rust-percent-encoding-2.0: 2.3.2
+- rust-pin-project-lite-0.2: 0.2.17
+- rust-pkcs8-0.10: 0.10.2
+- rust-pkg-config-0.3: 0.3.32
+- rust-plain-0.2: 0.2.3
+- rust-plotters-0.3: 0.3.7
+- rust-plotters-backend-0.3: 0.3.7
+- rust-plotters-svg-0.3: 0.3.7
+- rust-portable-atomic-1.0: 1.13.1
+- rust-portable-atomic-util-0.2: 0.2.6
+- rust-potential-utf-0.1: 0.1.5
+- rust-powerfmt-0.2: 0.2.0
+- rust-ppv-lite86-0.2: 0.2.21
+- rust-primeorder-0.13: 0.13.6
+- rust-prodash-30.0: 30.0.1
+- rust-pyo3-0.23: 0.23.5
+- rust-pyo3-0.28: 0.28.3
+- rust-pyo3-build-config-0.23: 0.23.5
+- rust-pyo3-build-config-0.28: 0.28.3
+- rust-pyo3-ffi-0.23: 0.23.5
+- rust-pyo3-ffi-0.28: 0.28.3
+- rust-pyo3-macros-0.23: 0.23.5
+- rust-pyo3-macros-0.28: 0.28.3
+- rust-pyo3-macros-backend-0.23: 0.23.5
+- rust-pyo3-macros-backend-0.28: 0.28.3
+- rust-r-efi-5.0: 5.3.0
+- rust-radium-0.7: 0.7.0
+- rust-rand-0.9: 0.9.4
+- rust-rand-chacha-0.9: 0.9.0
+- rust-rand-core-0.6: 0.6.4
+- rust-rand-core-0.9: 0.9.5
+- rust-rand-xoshiro-0.6: 0.6.0
+- rust-rayon-1.0: 1.12.0
+- rust-rayon-core-1.0: 1.13.0
+- rust-redox-syscall-0.7: 0.7.3
+- rust-regex-1.0: 1.12.3
+- rust-regex-automata-0.4: 0.4.14
+- rust-regex-syntax-0.8: 0.8.10
+- rust-reqwest-0.12: 0.12.28
+- rust-rfc6979-0.4: 0.4.0
+- rust-ring-0.17: 0.17.14
+- rust-rusqlite-0.36: 0.36.0
+- rust-rustc-hash-2.0: 2.1.2
+- rust-rustc-stable-hash-0.1: 0.1.2
+- rust-rustfix-0.9: 0.9.4
+- rust-rustls-0.23: 0.23.37
+- rust-rustls-pki-types-1.0: 1.14.0
+- rust-rustls-webpki-0.103: 0.103.10
+- rust-rustversion-1.0: 1.0.22
+- rust-ryu-1.0: 1.0.23
+- rust-same-file-1.0: 1.0.6
+- rust-schannel-0.1: 0.1.29
+- rust-sec1-0.7: 0.7.3
+- rust-security-framework-3.0: 3.7.0
+- rust-security-framework-sys-2.0: 2.17.0
+- rust-serde-ignored-0.1: 0.1.14
+- rust-serde-untagged-0.1: 0.1.9
+- rust-serde-urlencoded-0.7: 0.7.1
+- rust-serde-value-0.7: 0.7.0
+- rust-sha1-0.10: 0.10.6
+- rust-sha1-checked-0.10: 0.10.0
+- rust-sha2-0.10: 0.10.9
+- rust-sharded-slab-0.1: 0.1.7
+- rust-shell-escape-0.1: 0.1.5
+- rust-shell-words-1.0: 1.1.1
+- rust-shlex-1.0: 1.3.0
+- rust-signature-2.0: 2.2.0
+- rust-simd-adler32-0.3: 0.3.9
+- rust-similar-2.0: 2.7.0
+- rust-sized-chunks-0.6: 0.6.5
+- rust-slab-0.4: 0.4.12
+- rust-snapbox-0.6: 0.6.24
+- rust-snapbox-macros-0.4: 0.4.0
+- rust-socket2-0.6: 0.6.3
+- rust-spki-0.7: 0.7.3
+- rust-stable-deref-trait-1.0: 1.2.1
+- rust-static-assertions-1.0: 1.1.0
+- rust-subtle-2.0: 2.6.1
+- rust-supports-hyperlinks-3.0: 3.2.0
+- rust-supports-unicode-3.0: 3.0.0
+- rust-sync-wrapper-1.0: 1.0.2
+- rust-synstructure-0.13: 0.13.2
+- rust-system-configuration-0.7: 0.7.0
+- rust-system-configuration-sys-0.6: 0.6.0
+- rust-tap-1.0: 1.0.1
+- rust-tar-0.4: 0.4.45
+- rust-target-lexicon-0.12: 0.12.16
+- rust-target-lexicon-0.13: 0.13.5
+- rust-terminal-size-0.4: 0.4.4
+- rust-thiserror-1.0: 1.0.69
+- rust-thiserror-2.0: 2.0.18
+- rust-thiserror-impl-1.0: 1.0.69
+- rust-thiserror-impl-2.0: 2.0.18
+- rust-thread-local-1.0: 1.1.9
+- rust-time-0.3: 0.3.47
+- rust-time-core-0.1: 0.1.8
+- rust-time-macros-0.2: 0.2.27
+- rust-tinystr-0.8: 0.8.3
+- rust-tinytemplate-1.0: 1.2.1
+- rust-tinyvec-1.0: 1.11.0
+- rust-tinyvec-macros-0.1: 0.1.1
+- rust-tokio-1.0: 1.50.0
+- rust-tokio-rustls-0.26: 0.26.4
+- rust-tokio-util-0.7: 0.7.18
+- rust-toml-edit-0.23: 0.23.10
+- rust-tower-0.5: 0.5.3
+- rust-tower-http-0.6: 0.6.8
+- rust-tower-layer-0.3: 0.3.3
+- rust-tower-service-0.3: 0.3.3
+- rust-tracing-0.1: 0.1.44
+- rust-tracing-attributes-0.1: 0.1.31
+- rust-tracing-chrome-0.7: 0.7.2
+- rust-tracing-core-0.1: 0.1.36
+- rust-tracing-log-0.2: 0.2.0
+- rust-tracing-subscriber-0.3: 0.3.23
+- rust-triomphe-0.1: 0.1.15
+- rust-try-lock-0.2: 0.2.5
+- rust-typeid-1.0: 1.0.3
+- rust-typenum-1.0: 1.19.0
+- rust-unicase-2.0: 2.9.0
+- rust-unicode-bom-2.0: 2.0.3
+- rust-unicode-normalization-0.1: 0.1.25
+- rust-unicode-width-0.2: 0.2.2
+- rust-unindent-0.2: 0.2.4
+- rust-untrusted-0.9: 0.9.0
+- rust-url-2.0: 2.5.8
+- rust-utf8-iter-1.0: 1.0.4
+- rust-utf8-width-0.1: 0.1.8
+- rust-uuid-1.0: 1.23.1
+- rust-valuable-0.1: 0.1.1
+- rust-vcpkg-0.2: 0.2.15
+- rust-version-check-0.9: 0.9.5
+- rust-walkdir-2.0: 2.5.0
+- rust-want-0.3: 0.3.1
+- rust-wasi-0.11: 0.11.1
+- rust-wasm-bindgen-0.2: 0.2.118
+- rust-wasm-bindgen-futures-0.4: 0.4.67
+- rust-wasm-bindgen-macro-0.2: 0.2.118
+- rust-wasm-bindgen-macro-support-0.2: 0.2.118
+- rust-wasm-bindgen-shared-0.2: 0.2.118
+- rust-web-sys-0.3: 0.3.95
+- rust-winapi-util-0.1: 0.1.11
+- rust-windows-aarch64-gnullvm-0.52: 0.52.6
+- rust-windows-aarch64-gnullvm-0.53: 0.53.1
+- rust-windows-aarch64-msvc-0.52: 0.52.6
+- rust-windows-aarch64-msvc-0.53: 0.53.1
+- rust-windows-i686-gnu-0.52: 0.52.6
+- rust-windows-i686-gnu-0.53: 0.53.1
+- rust-windows-i686-gnullvm-0.52: 0.52.6
+- rust-windows-i686-gnullvm-0.53: 0.53.1
+- rust-windows-i686-msvc-0.52: 0.52.6
+- rust-windows-i686-msvc-0.53: 0.53.1
+- rust-windows-registry-0.6: 0.6.1
+- rust-windows-result-0.4: 0.4.1
+- rust-windows-strings-0.5: 0.5.1
+- rust-windows-sys-0.52: 0.52.0
+- rust-windows-sys-0.59: 0.59.0
+- rust-windows-sys-0.60: 0.60.2
+- rust-windows-targets-0.52: 0.52.6
+- rust-windows-targets-0.53: 0.53.5
+- rust-windows-x86-64-gnu-0.52: 0.52.6
+- rust-windows-x86-64-gnu-0.53: 0.53.1
+- rust-windows-x86-64-gnullvm-0.52: 0.52.6
+- rust-windows-x86-64-gnullvm-0.53: 0.53.1
+- rust-windows-x86-64-msvc-0.52: 0.52.6
+- rust-windows-x86-64-msvc-0.53: 0.53.1
+- rust-wit-bindgen-0.46: 0.46.0
+- rust-wit-bindgen-0.57: 0.57.1
+- rust-writeable-0.6: 0.6.2
+- rust-wyz-0.5: 0.5.1
+- rust-yada-0.5: 0.5.1
+- rust-yoke-0.8: 0.8.2
+- rust-yoke-derive-0.8: 0.8.2
+- rust-zerocopy-0.8: 0.8.48
+- rust-zerocopy-derive-0.8: 0.8.48
+- rust-zerofrom-0.1: 0.1.7
+- rust-zerofrom-derive-0.1: 0.1.7
+- rust-zeroize-1.0: 1.8.2
+- rust-zerotrie-0.2: 0.2.4
+- rust-zerovec-0.11: 0.11.6
+- rust-zerovec-derive-0.11: 0.11.3
+- rust-zlib-rs-0.6: 0.6.3
+- sddm-kcm: 6.5.5
+- signon-kwallet-extension: 25.12.3
+- slurp: 1.5.0
+- systemsettings: 6.5.5
+- unicorn: 2.1.4
+- wl-clipboard: 2.3.0
+- xdg-desktop-portal-kde: 6.5.5
+- z3: 4.13.0
+
+</details>
+
+[CVE-2026-45186]: https://www.cve.org/CVERecord?id=CVE-2026-45186
+[CVE-2026-3902]: https://www.cve.org/CVERecord?id=CVE-2026-3902
+[CVE-2026-4277]: https://www.cve.org/CVERecord?id=CVE-2026-4277
+[CVE-2026-4292]: https://www.cve.org/CVERecord?id=CVE-2026-4292
+[CVE-2026-33033]: https://www.cve.org/CVERecord?id=CVE-2026-33033
+[CVE-2026-33034]: https://www.cve.org/CVERecord?id=CVE-2026-33034
+[CVE-2026-9256]: https://www.cve.org/CVERecord?id=CVE-2026-9256
+[CVE-2026-42926]: https://www.cve.org/CVERecord?id=CVE-2026-42926
+[CVE-2026-42945]: https://www.cve.org/CVERecord?id=CVE-2026-42945
+[CVE-2026-42946]: https://www.cve.org/CVERecord?id=CVE-2026-42946
+[CVE-2026-40460]: https://www.cve.org/CVERecord?id=CVE-2026-40460
+[CVE-2026-40701]: https://www.cve.org/CVERecord?id=CVE-2026-40701
+[CVE-2026-43617]: https://www.cve.org/CVERecord?id=CVE-2026-43617
+[CVE-2026-43618]: https://www.cve.org/CVERecord?id=CVE-2026-43618
+[CVE-2026-43619]: https://www.cve.org/CVERecord?id=CVE-2026-43619
+[CVE-2026-43620]: https://www.cve.org/CVERecord?id=CVE-2026-43620
+[CVE-2026-45232]: https://www.cve.org/CVERecord?id=CVE-2026-45232
+[CVE-2026-29518]: https://www.cve.org/CVERecord?id=CVE-2026-29518
+[CVE-2026-33278]: https://www.cve.org/CVERecord?id=CVE-2026-33278
+[CVE-2026-42944]: https://www.cve.org/CVERecord?id=CVE-2026-42944
+[CVE-2026-42959]: https://www.cve.org/CVERecord?id=CVE-2026-42959
+[CVE-2026-32792]: https://www.cve.org/CVERecord?id=CVE-2026-32792
+[CVE-2026-40622]: https://www.cve.org/CVERecord?id=CVE-2026-40622
+[CVE-2026-41292]: https://www.cve.org/CVERecord?id=CVE-2026-41292
+[CVE-2026-42534]: https://www.cve.org/CVERecord?id=CVE-2026-42534
+[CVE-2026-42923]: https://www.cve.org/CVERecord?id=CVE-2026-42923
+[CVE-2026-42960]: https://www.cve.org/CVERecord?id=CVE-2026-42960
+[CVE-2026-44390]: https://www.cve.org/CVERecord?id=CVE-2026-44390
+[CVE-2026-44608]: https://www.cve.org/CVERecord?id=CVE-2026-44608
+[CVE-2026-6476]: https://www.cve.org/CVERecord?id=CVE-2026-6476
+[CVE-2026-6638]: https://www.cve.org/CVERecord?id=CVE-2026-6638
+[CVE-2026-6637]: https://www.cve.org/CVERecord?id=CVE-2026-6637
+[CVE-2026-6473]: https://www.cve.org/CVERecord?id=CVE-2026-6473
+[CVE-2026-6474]: https://www.cve.org/CVERecord?id=CVE-2026-6474
+[CVE-2026-6479]: https://www.cve.org/CVERecord?id=CVE-2026-6479
+[CVE-2026-6475]: https://www.cve.org/CVERecord?id=CVE-2026-6475
+[CVE-2026-6478]: https://www.cve.org/CVERecord?id=CVE-2026-6478
+[CVE-2026-6477]: https://www.cve.org/CVERecord?id=CVE-2026-6477
+[CVE-2026-6575]: https://www.cve.org/CVERecord?id=CVE-2026-6575
+[CVE-2026-6472]: https://www.cve.org/CVERecord?id=CVE-2026-6472
+[CVE-2026-31431]: https://lore.kernel.org/all/2026042214-CVE-2026-31431-3d65@gregkh/
+[CVE-2026-43284]: https://lore.kernel.org/linux-cve-announce/2026050856-CVE-2026-43284-6598@gregkh/
+[CVE-2026-43494]: https://lore.kernel.org/linux-cve-announce/2026052130-CVE-2026-43494-a65a@gregkh/
+[CVE-2026-43500]: https://lore.kernel.org/linux-cve-announce/2026051149-CVE-2026-43500-60d6@gregkh/
+[CVE-2026-43503]: https://lore.kernel.org/linux-cve-announce/2026052309-CVE-2026-43503-b134@gregkh/
+[CVE-2026-46333]: https://lore.kernel.org/linux-cve-announce/2026051554-CVE-2026-46333-662a@gregkh/
