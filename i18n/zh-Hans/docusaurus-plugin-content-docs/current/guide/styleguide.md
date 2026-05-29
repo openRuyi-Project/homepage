@@ -26,6 +26,14 @@ Git commit 必须包含 `Signed-off-by` 尾注，以示作者和责任信息。
 Signed-off-by: Example Author <author@example.com>
 ```
 
+#### 将同一软件包的相关小修改合并到一个 commit {#rule-git-package-related-small-changes}
+
+同一软件包的相关小修改应当合并到一个 commit 中提交。
+
+例如，版本号更新、同一 RPM spec 文件的小修正，以及相关软件包元数据的小调整，如果服务于同一个目的，可以放在同一个 commit 中。
+
+如果修改涉及多个无关软件包、解决多个无关问题，或者需要分别审阅和回滚，则应拆分为多个 commit。
+
 ### 审阅
 
 #### 优先使用文档链接 {#rule-review-prefer-links}

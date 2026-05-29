@@ -25,6 +25,14 @@ Git commits MUST contain a `Signed-off-by` trailer signifying authorship and res
 Signed-off-by: Example Author <author@example.com>
 ```
 
+#### Keep related package changes in one commit {#rule-git-package-related-changes}
+
+Related small changes to the same package SHOULD use one commit.
+
+A version bump, minor fixes to the same RPM spec file, and small package metadata updates MAY stay in one commit when they support the same package update.
+
+Changes SHOULD use separate commits when they affect different packages, address unrelated problems, or need independent review or rollback.
+
 ### Review
 
 #### Prefer links to a style rule {#rule-review-prefer-links}
