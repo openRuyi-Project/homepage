@@ -12,11 +12,11 @@ slug: /guide/how-to-install/qemu
 要在 QEMU 内使用 openRuyi，需要安装如下软件包。
 
 - `qemu-system-riscv64` 需要使用 QEMU 10.1 或更高版本，若版本过低需要手动编译或更新系统版本来支持 RVA23S64 ISA（例如 Ubuntu 需要 25.10 及更高版本）。
-- `qemu-efi-riscv64/edk2-riscv64` EDK II 是 UEFI API 的参考实现，若发行版未打包，则可在[openRuyi 下载页](https://releases.openruyi.cn/creek/)下载 UEFI 固件。
+- `qemu-efi-riscv64/edk2-riscv64` EDK II 是 UEFI API 的参考实现，若发行版未打包，则可在 [openRuyi 下载页](https://releases.openruyi.cn/creek/)下载 UEFI 固件。
 
 ## 下载镜像 
 
-您需要先获取 openRuyi 的镜像文件和对应校验文件。请访问我们的新闻页，在最新的版本文章下方获取 qcow2 文件以及相应的安装映像的校验和。
+您需要先获取 openRuyi 的镜像文件和对应校验文件，这些文件可在 [openRuyi 下载页](https://releases.openruyi.cn/creek/)获取。
 
 我们对于所有的镜像文件都提供了安装映像的基于 SHA256 算法的校验和。您可以使用任何支持该算法的检验工具来检查文件校验和是否正确。
 

@@ -16,7 +16,7 @@ To use openRuyi in QEMU, install the following packages:
 
 ## Download the image
 
-You will first need to obtain the openRuyi image files and the corresponding checksum files. Please visit our news site and refer to the latest release article, where you can find the qcow2 image and the checksums for the installation media.
+You will first need to obtain the openRuyi image files and the corresponding checksum files from the [openRuyi download page](https://releases.openruyi.cn/creek/).
 
 We provide SHA256 checksums for all image files. You may use any tool that supports the SHA256 algorithm to verify the integrity of the downloaded files.
 

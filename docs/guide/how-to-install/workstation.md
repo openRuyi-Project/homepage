@@ -11,8 +11,7 @@ This article explains how to install and use the openRuyi Workstation Edition. T
 
 ## Before You Begin
 
-You will first need to obtain the openRuyi image files and the corresponding checksum files.
-Please visit our news site and refer to the latest release article, where you can find the ISO image and the checksums for the installation media.
+You will first need to obtain the openRuyi image files and the corresponding checksum files from the [openRuyi download page](https://releases.openruyi.cn/creek/).
 
 ## Verify Image Integrity
 

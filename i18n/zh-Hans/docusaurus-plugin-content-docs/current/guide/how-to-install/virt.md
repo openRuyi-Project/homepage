@@ -17,7 +17,7 @@ slug: /guide/how-to-install/virt
 
 ## 下载镜像 
 
-您需要先获取 openRuyi 的镜像文件和对应校验文件，其中 ISO 可用于安装 openRuyi，qcow2 可直接启动 openRuyi，请访问我们的新闻页，在最新的版本文章下方获取 ISO 或 qcow2 文件以及相应的安装映像的校验和。
+您需要先获取 openRuyi 的镜像文件和对应校验文件，其中 ISO 可用于安装 openRuyi，qcow2 可直接启动 openRuyi，这些文件可在 [openRuyi 下载页](https://releases.openruyi.cn/creek/)获取。
 
 我们对于所有的镜像文件都提供了安装映像的基于 SHA256 算法的校验和。您可以使用任何支持该算法的检验工具来检查文件校验和是否正确。
 
