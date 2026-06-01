@@ -13,7 +13,7 @@ The openRuyi Zero edition is created to facilitate SoC bringup and kernel develo
 
 ## Bootup
 
-You can start openRuyi initramfs by providing it to your kernel through Devicetree or UEFI. This will depend on your device's boot process and thus is not described here.
+You can start openRuyi initramfs by providing it to your kernel through Devicetree or UEFI. This will depend on your device's boot process and thus is not described here. The initramfs image could be acquired from the [openRuyi download page](https://releases.openruyi.cn/creek/).
 
 Here's an example command for booting through QEMU with basic hardware emulation support for both CLI and GUI.
 

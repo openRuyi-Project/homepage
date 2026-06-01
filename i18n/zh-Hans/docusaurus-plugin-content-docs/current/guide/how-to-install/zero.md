@@ -13,7 +13,7 @@ openRuyi Zero 旨在简化硅前验证与内核开发。如需了解更多，请
 
 ## 启动
 
-您可以通过设备树或者 UEFI 将 openRuyi 的 initramfs 提供给内核，以启动 openRuyi。具体采用哪种方式取决于设备自身的启动流程，因此本文不再展开说明。
+您可以通过设备树或者 UEFI 将 openRuyi 的 initramfs 提供给内核，以启动 openRuyi。具体采用哪种方式取决于设备自身的启动流程，因此本文不再展开说明。这一 initramfs 可在 [openRuyi 下载页](https://releases.openruyi.cn/creek/)获取。
 
 下面是一个通过 QEMU 启动的命令例子，既支持 CLI 又支持 GUI。
 

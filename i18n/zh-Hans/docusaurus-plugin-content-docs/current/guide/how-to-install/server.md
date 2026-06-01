@@ -11,9 +11,7 @@ slug: /guide/how-to-install/server
 
 ## 安装准备
 
-您需要先获取 openRuyi 的镜像文件和对应校验文件。
-
-请访问我们的新闻页，在最新的版本文章下方获取 ISO 文件以及相应的安装映像的校验和。
+您需要先获取 openRuyi 的镜像文件和对应校验文件，这些文件可在 [openRuyi 下载页](https://releases.openruyi.cn/creek/)获取。
 
 ## 完整性校验
 
