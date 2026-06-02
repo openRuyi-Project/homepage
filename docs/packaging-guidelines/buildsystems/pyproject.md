@@ -9,7 +9,7 @@ slug: /guide/packaging-guidelines/BuildSystems/pyproject
 
 This document explains how to use the `pyproject` declarative build system when packaging software for openRuyi.
 
-When the package you maintain declares its build backend in `pyproject.toml` and follows the [PEP 517](https://peps.python.org/pep-0517/) and [PEP 518](https://peps.python.org/pep-0518/) build workflow. We recommend `BuildSystem: pyproject` to reuse the standardized Python build workflow and reduce repetitive boilerplate.
+When the package you maintain declares its build backend in `pyproject.toml` and follows the [PEP 517](https://peps.python.org/pep-0517/) and [PEP 518](https://peps.python.org/pep-0518/), we recommend `BuildSystem: pyproject` to reuse the standardized Python build workflow and reduce repetitive boilerplate.
 
 In general, these packages include most modern Python modules, as well as some projects that primarily use Python but also install command-line tools.
 
@@ -72,17 +72,21 @@ After switching to the `pyproject` declarative build system, you can let the bui
 BuildSystem:  pyproject
 
 BuildOption(generate_buildrequires):  -x test
-BuildOption(install):  example_pkg
+BuildOption(install):  -l example_pkg
 ```
 
-When using the `pyproject` declarative build system, always pass the corresponding module name to `BuildOption(install)`.
+When using the `pyproject` declarative build system, always pass the corresponding module name to `BuildOption(install)`. The build system passes this option as an argument to `%pyproject_save_files`, so we usually recommend adding the `-l` option by default.
+
+The `-l` option checks whether upstream declares a `License-File` according to [PEP 639](https://peps.python.org/pep-0639/). If the build reports a `No License-File` error, remove this option.
+
+When upstream correctly declares `License-File`, `%pyproject_save_files -l` automatically records the corresponding files under the Python package’s `.dist-info/licenses/` directory. In that case, you usually do not need to manually write `%license LICENSE` in `%files`. Only add extra entries for files that the macro does not record automatically but still need installation as license files.
 
 If the original install stage also contains extra cleanup logic, for example:
 
 ```specfile
 %install
 %pyproject_install
-%pyproject_save_files example_pkg
+%pyproject_save_files -l example_pkg
 rm -f %{buildroot}%{_bindir}/debug-helper
 ```
 

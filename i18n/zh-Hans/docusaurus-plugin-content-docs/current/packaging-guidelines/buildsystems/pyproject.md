@@ -1,7 +1,7 @@
 ---
 id: buildsystempyproject
-title: Pyproject  
-description: 这个文档讲述了在 openRuyi 打包时，如何使用名为 pyproject 的声明式构建系统。  
+title: Pyproject
+description: 这个文档讲述了在 openRuyi 打包时，如何使用名为 pyproject 的声明式构建系统。
 slug: /guide/packaging-guidelines/BuildSystems/pyproject
 ---
 
@@ -9,8 +9,7 @@ slug: /guide/packaging-guidelines/BuildSystems/pyproject
 
 这个文档讲述了在 openRuyi 打包时，如何使用名为 `pyproject` 的声明式构建系统。
 
-当你所打包的软件包使用 `pyproject.toml` 声明构建后端，并遵循 [PEP 517](https://peps.python.org/pep-0517/) 和 [PEP 518](https://peps.python.org/pep-0518/) 构建流程时，  
-推荐使用 `BuildSystem: pyproject`，以便复用标准化的 Python 构建流程，并减少重复样板代码。
+当你所打包的软件包使用 `pyproject.toml` 声明构建后端，并遵循 [PEP 517](https://peps.python.org/pep-0517/) 和 [PEP 518](https://peps.python.org/pep-0518/) 时，推荐使用 `BuildSystem: pyproject`，以便复用标准化的 Python 构建流程，并减少重复样板代码。
 
 通常来说，这类软件包包括绝大多数现代 Python 模块，也包括一部分以 Python 为主、但同时会安装命令行工具的项目。
 
@@ -72,17 +71,21 @@ BuildRequires:  pkgconfig(python3)
 BuildSystem:  pyproject
 
 BuildOption(generate_buildrequires):  -x test
-BuildOption(install):  example_pkg
+BuildOption(install):  -l example_pkg
 ```
 
-注意，在使用 `pyproject` 声明式构建系统时，一定要在 `BuildOption(install)` 处传入对应的模块名。
+注意，在使用 `pyproject` 声明式构建系统时，一定要在 `BuildOption(install)` 处传入对应的模块名。由于该选项会作为参数传递给 `%pyproject_save_files`，因此通常建议默认添加 `-l` 参数。
+
+`-l` 参数会根据 [PEP 639](https://peps.python.org/pep-0639/) 检查上游是否声明了 License-File；如果构建时报出 `No License-File` 错误，则去掉该参数。
+
+当上游正确声明了 License-File 时，`%pyproject_save_files -l` 会自动将对应文件记录到 Python 包的 `.dist-info/licenses/` 目录下。这种情况下通常不需要再在 `%files` 中手动写 `%license LICENSE`；只有未被自动记录、但仍需作为许可证文件安装的内容，才需要额外补充。
 
 如果原有安装阶段还有额外清理逻辑，例如:
 
 ```specfile
 %install
 %pyproject_install
-%pyproject_save_files example_pkg
+%pyproject_save_files -l example_pkg
 rm -f %{buildroot}%{_bindir}/debug-helper
 ```
 
@@ -91,7 +94,7 @@ rm -f %{buildroot}%{_bindir}/debug-helper
 ```specfile
 BuildSystem:  pyproject
 
-BuildOption(install):  example_pkg
+BuildOption(install):  -l example_pkg
 
 %install -a
 rm -f %{buildroot}%{_bindir}/debug-helper
