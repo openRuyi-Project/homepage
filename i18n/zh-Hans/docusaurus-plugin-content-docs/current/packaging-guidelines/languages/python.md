@@ -19,7 +19,7 @@ Python 库的软件包，其名称必须以 `python-` 为前缀。
 %global srcname DISTNAME
 ```
 
-简言之，`srcname` 宏代表项目在 PyPi 上的名称。
+简言之，`srcname` 宏代表项目在 PyPi 上的名称。这里的名称同时应遵循 [PEP 503](https://peps.python.org/pep-0503/) 的规范化名称规则: 使用小写字母，并将名称中的 `_` 和 `.` 统一替换为 `-`。例如，上游项目名为 `aiohttp_socks` 时，软件包名和 `srcname` 应写作 `aiohttp-socks`。
 
 ## 源码链接
 

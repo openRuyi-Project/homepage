@@ -19,7 +19,7 @@ For the package name (`DISTNAME`), use the name the upstream project uses on PyP
 %global srcname DISTNAME
 ```
 
-In short, the `srcname` macro represents the project’s name on PyPI.
+In short, the `srcname` macro represents the project’s name on PyPI. The name must also follow the normalized name rules in [PEP 503](https://peps.python.org/pep-0503/): use lowercase letters, and replace `_` and `.` with `-`. For example, if the upstream project name is `aiohttp_socks`, use `aiohttp-socks` as the package name and `srcname`.
 
 ## Source URL
 
