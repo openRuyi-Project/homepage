@@ -97,7 +97,7 @@ autoreconf
 # remove rpath from libtool
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
- 
+
 make SHLIB_LD="gcc -shared" %{?_smp_mflags} all pkglibdir=%_libdir/tcl/%name%version
 ```
 
@@ -142,6 +142,19 @@ ln -s libexpect%{majorver}.so %{buildroot}%{_libdir}/libexpect.so
 rm -f %{buildroot}%{_bindir}/{cryptdir,decryptdir}
 rm -f %{buildroot}%{_mandir}/man1/{cryptdir,decryptdir}.1*
 rm -f %{buildroot}%{_bindir}/autopasswd
+```
+
+Assume the original test section (`%check`) is as follows:
+
+```specfile
+%check
+%make_build test
+```
+
+For cases like this, where you only need to specify the test target, you do not need to keep a custom `%check` section. Instead, define the `_test_target` macro directly at the top of the spec file:
+
+```specfile
+%define _test_target test
 ```
 
 ## Build system macros

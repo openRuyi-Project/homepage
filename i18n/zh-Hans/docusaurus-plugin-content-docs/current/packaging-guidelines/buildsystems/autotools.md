@@ -97,7 +97,7 @@ autoreconf
 # remove rpath from libtool
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
- 
+
 make SHLIB_LD="gcc -shared" %{?_smp_mflags} all pkglibdir=%_libdir/tcl/%name%version
 ```
 
@@ -142,6 +142,19 @@ ln -s libexpect%{majorver}.so %{buildroot}%{_libdir}/libexpect.so
 rm -f %{buildroot}%{_bindir}/{cryptdir,decryptdir}
 rm -f %{buildroot}%{_mandir}/man1/{cryptdir,decryptdir}.1*
 rm -f %{buildroot}%{_bindir}/autopasswd
+```
+
+假设原有的测试 (`%check`) 配置如下:
+
+```specfile
+%check
+%make_build test
+```
+
+对于这种只需要指定测试目标的情况，不必保留自定义 `%check` 段，可以直接在 Spec 文件头部定义 `_test_target` 宏:
+
+```specfile
+%define _test_target test
 ```
 
 ## 构建系统宏说明
