@@ -1,0 +1,95 @@
+---
+title: openRuyi AI 新进展：让 RISC-V 异构 AI 开箱即用
+tags: [development]
+date: 2026-05-08
+slug: 2026-05/openruyi-ai-progress
+---
+> openRuyi 是一个基于 RISC-V 架构的原生发行版，专注于性能、安全、AI 以及云原生工作负载的优化。openRuyi 滚动版本对齐最新上游基线，并致力于为 RISC-V 构建前沿标准和软件应用的最佳实践。
+<!-- truncate -->
+在 AI 基础设施快速迭代的今天，RISC-V 平台的 AI 生态长期面临软件栈碎片化、配置门槛高、上游社区支持薄弱等挑战。围绕这些问题，中国科学院软件研究所 openRuyi 团队持续推进相关工作，逐步完善从底层 GPU 计算栈到上层应用工具的适配与集成。此次更新，openRuyi 带来了三项 AI 相关进展：ROCm 7.1.1 的性能提升、Ollama 的开箱即用本地推理，以及 PicoClaw AI 助手的集成。
+
+## 一、ROCm：大模型推理性能显著提升，支持更多显卡
+
+ROCm (Radeon Open Compute platform) 是 AMD 旗下全栈开源的 GPU 通用计算平台，涵盖驱动、运行时、算子库等完整组件，是当前开源生态中较为成熟的非 NVIDIA GPU 计算方案之一。openRuyi 已在 RISC-V 平台上完成 ROCm 的全栈移植适配，并在本次更新中将集成版本升级至较新的 ROCm 7.1.1。
+
+从测试结果来看，在 RX 7900 XTX 平台、llama.cpp b6029 环境下，llama 8B Q4_K - Medium 模型在不同测试项性能均有提升：
+
+| 测试项 | ROCm 6.2.4              | ROCm 7.1.1               |
+| ------ | ----------------------- | ------------------------ |
+| pp512  | 1116.23 ± 2.69 tokens/s | 2815.99 ± 16.68 tokens/s |
+| tg128  | 52.18 ± 0.06 tokens/s   | 77.56 ± 0.04 tokens/s    |
+
+这表明，openRuyi 在 RISC-V 平台上的 ROCm 适配已具备较好的实际可用性，并在推理性能上取得了进一步提升。与此同时，openRuyi 在本次更新中还新增了对主流 RDNA4 系列显卡 (RX90xx) 的支持，进一步拓宽了 RISC-V 平台对相关异构 AI 硬件的支持范围。
+
+### ROCm 上游化：让 RISC-V 成为 AI 开源生态的一等公民
+
+除了性能提升之外，openRuyi 团队也在积极推动 ROCm 的 RISC-V 上游化。目前，尚未上游化的相关补丁可在 openRuyi 的 SPECS 仓库<sup>[1]</sup> 中查看。接下来，团队将继续推进这些补丁的上游化工作，重点维护基础工具链与 ROCm 运行时相关的补丁，进一步完善 RISC-V 对 ROCm 生态的支持。
+
+## 二、Ollama：一条命令，本地大模型即刻可用
+
+Ollama 是当前较为流行的本地大模型管理与运行工具，支持 Llama、Qwen、Mistral、DeepSeek 等主流开源模型的一键下载与本地推理，无需复杂配置，是个人开发者和研究人员部署本地 LLM 的常用工具。
+
+此前，较新版本的 Ollama 尚不支持 riscv64 架构。针对这一问题，openRuyi 团队修复了 Ollama 在 riscv64 平台上的编译问题，并在此基础上为其启用了对 ROCm 7.1.1 的 GPU 加速支持，使 RISC-V 用户能够利用 AMD GPU 的算力进行本地模型推理<sup>[2]</sup>。
+
+在 openRuyi 上使用 Ollama，仅需执行以下命令：
+
+```
+sudo dnf install ollama
+# 或者使用 qwen3 等其他本地模型
+ollama run deepseek-r1
+```
+
+无需手动编译，也无需额外配置环境变量，安装完成后即可直接使用。这意味着，RISC-V 平台上本地大模型的部署门槛进一步降低，在本地开展推理也更加方便。
+
+![Ollama 本地运行 deepseek-r1:8b 模型时的性能表现](/article-images/2026-05/deepseek-r1.webp)
+<p align="center">Ollama 本地运行 deepseek-r1:8b 模型时的性能表现</p>
+
+## 三、PicoClaw：完全本地的 AI 智能体
+
+除了模型运行能力，openRuyi 也在进一步完善面向实际开发场景的 AI 应用工具支持。
+
+PicoClaw 是轻量的开源自主 AI 智能体软件，目前已经集成到 openRuyi 中，安装同样只需一条命令：
+
+```
+sudo dnf install picoclaw
+```
+
+安装后，用户可按照 PicoClaw 官方入门文档完成初始配置并开始使用<sup>[3]</sup>。
+
+基于 openRuyi 预集成的 Ollama + ROCm 7.1.1 后端，用户可以将 PicoClaw 的推理后端切换到本地 Ollama 服务，从而实现以下能力：
+
+- **推理完全本地化**：模型运行在本机 AMD GPU 上，数据无需经过任何外部服务器
+- **无需网络连接**：即使在离线环境下，也能够获得 AI 辅助能力
+- **GPU 加速**：借助 ROCm 7.1.1，在 RISC-V + AMD GPU 平台上获得更高的推理速度
+
+这表明，openRuyi 在 RISC-V 平台上的 AI 能力建设，已经从单纯的模型推理进一步延伸到 Agent 场景。
+
+![PicoClaw 通过本地 Ollama 后端运行，实现高性能的本地化 AI 辅助](/article-images/2026-05/picoclaw.png)
+<p align="center">PicoClaw 通过本地 Ollama 后端运行，实现高性能的本地化 AI 辅助</p>
+
+## 四、openRuyi AI 栈 Roadmap：我们的下一步
+
+当前版本中对 Ollama 和 PicoClaw 的集成，只是 openRuyi AI 能力建设的起点。根据项目规划，openRuyi AI 栈将沿以下方向持续演进：
+
+- **近期方向**：扩展支持更多 GPU 型号。在目前已验证 RX 7900 XTX 的基础上，后续将进一步测试并支持更多 AMD Radeon 显卡型号；继续推进 ROCm 上游化，向 ROCm、llama.cpp 等项目贡献 RISC-V 支持补丁，推动相关支持逐步合入主线。
+- **中期方向**：打通 vLLM 推理全链路，在 RISC-V + AMD GPU 平台上实现基于 PyTorch 和 vLLM 的大模型分布式推理服务，并探索多 GPU 分布式大模型训练能力；完善端侧推理支持，集成经 RISC-V 向量扩展 (RVV) 优化的 llama.cpp，覆盖算能 SG2044、SpacemiT K3、玄铁 C950 等主流 RISC-V 处理器，使无 GPU 的纯 CPU 环境也能够运行轻量模型；扩大模型验证覆盖范围，除语言模型外，逐步推进视觉模型 (YOLO)、多模态模型等在 RISC-V 平台上的验证；围绕主流 Agent 框架（如 LangChain 等）在 RISC-V 平台上的适配与运行，结合本地模型推理能力，探索端侧 Agent 应用的部署方案。
+- **长期方向**：探索国产加速硬件在 RISC-V 主机上的适配，推进“RISC-V + 国产加速器”全链路国产化方案，为后续 AI 生态适配与应用拓展奠定基础；基于 openRuyi 的软硬件协同能力，进一步探索面向具体行业场景的智能体应用落地，打造 RISC-V 平台上完整的 Agent 运行与开发体验。
+
+## 结语
+
+此次 openRuyi 在 ROCm、Ollama 和 PicoClaw 方面的相关工作，进一步完善了面向 RISC-V 平台的本地 AI 软件栈，也降低了本地大模型的部署和使用门槛。后续，openRuyi 还将继续围绕性能优化、工具完善、生态适配和上游协同等工作，持续完善 RISC-V 平台上的 AI 支持。
+
+## 相关链接
+
+[1] openRuyi SPECS 仓库：
+https://github.com/openRuyi-Project/openRuyi/tree/main/SPECS
+
+[2] openRuyi 中的 Ollama 适配与打包文件：
+https://github.com/openRuyi-Project/openRuyi/tree/main/SPECS/ollama
+
+[3] PicoClaw 官方入门文档：
+https://docs.picoclaw.io/zh-Hans/docs/getting-started/
+
+## 联系我们
+
+对 openRuyi 工作感兴趣的伙伴们可以关注 GitHub 开源项目，访问 openRuyi 文档中心获取更多信息，也欢迎加入 Discord 社区参与交流。团队长期招收全职/兼职/实习生，欢迎投递简历至邮箱 [wangjingwei@iscas.ac.cn](mailto:wangjingwei@iscas.ac.cn)（王经纬）。

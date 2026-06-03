@@ -1,0 +1,96 @@
+---
+title: "openRuyi AI Progress: Ready-to-Use Heterogeneous AI on RISC-V"
+tags: [development]
+date: 2026-05-08
+slug: 2026-05/openruyi-ai-progress
+---
+
+> openRuyi is a native Linux distribution for the RISC-V architecture, with a focus on performance, security, AI, and cloud-native workloads. The rolling-release version of openRuyi tracks the latest upstream baseline and is committed to building best practices for cutting-edge standards and software applications on RISC-V.
+<!-- truncate -->
+As AI infrastructure continues to evolve rapidly, the AI ecosystem on RISC-V has long faced challenges such as fragmented software stacks, high configuration barriers, and limited support from upstream communities. To address these issues, the openRuyi team at the Institute of Software, Chinese Academy of Sciences has been continuously advancing related work, gradually improving adaptation and integration from the low-level GPU computing stack to upper-layer application tools. In this update, openRuyi brings three AI-related improvements: performance gains with ROCm 7.1.1, ready-to-use local inference with Ollama, and integration of the PicoClaw AI assistant.
+
+## 1. ROCm: Significantly Improved LLM Inference Performance and Support for More GPUs
+
+ROCm (Radeon Open Compute platform) is AMD’s fully open-source GPU computing platform. It covers a complete set of components including drivers, runtime, and operator libraries, and is one of the more mature non-NVIDIA GPU computing solutions in the open-source ecosystem. openRuyi has completed full-stack ROCm porting and adaptation on the RISC-V platform, and in this update, the integrated version has been upgraded to the newer ROCm 7.1.1.
+
+According to test results, on the RX 7900 XTX platform with llama.cpp b6029, the llama 8B Q4_K - Medium model shows performance improvements across multiple test items:
+
+| Test item | ROCm 6.2.4              | ROCm 7.1.1               |
+| --------- | ----------------------- | ------------------------ |
+| pp512     | 1116.23 ± 2.69 tokens/s | 2815.99 ± 16.68 tokens/s |
+| tg128     | 52.18 ± 0.06 tokens/s   | 77.56 ± 0.04 tokens/s    |
+
+These results indicate that openRuyi’s ROCm adaptation on RISC-V has reached a good level of practical usability and has achieved further improvement in inference performance. At the same time, this update also adds support for mainstream RDNA4 series GPUs (RX90xx), further expanding RISC-V platform support for heterogeneous AI hardware.
+
+### Upstreaming ROCm: Making RISC-V a First-Class Citizen in the Open-Source AI Ecosystem
+
+In addition to performance improvements, the openRuyi team is also actively promoting the upstreaming of RISC-V support for ROCm. The relevant patches that have not yet been upstreamed can currently be found in the openRuyi SPECS repository<sup>[1]</sup>. Going forward, the team will continue to push these patches upstream, with a focus on maintaining patches related to the base toolchain and ROCm runtime, further improving RISC-V support in the ROCm ecosystem.
+
+## 2. Ollama: Run Local LLMs with a Single Command
+
+Ollama is a popular tool for managing and running local large language models. It supports one-command download and local inference for mainstream open-source models such as Llama, Qwen, Mistral, and DeepSeek. With no complex configuration required, it is widely used by individual developers and researchers for deploying local LLMs.
+
+Previously, newer versions of Ollama did not support the riscv64 architecture. To address this issue, the openRuyi team fixed the compilation problems of Ollama on riscv64 and enabled GPU acceleration with ROCm 7.1.1, allowing RISC-V users to leverage AMD GPU computing power for local model inference<sup>[2]</sup>.
+
+On openRuyi, using Ollama only requires the following commands:
+
+```
+sudo dnf install ollama
+# Or use other local models, such as qwen3
+ollama run deepseek-r1
+```
+
+No manual compilation or additional environment variable configuration is required. After installation, it can be used directly. This further lowers the barrier to deploying local LLMs on RISC-V and makes local inference more convenient.
+
+![Performance of running the deepseek-r1:8b model locally with Ollama](/article-images/2026-05/deepseek-r1.webp)
+<p align="center">Performance of running the deepseek-r1:8b model locally with Ollama</p>
+
+## 3. PicoClaw: A Fully Local AI Agent
+
+Beyond model runtime capability, openRuyi is also improving support for AI application tools aimed at real-world development scenarios.
+
+PicoClaw is a lightweight open-source autonomous AI agent. It has now been integrated into openRuyi, and installation also requires only a single command:
+
+```
+sudo dnf install picoclaw
+```
+
+After installation, users can follow the official PicoClaw getting-started documentation to complete the initial configuration and begin using it<sup>[3]</sup>.
+
+Based on openRuyi’s pre-integrated Ollama + ROCm 7.1.1 backend, users can switch PicoClaw’s inference backend to the local Ollama service, enabling the following capabilities:
+
+- **Fully local inference**: models run on the local AMD GPU, and data does not need to pass through any external server.
+- **No network connection required**: AI assistance remains available even in offline environments.
+- **GPU acceleration**: ROCm 7.1.1 enables higher inference speed on RISC-V + AMD GPU platforms.
+
+This shows that openRuyi’s AI capability development on RISC-V has moved beyond basic model inference and is now extending into agent scenarios.
+
+![PicoClaw runs through a local Ollama backend, enabling high-performance localized AI assistance](/article-images/2026-05/picoclaw.png)
+<p align="center">PicoClaw runs through a local Ollama backend, enabling high-performance localized AI assistance</p>
+
+## 4. openRuyi AI Stack Roadmap: What Comes Next
+
+The current integration of Ollama and PicoClaw is only the starting point for openRuyi’s AI capability development. According to the project roadmap, the openRuyi AI stack will continue to evolve in the following roadmap:
+
+- **Near-term priorities**: expand support for more GPU models. Based on the currently verified RX 7900 XTX, more AMD Radeon GPU models will be tested and supported in the future; continue promoting ROCm upstreaming by contributing RISC-V support patches to projects such as ROCm and llama.cpp, and gradually push related support into the mainline.
+- **Mid-term priorities**: complete the full vLLM inference pipeline, enabling distributed LLM inference services based on PyTorch and vLLM on RISC-V + AMD GPU platforms, while exploring multi-GPU distributed LLM training capabilities; improve edge-side inference support by integrating llama.cpp optimized with RISC-V Vector Extension (RVV), covering mainstream RISC-V processors such as SOPHGO SG2044, SpacemiT K3, and Xuantie C950, so that lightweight models can also run in CPU-only environments without a GPU; expand model validation coverage beyond language models, gradually advancing validation for vision models (YOLO), multimodal models, and more on the RISC-V platform; explore deployment solutions for edge-side agent applications by adapting and running mainstream agent frameworks such as LangChain on RISC-V, combined with local model inference capabilities.
+- **Long-term priorities**: explore adaptation of domestic acceleration hardware on RISC-V hosts, promote a fully domestic “RISC-V + domestic accelerator” end-to-end solution, and lay the foundation for future AI ecosystem adaptation and application expansion; based on openRuyi’s software-hardware co-design capabilities, further explore agent applications for specific industry scenarios and build a complete agent runtime and development experience on RISC-V.
+
+## Conclusion
+
+The work on ROCm, Ollama, and PicoClaw further improves openRuyi’s local AI software stack for the RISC-V platform and lowers the barrier to deploying and using local LLMs. Going forward, openRuyi will continue to improve AI support on RISC-V through performance optimization, tool enhancement, ecosystem adaptation, and upstream collaboration.
+
+## Related Links
+
+[1] openRuyi SPECS repository:  
+https://github.com/openRuyi-Project/openRuyi/tree/main/SPECS
+
+[2] Ollama adaptation and packaging files in openRuyi:  
+https://github.com/openRuyi-Project/openRuyi/tree/main/SPECS/ollama
+
+[3] Official PicoClaw getting-started documentation:  
+https://docs.picoclaw.io/zh-Hans/docs/getting-started/
+
+## Contact Us
+
+If you are interested in openRuyi, you can follow our GitHub project, visit the openRuyi documentation center for more information, and join our Discord community for discussion and collaboration. The team is also continuously recruiting full-time employees, part-time contributors, and interns. Please send your resume to [wangjingwei@iscas.ac.cn](mailto:wangjingwei@iscas.ac.cn) (Jingwei Wang).

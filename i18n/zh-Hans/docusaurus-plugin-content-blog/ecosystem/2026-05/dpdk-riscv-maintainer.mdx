@@ -1,0 +1,59 @@
+---
+title: 软件所孙越池成为 DPDK RISC-V 架构维护者，推动 openRuyi 高性能网络与存储栈生态建设
+tags: [ecosystem]
+date: 2026-05-15
+slug: 2026-05/dpdk-riscv-maintainer
+---
+近日，中国科学院软件研究所工程师孙越池成为 DPDK（Data Plane Development Kit）RISC-V 架构维护者，维护范围从此前的 RVV（RISC-V 向量扩展）子系统进一步扩展至整个 RISC-V 架构。
+<!-- truncate -->
+![DPDK MAINTAINERS 相关变更](/article-images/2026-05/DPDK-1.png)
+<p align="center">DPDK MAINTAINERS 相关变更</p>
+
+> DPDK 是全球广泛部署的用户态高速数据平面框架，覆盖电信网络、云数据中心、虚拟交换、负载均衡等关键场景，也是 SPDK、OVS-DPDK、VPP 等高性能网络与存储项目的核心依赖。RISC-V 架构维护职责由长期投入相关优化的开发者承担，意味着该架构的补丁评审、CI 维护与版本发布将进入更稳定的节奏，并进一步推动 RISC-V 在数据中心与网络基础设施场景中的规模化落地。
+
+## 长期投入 RISC-V，逐步深入维护体系
+
+自 2023 年下半年起，DPDK 社区中的 RISC-V 相关提交一度长期停留在评审阶段，整体合入节奏放缓。2025 年以来，孙越池围绕 V 扩展检测、运行时调度，以及 lpm/fib 等核心查表数据结构的 RVV 向量化推动了一批补丁，相关工作成为近三年来首批进入 DPDK 主线的 RISC-V 优化成果。
+
+同期，他以 RVV 子系统维护者身份进入 DPDK MAINTAINERS。随着持续投入和社区协作不断深入，他进一步承担起整个 RISC-V 架构的维护职责。
+
+## openRuyi 的 DPDK 推动计划
+
+DPDK 的 RISC-V 适配，是 openRuyi 系统化推进高性能软件栈的关键一环。除推动 DPDK 上游合入 RVV 优化外，如意存储（RuyiSDS）方向也在 openRuyi 操作系统中同步建设 DPDK 的发行版构建、运行验证与持续集成能力。
+
+这些能力将让每一个 RISC-V 相关上游变更都能在真实 RISC-V 服务器硬件上获得快速反馈，降低因硬件资源不足导致补丁搁置、维护停滞的风险。
+
+围绕 DPDK 的 RISC-V 优化，openRuyi 已开展并将持续推进以下工作：
+
+- **指令扩展检测框架**：在编译期与运行期统一识别 V 等扩展能力，为后续优化分发奠定基础。
+- **核心数据结构 RVV 优化**：针对 fib、lpm 等查表/路由热路径完成 RVV 向量化，性能取得明显提升。
+- **构建与测试基础设施**：完善 RISC-V 平台上 V 扩展相关的构建与单元测试，保障 DPDK 在 RISC-V 上的稳定性。
+- **持续拓展**：mem、node、acl 等模块的 RVV 优化探索正在进行中，后续将逐步推向上游。
+
+与此同时，DPDK 社区中已有越来越多国内外开发者（例如中兴、字节等）参与 RISC-V 适配，目前在评审与讨论中的相关工作覆盖 Z 系列扩展（Zbc、Zicbop 等）支持与 hwprobe 检测、hash 等核心库的 RVV 向量化、rte_memcpy 优化、I/O 设备内存与预取操作等多个方向。孙越池将与社区贡献者协同推进这些工作的评审与合入，让 RISC-V 在 DPDK 上的优化版图持续扩展。
+
+## 围绕 Ceph 的 RISC-V 存储栈：openRuyi 的下一站
+
+在 RISC-V 平台上，存储栈优化离不开一条自下而上的组件链：上层 Ceph 分布式存储依赖 SPDK 用户态块存储栈、ISA-L 数据加速库、OpenSSL、zstd 等基础组件；SPDK 又依赖 DPDK 提供高性能内存池、轮询与无锁队列等运行时设施。
+
+RuyiSDS 方向的工作主线，正是沿着这条依赖链系统推进：
+
+- **底层加速库**：联合上游社区，在 ISA-L、zstd、OpenSSL 等 Ceph 依赖的基础组件上推进 RVV 向量化与 riscv64 适配。例如，今年早些时候发布的 ISA-L v2.32 已正式支持 riscv64，覆盖纠删码、CRC、压缩校验等核心算子的 RVV 实现。
+- **运行时与块存储**：以 DPDK 维护工作为支点，向上推动 SPDK 在 RISC-V 上的适配与完善，并逐步打通 Ceph 在 RISC-V 平台上的 DPDK/SPDK 路径。
+- **集成验证**：相关工作完成后，将在 openRuyi 中先行运行完整的 Ceph CI，争取使 openRuyi 成为业界首个完整支持 Ceph 的 RISC-V 发行版。
+- **性能调优**：在功能完整的基础上，逐步接入并验证 Ceph 中依赖 DPDK/SPDK 的高性能与下一代 OSD 路径；部分能力在上游仍处于实验阶段，后续将持续跟进。
+
+![openRuyi RISC-V 软件栈](/article-images/2026-05/DPDK-2.png)
+<p align="center">openRuyi RISC-V 软件栈</p>
+
+随着 RVA23 标准正式落地、服务器级 RISC-V 平台逐步成熟，网络与存储栈的系统级优化正从“逐点适配”进入“端到端协同”的新阶段。openRuyi 将以 DPDK 维护工作为支点，协同 SPDK、ISA-L、Ceph、OVS 等上下游组件，构建贯通基础设施与分布式应用的 RISC-V 软件栈。
+
+## 共建生态
+
+未来，RuyiSDS 方向将持续投入 RISC-V 在高性能网络与分布式存储领域的上游协作，推动更多优化合入 DPDK、SPDK、Ceph 等核心项目，并依托 openRuyi 提供稳定的开发、构建与验证环境，助力 RISC-V 服务器生态中的关键基础软件早日具备产线可用能力。
+
+我们诚挚邀请更多开发者、芯片厂商与系统厂商加入，与 openRuyi 共同推进 RISC-V 网络与存储软件栈的演进。
+
+## 联系我们
+
+对 openRuyi 工作感兴趣的伙伴们，可以关注 GitHub 开源项目，访问 openRuyi 文档中心获取更多信息，也欢迎加入 Discord 社区参与交流。团队长期招收全职、兼职和实习生，欢迎投递简历至邮箱 [wangjingwei@iscas.ac.cn](mailto:wangjingwei@iscas.ac.cn)（王经纬）。

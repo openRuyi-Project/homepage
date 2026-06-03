@@ -1,0 +1,60 @@
+---
+title: ISCAS Engineer Yuechi Sun Becomes DPDK RISC-V Architecture Maintainer, Advancing the Ecosystem of openRuyi’s High-Performance Networking and Storage Stack
+tags: [ecosystem]
+date: 2026-05-15
+slug: 2026-05/dpdk-riscv-maintainer
+---
+
+Recently, Yuechi Sun, an engineer at the Institute of Software, Chinese Academy of Sciences, became the RISC-V architecture maintainer for DPDK (Data Plane Development Kit). His maintenance scope has expanded from the previous RVV (RISC-V Vector Extension) subsystem to the entire RISC-V architecture.
+<!-- truncate -->
+![DPDK MAINTAINERS update](/article-images/2026-05/DPDK-1.png)
+<p align="center">DPDK MAINTAINERS update</p>
+
+> DPDK is a widely deployed user-space high-speed data plane framework, covering key scenarios such as telecommunications networks, cloud data centers, virtual switching, and load balancing. It is also a core dependency of high-performance networking and storage projects such as SPDK, OVS-DPDK, and VPP. Having long-term contributors to RISC-V optimization take on architecture maintenance means that patch review, CI maintenance, and release work for this architecture will move into a more stable cadence, further promoting the large-scale adoption of RISC-V in data center and network infrastructure scenarios.
+
+## Long-Term Investment in RISC-V and Deeper Involvement in the Maintenance Framework
+
+Since the second half of 2023, RISC-V-related submissions in the DPDK community had, for a time, remained under review for a prolonged period, and the overall merge pace slowed down. Since 2025, Yuechi Sun has promoted a series of patches around V extension detection, runtime dispatching, and RVV vectorization of core lookup data structures such as lpm and fib. This work became the first batch of RISC-V optimization achievements to enter the DPDK mainline in nearly three years.
+
+During the same period, he joined DPDK MAINTAINERS as the RVV subsystem maintainer. As his continued investment and community collaboration deepened, he further took on maintenance responsibilities for the entire RISC-V architecture.
+
+## openRuyi’s Plan to Advance DPDK
+
+DPDK support for RISC-V is a key part of openRuyi’s systematic efforts to advance the high-performance software stack. In addition to promoting the upstreaming of RVV optimizations into DPDK, the RuyiSDS initiative is also building distribution packaging, runtime validation, and continuous integration capabilities for DPDK in the openRuyi operating system.
+
+These capabilities will allow every RISC-V-related upstream change to receive fast feedback on real RISC-V server hardware, reducing the risk that patches are left pending or maintenance stalls due to insufficient hardware resources.
+
+Around RISC-V optimization for DPDK, openRuyi has carried out and will continue to advance the following work:
+
+- **Instruction extension detection framework**: Unified detection of extension capabilities such as V at both compile time and runtime, laying the foundation for future optimized dispatch.
+- **RVV optimization of core data structures**: RVV vectorization has been completed for lookup and routing hot paths such as fib and lpm, with notable performance improvements.
+- **Build and test infrastructure**: Improvements to build and unit testing related to the V extension on RISC-V platforms, ensuring DPDK stability on RISC-V.
+- **Continuous expansion**: Exploration of RVV optimizations for modules such as mem, node, and acl is underway and will be gradually pushed upstream.
+
+At the same time, an increasing number of developers from China and abroad, including contributors from ZTE and ByteDance, have been participating in RISC-V adaptation in the DPDK community. Related work currently under review and discussion covers multiple areas, including support for Z-series extensions such as Zbc and Zicbop, hwprobe detection, RVV vectorization of core libraries such as hash, rte_memcpy optimization, and memory and prefetch operations for I/O devices. Yuechi Sun will work with community contributors to advance the review and merging of this work, continuously expanding the scope of RISC-V optimization in DPDK.
+
+## The RISC-V Storage Stack Around Ceph: openRuyi’s Next Step
+
+On the RISC-V platform, storage stack optimization depends on a bottom-up component chain: the upper-layer Ceph distributed storage system depends on foundational components such as the SPDK user-space block storage stack, the ISA-L data acceleration library, OpenSSL, and zstd; SPDK, in turn, depends on DPDK for runtime facilities such as high-performance memory pools, polling, and lock-free queues.
+
+The main line of work in the RuyiSDS initiative is to systematically advance along this dependency chain:
+
+- **Low-level acceleration libraries**: Working with upstream communities to promote RVV vectorization and riscv64 adaptation for Ceph dependencies such as ISA-L, zstd, and OpenSSL. For example, ISA-L v2.32, released earlier this year, officially supports riscv64 and covers RVV implementations of core operators such as erasure coding, CRC, and compression checks.
+- **Runtime and block storage**: Using DPDK maintenance work as a foothold to further advance the adaptation and improvement of SPDK on RISC-V, and gradually enable the DPDK/SPDK path for Ceph on RISC-V platforms.
+- **Integration validation**: After the related work is completed, the full Ceph CI will first be run in openRuyi, with the goal of making openRuyi the industry’s first RISC-V distribution with complete Ceph support.
+- **Performance tuning**: On the basis of functional completeness, openRuyi will gradually integrate and validate the high-performance and next-generation OSD paths in Ceph that depend on DPDK/SPDK. Some of these capabilities are still experimental upstream, and openRuyi will continue to track their progress.
+
+![openRuyi RISC-V software stack](/article-images/2026-05/DPDK-2.png)
+<p align="center">openRuyi RISC-V software stack</p>
+
+As the RVA23 standard is officially implemented and server-class RISC-V platforms gradually mature, system-level optimization of networking and storage stacks is moving from “point-by-point adaptation” to a new stage of “end-to-end collaboration.” With DPDK maintenance as a foothold, openRuyi will collaborate with upstream and downstream components such as SPDK, ISA-L, Ceph, and OVS to build a RISC-V software stack that connects infrastructure and distributed applications.
+
+## Building the Ecosystem Together
+
+In the future, the RuyiSDS initiative will continue to invest in upstream collaboration for RISC-V in high-performance networking and distributed storage, promote more optimizations into core projects such as DPDK, SPDK, and Ceph, and rely on openRuyi to provide a stable development, build, and validation environment. These efforts will help key infrastructure software in the RISC-V server ecosystem reach production readiness sooner.
+
+We sincerely invite more developers, chip vendors, and system vendors to join us and work with openRuyi to advance the evolution of the RISC-V networking and storage software stack.
+
+## Contact Us
+
+If you are interested in openRuyi, you can follow our GitHub open-source project, visit the openRuyi documentation center for more information, and join our Discord community for discussion. The team is continuously recruiting full-time employees, part-time contributors, and interns. Please send your resume to [wangjingwei@iscas.ac.cn](mailto:wangjingwei@iscas.ac.cn) (Jingwei Wang).
