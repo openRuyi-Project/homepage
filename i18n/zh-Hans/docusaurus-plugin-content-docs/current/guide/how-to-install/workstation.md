@@ -29,7 +29,7 @@ $ sha256sum openRuyi-xxxx.xx-Workstation-labwc-dvd.iso
 
 * 准备一张 DVD 或一个 USB 闪存盘 (U 盘)，用于刷写 ISO 安装镜像。
 
-  * 如果您在 SG2044 上安装，可以准备一条 NVMe 固态硬盘，用于刷写 ISO 安装镜像。.时，需要准备一个 SD 卡，用于刷写 [EDK2 固件](https://github.com/revyos/firmware-sg204x/releases/download/20260212/firmware_edk2-sg2044-single-revyos_6.18.y-sg204x-v1.8.1-rva23.img)。
+  * 如果您在 SG2044 上安装，可以准备一条 NVMe 固态硬盘，用于刷写 ISO。安装镜像时，需要准备一张 SD 卡，用于刷写 [EDK2 固件](https://github.com/revyos/firmware-sg204x/releases/download/20260212/firmware_edk2-sg2044-single-revyos_6.18.y-sg204x-v1.8.1-rva23.img)。
 
 * 准备一个磁盘用于安装 openRuyi 系统。注意，该盘的内容会被覆盖，请提前备份数据。
 
