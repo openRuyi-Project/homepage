@@ -5,186 +5,320 @@ description: 这个文档讲述了 openRuyi 的 Rust 打包指南。
 slug: /guide/packaging-guidelines/languages/rust
 ---
 
-# Rust打包指南
+# Rust 打包指南
 
-本文介绍如何在 openRuyi 中使用 **TakoPack** 对 Rust crate 进行打包。对于相关的构建系统，请参阅 [Rust](/docs/guide/packaging-guidelines/BuildSystems/rust)。
+这个文档讲述了 openRuyi 的 Rust 打包指南。对于相关构建系统的说明，请参阅 [Rust](/docs/guide/packaging-guidelines/BuildSystems/rust)。
 
-通常来说，TakoPack 主要用于:
+openRuyi 中的 Rust 软件包通常分为以下几类:
 
-- 为单个 crate 生成初始 spec 文件和软件包目录
-- 为 Rust 项目准备 crate 依赖
-- 在人工审查和调整之前，辅助完成 Rust 打包的初始引导工作
+* Rust crate provider 包。
+* Rust 应用或命令行工具。
+* 带有 Rust 扩展的其他语言软件包，例如 Python/Rust 扩展包。
 
-在大多数情况下，自动生成的结果只是一个起点。对于存在严格版本约束、打过补丁的 `Cargo.toml`、git 依赖、workspace 布局或复杂 feature 关系的 crate，通常仍然需要手动修正。
+不同类型的软件包应选择不同的构建系统和依赖表达方式。
+Rust 打包工作中通常会配合 TakoPack 生成 crate provider、分析依赖和辅助审查，项目地址:
+https://github.com/TakoPack/TakoPack
 
-## 打包单个 Crate
+## 命名
 
-### 在线打包
+Rust crate provider 包必须以 `rust-` 为前缀。
 
-示例:
+crate provider 包名通常来自 crate 的兼容性名称。例如:
 
-```sh
-cargo pkg cbindgen 0.29.2
-Spec file: rust-cbindgen-0.29/rust-cbindgen.spec
+```specfile
+%global crate_name serde
+%global full_version 1.0.228
+%global pkgname serde-1
+
+Name:           rust-serde-1
+Version:        1.0.228
 ```
 
-该命令会从 crates.io 拉取指定的 crate 及其版本，并在当前工作目录下生成对应的打包目录。
+其中:
 
-同时，它还会将原始的 `Cargo.toml` 备份到:
+* `crate_name` 是上游 `Cargo.toml` 中的原始 crate 名称；
+* `full_version` 是上游完整 crate 版本；
+* `pkgname` 是 openRuyi 中用于包名、目录名和 `crate(...)` 能力的兼容性名称。
+
+crate 名中的 `_` 通常会在 RPM 包名和 `crate(...)` 能力中规范化为 `-`。例如，上游 crate 名为 `os_str_bytes` 时，provider 包名中通常使用 `os-str-bytes`。
+
+crate provider 的目录名、spec 文件名和 `Name` 应保持一致。例如:
 
 ```text
-~/cargo_back/origin
+SPECS/rust-serde-1/rust-serde-1.spec
 ```
 
-备份名称通常为:
+对应:
+
+```specfile
+%global pkgname serde-1
+Name:           rust-serde-1
+```
+
+如果确实需要修改 `pkgname`，也应同步调整目录名、spec 文件名以及相关的 `crate(...)` 依赖声明，并在 commit 和 PR 中说明原因。
+
+## 兼容性名称
+
+Rust crate provider 使用兼容性名称，以允许不同不兼容版本在仓库中共存。
+
+通常规则如下:
+
+* `1.x.y` 及以上版本按 major 版本划分。
+* `0.y.z` 且 `y > 0` 的版本按 minor 版本划分。
+* `0.0.z` 版本按完整 patch 版本划分。
+
+例如:
 
 ```text
-crate_name-full_version
+serde 1.0.228       -> serde-1
+tokenizers 0.22.2   -> tokenizers-0.22
+foo 0.0.7           -> foo-0.0.7
 ```
 
-其中 `_` 会被规范化为 `-`。
+除非 crate 存在明确的兼容性问题，不应引入不必要的更细粒度兼容性名称，例如 `serde-1.0.15`。
 
-这种模式适用于托管在 crates.io 上的普通 crate。
+## 构建系统
 
-### 从本地 `Cargo.toml` 打包
+Rust crate provider 包应使用:
 
-示例:
-```sh
-cargo localpkg value-bag-1.12.0/Cargo.toml
-cargo localpkg value-bag-1.12.0/Cargo.toml -o dir
+```specfile
+BuildSystem:    rustcrates
 ```
 
-其中 `-o dir` 是可选参数，用于指定输出目录。
+Rust 应用、命令行工具或其他需要执行 Cargo build/test 流程的软件包应使用:
 
-输出示例:
+```specfile
+BuildSystem:    rust
+```
+
+带有 Rust 扩展的 Python 软件包通常仍应使用 Python 相关构建系统，例如:
+
+```specfile
+BuildSystem:    pyproject
+```
+
+## 依赖关系
+
+Rust crate 依赖应通过 `crate(...)` 能力声明。例如:
+
+```specfile
+BuildRequires:  crate(serde-1/default) >= 1.0.0
+BuildRequires:  crate(clap-4/derive) >= 4.5.0
+```
+
+如果需要某个 feature，应显式依赖对应 feature 能力。
+
+不要使用普通 RPM 包名替代 `crate(...)` 能力来表达 Rust crate 依赖。`crate(...)` 能力是 Rust 生态包之间进行依赖解析的主要接口。
+
+在修改 crate 或软件包时，应确认:
+
+* 新增或修改的 crate provider 满足 openRuyi 的命名、源码、补丁和依赖规范。
+* 变更不会破坏仓库中已有 Rust 软件包的构建。
+* 使用仓库中已有的 crate provider，能够基于使用 crate 包构建软件的 `Cargo.toml` 完成依赖分析。
+* 新增 provider、升级 provider 和已有 provider 的影响范围已经被检查。
+
+## Rust crate provider 包
+
+Rust crate provider 包用于把 crate 源码安装到系统中，并提供 `crate(...)` 能力供其他 Rust 软件包使用。
+
+crate provider 包应使用 TakoPack 生成，生成结果应作为初始打包内容提交审查。维护者需要检查生成结果是否符合 openRuyi 的命名、源码、依赖和补丁规范。
+
+一个典型 crate provider 包示例:
+
+```specfile
+%global crate_name anes
+%global full_version 0.1.6
+%global pkgname anes-0.1
+
+Name:           rust-anes-0.1
+Version:        0.1.6
+Release:        %autorelease
+Summary:        Benchmarking helper library
+License:        MIT OR Apache-2.0
+URL:            https://crates.io/crates/%{crate_name}
+#!RemoteAsset:  sha256:...
+Source:         https://static.crates.io/crates/%{crate_name}/%{full_version}/download#/%{name}-%{version}.tar.gz
+BuildArch:      noarch
+BuildSystem:    rustcrates
+
+BuildRequires:  rust-rpm-macros
+```
+
+`Source`、`#!RemoteAsset`、`Patch` 等源码相关内容应以实际生成结果和仓库规范为准。不要在手工修改时破坏源码文件、哈希值和 spec 声明之间的一致性。
+
+crate provider 包通常不需要手写 `%build`、`%install` 或 `%check`。相关行为由 `rustcrates` 构建系统处理。
+
+### provider 目录中的 `Cargo.toml`
+
+TakoPack 生成 crate provider 包时，会在 provider 目录中保留一个 `Cargo.toml`。例如:
 
 ```text
-Spec file: 1/rust-value-bag-1.0/rust-value-bag.spec
+SPECS/rust-serde-1/Cargo.toml
+SPECS/rust-serde-1/rust-serde-1.spec
 ```
 
-这种模式通常用于本地 `Cargo.toml` 已经被修改过的情况，例如已经应用了补丁，或者已经放宽了依赖约束。
+这个 `Cargo.toml` 是打包时使用的 crate 元数据副本，主要用于记录 crate 名称、版本、依赖和 feature 信息。它也是生成 `BuildRequires: crate(...)`、feature 子包以及相关依赖关系的重要依据。
 
-需要注意的是，在这种模式下，生成的 spec 中源码归档包的哈希值通常需要你在下载 crate 并自行计算校验和之后再手动补充。
-## 准备多个 Crate
+对于从 crates.io 生成的 provider，这个文件通常来自上游 crate 归档中的 `Cargo.toml`。对于从本地 `Cargo.toml` 生成的 provider，它来自命令中指定的本地文件。
 
-### `track` 子命令
+如果打包过程中需要 patch 上游 `Cargo.toml`，应确保以下内容保持一致:
 
-准备完整依赖集的推荐方式是使用 `track` 子命令。
+* provider 目录中的 `Cargo.toml`。
+* 源码包中应用补丁后的 `Cargo.toml`。
+* spec 中声明的 `Patch`。
+* 由 crate 元数据生成的 `Requires` 和 `Provides`。
 
-它通过分析 `Cargo.lock` 工作，这通常比根据 `cargo tree` 推导依赖关系更可靠。
+不要只修改 spec 中生成出来的依赖声明，而不更新对应的 `Cargo.toml`。
 
-### 从本地 `Cargo.lock` 跟踪依赖
+### 从 crates.io 生成 provider
 
-示例:
+对于 crates.io 上的 crate，可以使用 TakoPack 生成初始 provider 包。例如:
 
 ```sh
-cargo run -- cargo track -f sieve/Cargo.lock -o 2022
+takopack cargo pkg cbindgen 0.29.2
 ```
 
-输出示例:
+也可以省略版本，让工具使用当前解析到的版本:
+
+```sh
+takopack cargo pkg pem
+```
+
+生成结果通常位于当前目录下，例如:
 
 ```text
-[18/19] Processing: unicode-ident 1.0.22
-    Updating crates.io index
-  ✓ Successfully packaged unicode-ident 1.0.22
-[19/19] Processing: windows-sys 0.61.2
-    Updating crates.io index
-  ✓ Successfully packaged windows-sys 0.61.2
-
-============================================================
-Batch Processing Summary
-============================================================
-Total packages processed: 19
-Successfully packaged:    19
-Failed:                   0
-
-Output directory: 2022
-============================================================
+rust-cbindgen-0.29/
+rust-pem-3/
 ```
 
-这种模式适用于你已经有一个本地项目，并且希望尽可能准确地将锁定后的完整依赖集打包出来的场景。
+生成后应检查目录名、spec 文件名、`pkgname`、源码链接、哈希值和依赖声明是否符合规范。
 
-### 根据 crate 名称和版本跟踪依赖
+### 从本地 `Cargo.toml` 生成 provider
 
-示例:
+如果 crate 的 `Cargo.toml` 已经被补丁修改，或者需要基于本地源码生成 provider，应使用本地 `Cargo.toml` 作为输入。例如:
 
 ```sh
-cargo run -- cargo track bindgen 0.29
+takopack cargo localpkg value-bag-1.12.0/Cargo.toml
 ```
 
-这种模式同样依赖类似 lock 的依赖解析方式，但它可能会尝试刷新依赖版本。多数情况下这没有问题，但对于依赖要求异常严格的 crate，仍然可能需要手动调整。
-
-### 本地依赖记录
-
-在处理依赖时，`track` 还会把已经打包过的 crate 名称和版本记录到本地数据库中。
-
-示例:
+也可以指定输出目录:
 
 ```sh
-ls ~/.config/takopack
-crate_db.txt
+takopack cargo localpkg value-bag-1.12.0/Cargo.toml -o outdir
 ```
 
-这有助于减少重复劳动，但它并不是一个完整的依赖管理系统。可选依赖、feature 关系以及某些版本边界情况，仍然可能需要人工审查。
+这种方式常用于:
 
-## 常见限制
+* 放宽或修正依赖约束；
+* 把 git/path 依赖改成适合 openRuyi 打包的形式。
 
-### Git 依赖
+使用本地 `Cargo.toml` 生成 provider 后，应确认 provider 目录中的 `Cargo.toml` 与打包源码中补丁后的 `Cargo.toml` 保持同步。
 
-并不是所有 Rust 依赖都来自 crates.io，有些软件包依赖的是 git 仓库。
+## Rust 应用包
 
-如果该 git 仓库的结构对应单个 crate，通常可以这样处理:
+Rust 应用包通常使用:
 
-1. 手动克隆仓库
-2. 对它的 `Cargo.toml` 使用 `localpkg`
-3. 调整源码哈希值
-4. 将生成的 spec 中的源码 URL 替换为合适的 git 归档 URL
+```specfile
+BuildSystem:    rust
+```
 
-如果该仓库采用的是 workspace 布局，打包会复杂得多。这种情况下，你可能需要给 `Cargo.toml` 打补丁、将整个仓库作为源码进行打包，并手动重写 workspace 依赖版本。
+Rust 应用包也需要声明 Rust 构建环境和实际构建所需的 crate 依赖。例如:
 
-### Rust 应用比库 crate 更难打包
+```specfile
+BuildRequires:  rust
+BuildRequires:  rust-rpm-macros
+BuildRequires:  crate(clap-4/default) >= 4.5.0
+BuildRequires:  crate(clap-4/derive) >= 4.5.0
+```
 
-TakoPack 最适合用于打包单个 crate。
+如果应用需要安装二进制文件，应在 `%install` 中明确安装构建产物。例如:
 
-对于完整的 Rust 应用，依赖处理会困难得多:
+```specfile
+%install
+install -Dm0755 target/release/example-cli %{buildroot}%{_bindir}/example-cli
+```
 
-- `Cargo.lock` 可能会产生非常庞大的依赖列表
-- 列出来的某些依赖在最终构建中实际上并不需要
-- feature 之间的关系并不总是容易自动推断
-- 严格的版本约束往往只有在真正构建应用时才会暴露出来
+对于存在 git 依赖或源码内 path 依赖的 Rust 应用，通常应通过补丁修改 `Cargo.toml`，使其指向打包时实际存在的源码位置或系统中已经提供的 crate provider。修改后，应确认 spec 附带的 `Cargo.toml`、源码中实际使用的 `Cargo.toml` 以及补丁内容相互一致。
 
-一种常见的工作流是先用 `localpkg` 生成初始 spec，然后再手动精简依赖列表并调整打包结构。
+如果 Rust 应用本身也发布到了 crates.io，可以先使用 TakoPack 生成初始 provider 目录，再根据应用包实际需要调整 spec。此时，应将生成得到的 `Cargo.toml` 复制到实际软件包目录中，并确保它与最终打包源码中使用的 `Cargo.toml` 保持一致。
 
-### 严格的依赖约束
+如果 Rust 应用并非来自 crates.io，应从解压后的上游源码中复制主要 `Cargo.toml` 到软件包目录中，作为依赖分析和审查依据。
 
-有些 crate 并没有很好地遵循 Rust 的版本兼容规则，或者它们把依赖版本钉得过死。
+## Python/Rust 扩展包
 
-在这种情况下，打包可能需要:
+如果 Python 软件包包含 Rust 扩展，通常仍应使用 Python 相关构建系统，例如:
 
-- 给 `Cargo.toml` 打补丁
-- 放宽依赖版本范围
-- 基于打过补丁的本地源码重新生成 spec
+```specfile
+BuildSystem:    pyproject
+```
 
-这也是使用 `localpkg` 最常见的原因之一。
+同时声明 Python 和 Rust 构建所需依赖。例如:
 
-### 可选依赖与 Feature
+```specfile
+BuildRequires:  rust
+BuildRequires:  rust-rpm-macros
+BuildRequires:  python3dist(maturin)
+BuildRequires:  crate(pyo3-0.27/default) >= 0.27.0
+BuildRequires:  crate(pyo3-0.27/extension-module) >= 0.27.0
+```
 
-即使已经拿到了依赖数据，可选依赖和 feature 组合仍然可能带来问题。
+这类软件包的 `%prep` 通常需要在 Python 构建系统的默认准备逻辑之后配置 Rust system registry，并根据实际情况移除上游 `Cargo.lock`。例如:
 
-某个 crate 在 API 层面看起来可能是兼容的，但当另一个软件包启用了此前未使用的可选依赖后，它仍可能在后续构建中失败。此时，缺失或过时的依赖往往只有在实际构建时才会暴露出来。
+```specfile
+%prep -a
+%rust_setup_registry
+rm -f Cargo.lock
+```
 
-一旦出现这种情况，可能就需要在之后额外单独打包更多 crate。
+如果 Rust 源码位于子目录，应在正确目录下处理对应的 `Cargo.lock`。例如:
+
+```specfile
+%prep -a
+%rust_setup_registry
+rm -f rust/Cargo.lock
+```
+
+Python/Rust 扩展包一般需要从解压后的上游源码中手动复制主要 `Cargo.toml` 到软件包目录中，作为依赖分析和审查依据。
+
+## CI 检查
+
+打包或更新 Rust crate provider 时，应根据 CI 结果在 spec 中进行必要处理。CI 可能会暴露源码文件权限、解释器路径、feature 依赖闭包缺失等问题，维护者应结合实际情况调整 spec 或相关打包内容。
+
+openRuyi 不一定会使用 crate 的全部 feature。如果 CI 中出现未实际使用 feature 的依赖闭包问题，且确认当前不需要为这些 feature 补齐额外 crate provider，应在 PR 评论中说明原因。
+
+升级 crate provider 后，即使应用包的依赖仍然满足构建要求，也应检查实际 spec 文件中的 `BuildRequires: crate(...)` 是否需要更新。
+
+## 补丁
+
+有些 crate 的依赖约束无法直接映射到 openRuyi 的 crate provider 规则。常见情况包括:
+
+* 依赖范围跨越多个 crate 兼容性 key。
+* 依赖 prerelease 版本。
+* 依赖版本钉得过死。
+* 依赖 git 仓库。
+* 依赖 workspace 内部 path crate。
+
+遇到这些情况时，优先修改上游 `Cargo.toml`，形成补丁，然后基于补丁后的 `Cargo.toml` 重新生成或更新 provider。
+
+禁止只手动修改生成后的 `Requires` 或 `Provides` 来绕过问题。`Requires` 和 `Provides` 应当由修正后的 crate 元数据重新生成，以免 spec 与实际源码不一致。
+
+补丁应按仓库通用补丁规范声明，并确保 `Patch`、源码内容、provider 目录中的 `Cargo.toml` 和生成后的 provider 目录保持一致。
 
 ## 实践建议
 
-在实际使用中，这几个命令通常可以这样选择:
+打包 Rust 软件包时，建议遵循以下原则:
 
-- 对于来自 crates.io 的普通单个 crate，使用 **`pkg`**
-- 对于 `Cargo.toml` 被打过补丁或手动修改过的 crate，使用 **`localpkg`**
-- 当你需要根据 `Cargo.lock` 准备完整依赖集时，使用 **`track`**
-
-对于简单 crate，TakoPack 往往足以生成一个不错的初始 spec。对于应用、workspace、git 依赖、严格版本约束以及复杂 feature 组合，则要预期仍需进行人工审查和调整。
+* crate provider 使用 `BuildSystem: rustcrates`。
+* Rust 应用使用 `BuildSystem: rust`。
+* Python/Rust 扩展通常继续使用 `BuildSystem: pyproject`。
+* Rust crate provider 应使用 TakoPack 生成。
+* Rust crate 依赖使用 `BuildRequires: crate(...)` 表达。
+* 对生成出来的 provider 进行人工审查。
+* 遇到不合理依赖时，优先 patch `Cargo.toml` 并重新生成 provider。
+* 不要直接手改生成的 `Requires`/`Provides` 来代替元数据修正。
+* 修改 crate 或软件包时，确认不会破坏仓库中已有 Rust 软件包的构建。
+* 新增 provider、升级 provider 和已有包影响面应进行检查。
 
 ## 来源
 
-该工具基于 Debian Rust Packaging Team 的 `debcargo` 改造而来，以满足 openRuyi 的打包需求。我们在此对他们的工作表示感谢。
+Rust crate provider 的自动生成工具基于 Debian Rust Packaging Team 的 `debcargo` 改造而来，以满足 openRuyi 的打包需求。我们在此对他们的工作表示感谢。
