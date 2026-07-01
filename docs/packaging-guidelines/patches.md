@@ -21,7 +21,9 @@ All patch files should begin with a four-digit numeric prefix. openRuyi reserves
 
 * Use the range `1000-1999` for CVE fixes and backported patches from other upstream versions.
 
-* Use the range `2000-2999` for openRuyi-specific patches that do not target upstream acceptance.
+* Use the range `2000-2999` for openRuyi-specific patches, patches that have not been submitted upstream, and patches that have been submitted upstream but have not yet been accepted.
+
+If such a patch has been submitted upstream, the Spec file should include a comment with the related submission information, such as a pull request link. After upstream merges the patch, the patch should generally not be renamed solely because its upstream status has changed.
 
 ## Using Individual `Patch` Tags
 
