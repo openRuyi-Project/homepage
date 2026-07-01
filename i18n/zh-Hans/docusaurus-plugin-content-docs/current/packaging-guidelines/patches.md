@@ -21,7 +21,9 @@ slug: /guide/packaging-guidelines/Patch
 
 * CVE 修复及上游其它版本 backport 补丁，声明范围为 1000-1999。
 
-* openRuyi 特有，而不会被 upstream 的补丁声明范围为 2000-2999。
+* openRuyi 特有，或者尚未提交 upstream，以及已提交但尚未被 upstream 接受的补丁，声明范围为 2000-2999。
+
+如此类补丁被提交 upstream，该补丁在 spec 内应该有提交信息相关的注释 (例如 Pull Request 链接)；被 upstream 合并后，原则上不因状态变化而重命名。
 
 ## 使用单 `Patch` 字段
 
