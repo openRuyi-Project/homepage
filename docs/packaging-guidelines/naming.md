@@ -43,6 +43,8 @@ For various reasons, openRuyi may sometimes provide multiple versions of the sam
 
 One package should use the base name (without additional qualifiers). In contrast, all other derived packages must include that base name followed by a hyphen (`-`) and a descriptive suffix (for example, `stable`) or a version number (for example, `21`).
 
+However, openRuyi exempts existing packages whose names have already become established through common use, such as `gcc15` and `llvm23`.
+
 ## Letter Case
 
 Although openRuyi does not strictly require case sensitivity, you should use capitalization only when necessary.
