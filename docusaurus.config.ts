@@ -27,6 +27,8 @@ const config: Config = {
     locales: ['zh-Hans', 'en'],
   },
 
+  clientModules: ['./src/clientModules/languageRedirect.ts'],
+
   presets: [
     [
       'classic',
