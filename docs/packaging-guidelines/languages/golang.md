@@ -13,6 +13,20 @@ This document describes the Golang packaging guidelines for openRuyi. For the re
 
 Many Go libraries, as well as some Go programs, exist only in version control systems and are never released as formal upstream versions. For versioning rules, please refer to the [Versioning](/docs/guide/packaging-guidelines/Versioning) section.
 
+## Determining Packaging Boundaries
+
+### Prefer Repository-Level Source Packages
+
+The VCS repository should serve as the source package boundary. Go modules contained in the same repository snapshot should preferably be combined into one source package, rather than split into multiple Specs merely because the repository contains multiple `go.mod` files or independently versioned tags.
+
+For example, a remote VCS repository may contain `ansi`, `cellbuf`, and `term`, each with its own `go.mod` file and version tag. As long as one repository snapshot contains all the source code required by openRuyi, a single repository-level source package can maintain them together. Make sure that each module is installed at the location corresponding to its actual import path.
+
+### Version Granularity for Repository-Level Packages
+
+The RPM `Version` of a repository-level package represents the selected VCS snapshot. It does not need to reproduce the independent version of every nested module exactly.
+
+Each `go(...)` capability provided by the package may also use this RPM `Version`. The version indicates which repository snapshot provides the capability and should not be interpreted as the exact upstream semantic version of each nested module.
+
 ## Binary-Only Packages
 
 A binary-only package contains a program written in Go, but does not ship source code. For example, `ollama` is written in Go, but it does not provide an API intended for reuse by other Go packages, so it should not ship a source package for others to import.
@@ -29,6 +43,8 @@ Within openRuyi, the sole purpose of packaging Go libraries is to build other Go
 
 Every Go library has its own import path. You should derive package names from that import path by replacing all slashes with hyphens and substituting the hostname with a standardized identifier.
 
+For a repository-level package containing multiple modules, derive the package name from the normalized VCS repository root rather than from whichever nested module happened to be packaged first.
+
 Ideally, you will base the final package name directly on the import path. The table below shows some examples:
 
 | Import Path                 | openRuyi Package Name      |
@@ -43,6 +59,8 @@ Ideally, you will base the final package name directly on the import path. The t
 You must install all files under `/usr/share/gocode/src`, which corresponds to `$GOPATH/src`.
 
 For example, for `github.com/boombuler/barcode` (that is, `go-github-boombuler-barcode`), you should install one of its files as: `/usr/share/gocode/src/github.com/boombuler/barcode/code93/encoder.go`
+
+For a repository-level package, the final installation path of each module must match its actual import path.
 
 ### Handling Multiple Versions
 
