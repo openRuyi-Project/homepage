@@ -95,7 +95,7 @@ You can rewrite it as follows:
 ```specfile
 BuildSystem:  pyproject
 
-BuildOption(install):  example_pkg
+BuildOption(install):  -l example_pkg
 
 %install -a
 rm -f %{buildroot}%{_bindir}/debug-helper

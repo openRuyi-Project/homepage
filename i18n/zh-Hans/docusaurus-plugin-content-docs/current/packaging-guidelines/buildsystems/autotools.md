@@ -63,7 +63,7 @@ cp {SOURCE1} .
 可以看到，首先我们指定解压源码并加载补丁，最后再将定义的 Source1 复制到当前目录下。通过使用 `autotools` 构建系统，可以修改为如下:
 
 ```specfile
-BuildOptin(prep): -p0
+BuildOption(prep): -p0
 
 # ...
 
@@ -77,7 +77,7 @@ cp {SOURCE1} .
 
 ```specfile
 # 假设上游的压缩包解压之后，第二部分不是版本号，而是 %%{short_commit_id}
-BuildOptin(prep): -p0 -n %{name}-%{short_commit_id}
+BuildOption(prep): -p0 -n %{name}-%{short_commit_id}
 
 # ...
 

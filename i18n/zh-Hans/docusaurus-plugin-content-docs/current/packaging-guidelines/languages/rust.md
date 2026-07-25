@@ -2,7 +2,7 @@
 id: languagesrust
 title: Rust
 description: 这个文档讲述了 openRuyi 的 Rust 打包指南。
-slug: /guide/packaging-guidelines/languages/rust
+slug: /guide/packaging-guidelines/languages/Rust
 ---
 
 # Rust 打包指南

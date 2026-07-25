@@ -33,7 +33,7 @@ The terms used in this specification are defined as follows:
 4. UEFI：Unified Extensible Firmware Interface Specification.
 5. ACPI：Advanced Configuration and Power Interface Specification.
 6. SMBIOS：System Management BIOS (SMBIOS) Reference Specification.
-7. BRS：RISC-V Boot and Runtime Services Specificatio is designed to provide unified, open support for boot and runtime services on the RISC-V platform.
+7. BRS：RISC-V Boot and Runtime Services Specification is designed to provide unified, open support for boot and runtime services on the RISC-V platform.
 8. SoC：System on Chip. A single chip encapsulates the processor and some on-chip peripherals.
 
 ## 3. Processor
@@ -119,7 +119,7 @@ As an implementation option, the UEFI firmware can begin execution in machine mo
 3. An implementation may comply with the UEFI Platform Initialization Specification[^10].
 4. All HART manipulation internal to a firmware implementation should be done before completion of the EFI_EVENT_GROUP_READY_TO_BOOT event. And must place all secondary harts in an offline.
 5. The implementation must declare the EFI_CONFORMANCE_PROFILES_UEFI_SPEC_GUID conformance profile. Indicates that the UEFI firmware complies with the “Required” section of the UEFI specification.
-6. The implementation must declare the EFI_CONFORMANCE_PROFILES_UEFI_SPEC_GUID conformance profile. Indicates that the UEFI firmware complies with the requirements of riscv-brs 1.0
+6. The implementation must declare the EFI_CONFORMANCE_PROFILE_BRS_1_0_SPEC_GUID conformance profile. Indicates that the UEFI firmware complies with the requirements of riscv-brs 1.0
 
 ### 7.1 IO Requirements
 
