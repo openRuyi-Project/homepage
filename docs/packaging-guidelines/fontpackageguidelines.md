@@ -86,3 +86,75 @@ We recommend the following split:
 * `fonts-fontname-static` (static fonts): contains non-VF font files, typically non-variable `.ttf` or `.otf`.
 
   * In some cases, the upstream may provide only collection files (`*.ttc` / `*.otc`). In such cases, you may instead name the subpackage `fonts-fontname-ttc` or `fonts-fontname-otc`.
+
+## Macros
+
+The `fonts-rpm-macros` package provides RPM macros that name the font directories described above and install font files into them. To use these macros, add the following `BuildRequires`:
+
+```specfile
+BuildRequires:  fonts-rpm-macros
+```
+
+The macros currently cover OpenType TT (`*.ttf` / `*.ttc`) and OpenType CFF/CFF2 (`*.otf`). Install the remaining formats, such as `*.otc`, `*.otb`, `*.pcf`, `*.pfb`, `*.psf`, and `*.woff`, with the explicit paths that [Installation Paths](#installation-paths) describes.
+
+### Directory Macros
+
+Use the following macros in `%install` and `%files` instead of hardcoding the paths:
+
+| Macro                    | Expansion                            | Meaning                                              |
+| ------------------------ | ------------------------------------ | ---------------------------------------------------- |
+| `%{_fontdir}`            | `%{_datadir}/fonts`                  | Top-level directory for system-wide fonts            |
+| `%{_font_truetypedir}`   | `%{_fontdir}/truetype`               | Directory for OpenType TT fonts                      |
+| `%{_font_opentypedir}`   | `%{_fontdir}/opentype`               | Directory for OpenType CFF/CFF2 fonts                |
+| `%{_font_fontconfigdir}` | `%{_datadir}/fontconfig/conf.avail`  | Directory for available fontconfig configuration files |
+
+### %install_font
+
+`%install_font <src> [subdir]` installs one font file and picks the destination from the file extension: `*.ttf` and `*.ttc` go under `%{_font_truetypedir}`, and `*.otf` goes under `%{_font_opentypedir}`. Any other extension fails the build.
+
+Pass `subdir` to keep a package's font files in their own directory under the type directory. If you omit `subdir`, the macro installs the files directly into the type directory.
+
+The macro creates the destination directory, installs the file with mode `0644`, and preserves its timestamp.
+
+```specfile
+%install
+%install_font Example-Regular.ttf example
+%install_font Example-Bold.otf example
+%install_font Example.ttc example
+```
+
+### %install_fonts
+
+`%install_fonts <glob> [subdir]` passes every file that `<glob>` matches to `%install_font`. A glob that matches nothing is skipped, so you may list patterns for formats that a given release does not ship.
+
+```specfile
+%install
+%install_fonts *.ttf example
+%install_fonts *.otf example
+```
+
+`%install_fonts_auto [subdir]` scans the current directory for `*.ttf`, `*.otf`, and `*.ttc`, and installs each file to the directory that matches its extension.
+
+```specfile
+%install
+cd fonts
+%install_fonts_auto example
+```
+
+### %font_files
+
+`%font_files <subdir> [ext...]` generates the `%files` entries for the fonts that the macros installed under `<subdir>`. For each extension, it emits a `%dir` entry for the owning type directory and a glob for the font files.
+
+```specfile
+%files
+%font_files example ttf
+```
+
+The macro above expands to the following:
+
+```specfile
+%dir /usr/share/fonts/truetype/example/
+/usr/share/fonts/truetype/example/*.ttf
+```
+
+List the extensions that the package actually installs. When you omit them, the macro falls back to `ttf`, `otf`, and `ttc`, and rpmbuild then fails on every one of the three globs that matches no file.

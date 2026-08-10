@@ -68,3 +68,75 @@ Linux 的控制台字体 (`*.psf`) 和 Web 字体 (`*.woff`/`*.woff2`) 不应该
 * `fonts-fontname-static` (静态字体): 放非 VF 的字体文件，通常为 `.ttf` 或 `.otf` 的非 VF。
 
   * 有些时候，上游也会只提供集合文件 (`*.ttc`/`*.otc`)，此时可以将子包命名为 `fonts-fontname-ttc` 或 `fonts-fontname-otc`。
+
+## 宏
+
+`fonts-rpm-macros` 包提供了一组 RPM 宏，用于表示上文所述的字体目录，并将字体文件安装到这些目录中。使用这些宏时，需要添加如下 `BuildRequires`:
+
+```specfile
+BuildRequires:  fonts-rpm-macros
+```
+
+当前版本的宏覆盖 OpenType TT (`*.ttf`/`*.ttc`) 和 OpenType CFF/CFF2 (`*.otf`)。其余格式，例如 `*.otc`、`*.otb`、`*.pcf`、`*.pfb`、`*.psf` 和 `*.woff`，仍需按照[安装位置](#安装位置)一节所述的路径手动安装。
+
+### 目录宏
+
+在 `%install` 和 `%files` 中应使用下列宏，而不是硬编码路径:
+
+| 宏                       | 展开结果                             | 含义                                  |
+| ------------------------ | ------------------------------------ | ------------------------------------- |
+| `%{_fontdir}`            | `%{_datadir}/fonts`                  | 系统级字体的顶层目录                  |
+| `%{_font_truetypedir}`   | `%{_fontdir}/truetype`               | OpenType TT 字体目录                  |
+| `%{_font_opentypedir}`   | `%{_fontdir}/opentype`               | OpenType CFF/CFF2 字体目录            |
+| `%{_font_fontconfigdir}` | `%{_datadir}/fontconfig/conf.avail`  | fontconfig 可用配置文件目录           |
+
+### %install_font
+
+`%install_font <src> [subdir]` 安装单个字体文件，并根据扩展名选择目标目录: `*.ttf` 和 `*.ttc` 安装至 `%{_font_truetypedir}`，`*.otf` 安装至 `%{_font_opentypedir}`。其他扩展名会导致构建失败。
+
+传入 `subdir` 可以把一个包的字体文件放在类型目录下自己的子目录中。如果省略 `subdir`，字体文件会直接安装到类型目录内。
+
+该宏会自动创建目标目录，以 `0644` 权限安装文件，并保留文件时间戳。
+
+```specfile
+%install
+%install_font Example-Regular.ttf example
+%install_font Example-Bold.otf example
+%install_font Example.ttc example
+```
+
+### %install_fonts
+
+`%install_fonts <glob> [subdir]` 会把 `<glob>` 匹配到的每个文件交给 `%install_font` 安装。未匹配到任何文件的 glob 会被跳过，因此可以为某个版本可能并未提供的格式预留匹配规则。
+
+```specfile
+%install
+%install_fonts *.ttf example
+%install_fonts *.otf example
+```
+
+`%install_fonts_auto [subdir]` 会扫描当前目录下的 `*.ttf`、`*.otf` 和 `*.ttc`，并按扩展名把每个文件安装到对应目录。
+
+```specfile
+%install
+cd fonts
+%install_fonts_auto example
+```
+
+### %font_files
+
+`%font_files <subdir> [ext...]` 用于为安装在 `<subdir>` 下的字体生成 `%files` 条目。对每个扩展名，它会生成所属类型目录的 `%dir` 条目和字体文件的 glob 条目。
+
+```specfile
+%files
+%font_files example ttf
+```
+
+上面的宏展开为如下结果:
+
+```specfile
+%dir /usr/share/fonts/truetype/example/
+/usr/share/fonts/truetype/example/*.ttf
+```
+
+在使用时应当列出包实际安装的扩展名。如果省略扩展名，宏会回退为 `ttf`、`otf` 和 `ttc`，此时三个 glob 中任何一个未匹配到文件都会导致 rpmbuild 失败。
