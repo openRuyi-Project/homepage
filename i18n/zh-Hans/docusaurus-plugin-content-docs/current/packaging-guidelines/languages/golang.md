@@ -13,6 +13,20 @@ slug: /guide/packaging-guidelines/languages/Golang
 
 许多 Go 库 (以及部分 Go 程序) 是直接存在于版本控制系统中的，而从未发布过版本。关于版本号的编写，请参阅[版本号](/docs/guide/packaging-guidelines/Versioning)。
 
+## 确定打包边界
+
+### 优先按 VCS 仓库打大包
+
+应当以 VCS 仓库作为源码包的边界。在同一份仓库快照中的 Go module，应该优先合并到一个源码包中，而不是仅仅因为存在多个 `go.mod` 或独立 tag 就拆成多个 Spec。
+
+例如，一个远程 VCS 仓库内的 `ansi`、`cellbuf` 和 `term` 分别拥有自己的 `go.mod` 和版本标签，只要同一仓库快照能够提供 openRuyi 所需的全部源码，就可以由一个仓库级源码包统一维护。注意将每个 module 安装到与其真实 import path 对应的位置。
+
+### 大包的版本粒度
+
+仓库级大包的 RPM `Version` 表示所选 VCS 快照，而不要求精确复刻其中每个嵌套 module 的独立版本。
+
+大包中各 `go(...)` capability 的版本也可以统一使用该 RPM `Version`。这个版本表示“由哪一份仓库快照提供”，不应被解释为每个嵌套 module 各自的精确上游语义版本。
+
 ## 仅包含二进制的软件包
 
 仅包含二进制的软件包是指包含由 Go 编写的程序，但不包含源代码的软件包。例如 `ollama`，它由 Go 编写，但不提供 API，因此不提供源码包供其它 Go 包引用。
@@ -29,6 +43,8 @@ slug: /guide/packaging-guidelines/languages/Golang
 
 所有的 Go 库都有自己的导入路径 (import path)，我们将其的所有斜杠替换为横杠，并使用规范的标识符代替主机名来给软件包命名。
 
+对于包含多个 module 的仓库级大包，名称应该根据规范化后的 VCS 仓库根路径生成，而不是根据某个偶然先被打包的嵌套 module 命名。
+
 在理想的情况下，软件包最终的名称通常都是导入路径。以下是一些例子:
 
 | 导入路径                     | openRuyi 软件包名称          |
@@ -43,6 +59,8 @@ slug: /guide/packaging-guidelines/languages/Golang
 所有文件必须安装至 `/usr/share/gocode/src`，这对应于 `$GOPATH/src`。
 
 例如，对于 `github.com/boombuler/barcode` 来说 (即 `go-github-boombuler-barcode`)，其中一个文件的路径应该为 `/usr/share/gocode/src/github.com/boombuler/barcode/code93/encoder.go`。
+
+对于大包，每个 module 最终安装路径必须与实际 import path 一致。
 
 ### 多版本的情况处理
 
