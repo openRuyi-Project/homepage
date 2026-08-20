@@ -31,7 +31,7 @@ Place `Patch` tags above the `BuildOption` tag (if present), or above the `Build
 
 ```specfile
 # https://github.com/pypa/wheel/pull/655
-Patch0:         0001-adjusts-tests-for-setuptools-78.patch
+Patch1:         0001-adjusts-tests-for-setuptools-78.patch
 ```
 
 If you prefer, you may also include an explanatory comment together with the link:
@@ -39,7 +39,7 @@ If you prefer, you may also include an explanatory comment together with the lin
 ```specfile
 # Upstream has removed this code entirely instead
 # https://github.com/pypa/wheel/pull/655
-Patch0:         0001-adjusts-tests-for-setuptools-78.patch
+Patch1:         0001-adjusts-tests-for-setuptools-78.patch
 ```
 
 ## Using `%patchlist`

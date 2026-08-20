@@ -31,7 +31,7 @@ slug: /guide/packaging-guidelines/Patch
 
 ```specfile
 # https://github.com/pypa/wheel/pull/655
-Patch0:         0001-adjusts-tests-for-setuptools-78.patch
+Patch1:         0001-adjusts-tests-for-setuptools-78.patch
 ```
 
 如果你愿意的话，可以同时添加注释并附上链接：
@@ -39,7 +39,7 @@ Patch0:         0001-adjusts-tests-for-setuptools-78.patch
 ```specfile
 # Upstream has removed this code entirely instead
 # https://github.com/pypa/wheel/pull/655
-Patch0:         0001-adjusts-tests-for-setuptools-78.patch
+Patch1:         0001-adjusts-tests-for-setuptools-78.patch
 ```
 
 ## 使用 `%patchlist` 字段
