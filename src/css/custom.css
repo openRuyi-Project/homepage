@@ -32,3 +32,17 @@
   display: flex;
   justify-content: center;
 }
+
+/* Display the fenced code language. */
+.theme-code-block[class*="language-"]::before { display: block; padding: 0.45rem var(--ifm-pre-padding); border-bottom: 1px solid var(--ifm-color-emphasis-300); color: var(--ifm-color-emphasis-600); font-family: var(--ifm-font-family-monospace); font-size: 0.8rem; font-weight: 600; line-height: 1.4; text-transform: lowercase; }
+.theme-code-block.language-bash::before { content: "bash"; }
+.theme-code-block.language-sh::before { content: "sh"; }
+.theme-code-block.language-powershell::before { content: "powershell"; }
+.theme-code-block.language-markdown::before { content: "markdown"; }
+.theme-code-block.language-mermaid::before { content: "mermaid"; }
+.theme-code-block.language-spec::before { content: "spec"; }
+.theme-code-block.language-specfile::before { content: "specfile"; }
+.theme-code-block.language-text::before { content: "text"; }
+.theme-code-block.language-toml::before { content: "toml"; }
+.theme-code-block.language-xml::before { content: "xml"; }
+.theme-code-block.language-yaml::before { content: "yaml"; }

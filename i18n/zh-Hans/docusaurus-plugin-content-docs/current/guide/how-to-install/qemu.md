@@ -23,7 +23,7 @@ slug: /guide/how-to-install/qemu
 如果您正在使用的系统上安装了 sha256sum 命令，则可以将校验和文件放在安装映像的同一个目录下，然后运行一下命令来验证：
 
 ```sh
-$ sha256sum openRuyi-xxxx.xx-Server-cloud.qcow2
+sha256sum openRuyi-xxxx.xx-Server-cloud.qcow2
 ```
 
 ## 通过 QEMU 运行

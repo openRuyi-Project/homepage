@@ -43,14 +43,14 @@ If upstream provides methods to further verify the downloaded files, you can als
 
 You can pipe the output patch into `git apply` to fix the spec file:
 
-```
-$ scripts/remoteassetify.py SPECS/hello/hello.spec | git apply
+```bash
+scripts/remoteassetify.py SPECS/hello/hello.spec | git apply
 ```
 
 For details on options, see:
 
-```
-$ scripts/remoteassetify.py --help
+```bash
+scripts/remoteassetify.py --help
 ```
 
 ## Automation usage

@@ -14,7 +14,7 @@ RPM provides a rich set of macros that simplify package maintenance and ensure c
 You can ask RPM to evaluate any string containing macros by running `rpm --eval` on the command line:
 
 ```bash
-$ rpm --eval "some text printed on %{_arch}"
+rpm --eval "some text printed on %{_arch}"
 some text printed on riscv64
 ```
 

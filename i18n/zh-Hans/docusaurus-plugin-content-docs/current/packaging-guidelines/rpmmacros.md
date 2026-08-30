@@ -14,7 +14,7 @@ RPM 提供了一套丰富的宏，旨在使软件包的维护工作更简单，�
 通过在命令行中运行 `rpm --eval`，可以让 RPM 计算包含宏的任意字符串：
 
 ```bash
-$ rpm --eval "some text printed on %{_arch}"
+rpm --eval "some text printed on %{_arch}"
 some text printed on riscv64
 ```
 

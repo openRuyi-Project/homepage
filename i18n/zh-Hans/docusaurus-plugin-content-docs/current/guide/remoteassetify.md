@@ -43,14 +43,14 @@ slug: /guide/remoteassetify-usage-guide
 
 如需修改 spec 文件，可以将输出的补丁用管道送入 `git apply`：
 
-```
-$ scripts/remoteassetify.py SPECS/hello/hello.spec | git apply
+```bash
+scripts/remoteassetify.py SPECS/hello/hello.spec | git apply
 ```
 
 更多参数信息，请详见
 
-```
-$ scripts/remoteassetify.py --help
+```bash
+scripts/remoteassetify.py --help
 ```
 
 ## 自动化使用

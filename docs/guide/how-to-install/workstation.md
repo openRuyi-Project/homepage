@@ -20,7 +20,7 @@ We provide SHA256 checksums for all image files. You may use any tool that suppo
 If the sha256sum command is available on your current system, place the checksum file in the same directory as the installation image and run the following command:
 
 ```bash
-$ sha256sum openRuyi-xxxx.xx-Workstation-labwc-dvd.iso
+sha256sum openRuyi-xxxx.xx-Workstation-labwc-dvd.iso
 ```
 
 ## Installation Requirements

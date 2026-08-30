@@ -18,7 +18,7 @@ openRuyi Zero 旨在简化硅前验证与内核开发。如需了解更多，请
 下面是一个通过 QEMU 启动的命令例子，既支持 CLI 又支持 GUI。
 
 ```bash
-$ qemu-system-riscv64 \
+qemu-system-riscv64 \
   -M virt -smp 1 -m 4G -cpu rva23s64 \
   -object rng-random,filename=/dev/urandom,id=rng0 \
   -device virtio-rng-device,rng=rng0 \
@@ -39,7 +39,7 @@ openRuyi 内核的发布文件通常需要配合模块附加包使用，以提�
 
 例如，如果想使用如下的内核与模块附加包:
 
-```
+```text
 openRuyi-2026.03-zero.kernel
 openRuyi-2026.03-zero.kernel-modules.cpio
 ```
@@ -47,7 +47,7 @@ openRuyi-2026.03-zero.kernel-modules.cpio
 您可以将这个 `.cpio` 文件拼接到基础 initramfs 后面，生成最终使用的 initramfs，例子如下:
 
 ```bash
-$ cat /path/to/openruyi-base.cpio.gz /path/to/openRuyi-2026.03-zero.kernel-modules.cpio > final-initramfs.img
+cat /path/to/openruyi-base.cpio.gz /path/to/openRuyi-2026.03-zero.kernel-modules.cpio > final-initramfs.img
 ```
 
 请将 `/path/to/...` 替换为实际路径。
@@ -66,7 +66,7 @@ $ cat /path/to/openruyi-base.cpio.gz /path/to/openRuyi-2026.03-zero.kernel-modul
 
 启动成功后，您将看到类似如下的信息:
 
-```
+```text
 [   90.019455] Run /init as init process
 Welcome to openRuyi
 

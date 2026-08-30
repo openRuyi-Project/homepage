@@ -76,7 +76,7 @@ Once you complete the setup, pre-commit runs automatically, so you can continue 
 When you make a commit, pre-commit checks all staged files in sequence according to the rules defined in `.pre-commit-config.yaml`. If all hooks show either `Passed` or `Skipped`, Git completes the commit automatically. For example:
 
 ```bash
-$ ~/openruyi-repo/ git commit -m "SPECS: helloworld: Format spec file."
+~/openruyi-repo/ git commit -m "SPECS: helloworld: Format spec file."
 trim trailing whitespace.................................................Passed
 fix end of files.........................................................Passed
 check for added large files..............................................Passed

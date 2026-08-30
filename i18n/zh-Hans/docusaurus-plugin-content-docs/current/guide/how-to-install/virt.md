@@ -23,7 +23,7 @@ slug: /guide/how-to-install/virt
 
 如果您正在使用的系统上安装了 sha256sum 命令，则可以将校验和文件放在安装映像的同一个目录下，然后运行一下命令来验证：
 ```sh
-$ sha256sum openruyi-xxxx.xx-Server-dvd.iso
+sha256sum openruyi-xxxx.xx-Server-dvd.iso
 ```
 
 ## 配置 virt-manager

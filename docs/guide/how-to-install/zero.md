@@ -18,7 +18,7 @@ You can start openRuyi initramfs by providing it to your kernel through Devicetr
 Here's an example command for booting through QEMU with basic hardware emulation support for both CLI and GUI.
 
 ```bash
-$ qemu-system-riscv64 \
+qemu-system-riscv64 \
   -M virt -smp 1 -m 4G -cpu rva23s64 \
   -object rng-random,filename=/dev/urandom,id=rng0 \
   -device virtio-rng-device,rng=rng0 \
@@ -39,7 +39,7 @@ You can use openRuyi-provided kernels and module addons. The release files with 
 
 As an example, to use the following kernel and module addon:
 
-```
+```text
 openRuyi-2026.03-zero.kernel
 openRuyi-2026.03-zero.kernel-modules.cpio
 ```
@@ -47,7 +47,7 @@ openRuyi-2026.03-zero.kernel-modules.cpio
 You can concat the `.cpio` into the base initramfs to create the final initramfs, with a command like (replacing `/path/to/...` with actual paths):
 
 ```bash
-$ cat /path/to/openruyi-base.cpio.gz /path/to/openRuyi-2026.03-zero.kernel-modules.cpio > final-initramfs.img
+cat /path/to/openruyi-base.cpio.gz /path/to/openRuyi-2026.03-zero.kernel-modules.cpio > final-initramfs.img
 ```
 
 And use `final-initramfs.img` instead for booting. As an example, for QEMU, replace the final command line arguments with:
@@ -64,7 +64,7 @@ Since the initramfs contains a mostly complete system, it is larger than a typic
 
 On successful boot, you will see messages such as:
 
-```
+```text
 [   90.019455] Run /init as init process
 Welcome to openRuyi
 

@@ -74,7 +74,7 @@ pre-commit install
 当执行提交时，Pre-commit 会依据 `.pre-commit-config.yaml` 定义的规则，按顺序检查所有暂存区 (Staged) 的文件。如果所有钩子都显示 Passed 或 Skipped，Git 提交将自动完成，以下是一个示例:
 
 ```bash
-$ ~/openruyi-repo/ git commit -m "SPECS: helloworld: Format spec file."
+~/openruyi-repo/ git commit -m "SPECS: helloworld: Format spec file."
 trim trailing whitespace.................................................Passed
 fix end of files.........................................................Passed
 check for added large files..............................................Passed

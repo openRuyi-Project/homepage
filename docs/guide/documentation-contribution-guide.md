@@ -169,20 +169,16 @@ Use inline code formatting for commands, file names, field names, paths, and pac
 
 Use fenced code blocks for multi-line commands and configuration, and specify the language:
 
-````markdown
 ```bash
 osc up -S
 osc build --skip-local-service-run riscv64 riscv64
 ```
-````
 
-````markdown
 ```xml
 <service name="obs_scm">
   <param name="scm">git</param>
 </service>
 ```
-````
 
 When showing commands, do not include a shell prompt such as `$` by default. Use `$` or another prompt only when showing complete terminal output.
 
