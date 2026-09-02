@@ -7,66 +7,34 @@ slug: /ospp
 
 # OSPP
 
-openRuyi welcomes students to participate in the Open Source Promotion Plan (OSPP).
+openRuyi welcomes university students and community contributors to participate in the Open Source Promotion Plan (OSPP), where they can learn, collaborate, and contribute code to real-world open source projects.
 
-OSPP allows students to contribute to open-source projects under the guidance of community mentors. openRuyi participates in OSPP through two models:
+## What Is OSPP?
 
-* **Classic Track**: Mentors define project tasks, and students apply for projects that match their interests and skills.
+The Open Source Promotion Plan is an open source program initiated by the Institute of Software, Chinese Academy of Sciences. The program works with open source organizations to publish project tasks and invites university students worldwide to apply. Accepted students complete their projects under the guidance of community mentors. Students who pass the project completion review receive a completion certificate and the corresponding stipend.
 
-* **Pioneer Program**: The community provides broad technical areas, and students identify a specific problem and propose a solution.
+In 2026, OSPP entered the 2.0 phase of the Open Source Software Supply Chain Promotion Plan. With a focus on core infrastructure software for RISC-V, the program gives particular attention to operating systems, compilers, virtualization, artificial intelligence, and related fields.
 
-Both models use a rolling schedule. OSPP does not define one application or development period for all projects. Each accepted project follows its own schedule.
+## openRuyi Participation in OSPP
 
-## For students
+openRuyi participates in OSPP through the Classic Track and the Pioneer Program.
 
-Before applying, read the [OSPP Organization Guide](https://docs2026-en.summer.ospp.ac.cn/archives/community-guide) and [OSPP FAQ](https://docs2026-en.summer.ospp.ac.cn/archives/FAQ).
+| Aspect                    | Classic Track                                                | Pioneer Program                                              |
+| ------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| How projects are created  | The community or a mentor defines a specific task in advance | The community publishes a broad direction, and students identify a problem and design a solution |
+| How students participate  | Students choose a published project and submit an application | Students submit a proposal for a published direction and develop it into a project through further discussion |
+| When projects are refined | The objectives, requirements, and expected deliverables are defined before publication | After a proposal is accepted, the student and mentor refine the project together |
+| Difficulty levels         | Basic and Advanced                                           | Basic, Advanced, and Challenge                               |
 
-You should also read the [Student Guide](https://docs2026-en.summer.ospp.ac.cn/archives/student-guide) and [Pioneer Program Guide](https://docs2026-en.summer.ospp.ac.cn/archives/Pioneer-guide) for the model you plan to join.
+Both tracks remain open on an ongoing basis and do not use a single application or development period. Students may apply after a project is published. The development period shown on each project page is authoritative.
 
-### Eligibility
+## Choose the Right Guide
 
-OSPP accepts university students worldwide who are at least 18 years old. You must remain enrolled throughout your project's development period.
+- If you are a student, read the [Student Participation Guide](community\ospp\studentguide.md) for eligibility requirements, the application process, development requirements, and project completion criteria.
+- If you plan to publish an openRuyi project or serve as a mentor, read the [Guide to Submitting OSPP Projects](community\ospp\projectsubmissionguide.md).
 
-If you have received an offer for a master's or doctoral program but have not yet enrolled, you may provide your admission letter and other required documents.
+## Browse openRuyi Projects
 
-You cannot participate in OSPP as both a student and a mentor.
+Visit the [openRuyi organization page on the OSPP website](https://summer.ospp.ac.cn/org/orgdetail/59ab01aa-4c76-4f61-834f-ac4c636267bf) to browse published projects. New projects are added on an ongoing basis, so check again later if none of the currently available projects is a good match.
 
-You may apply for or work on only one OSPP project at a time. After an application is rejected or a project is completed, you may apply for another project.
-
-The account that you use to submit contributions to the project repository must be public. The public email address of the account must match the Git email address that you provide during OSPP registration.
-
-### Prepare for your application
-
-You do not need extensive open-source development experience to apply. However, familiarity with the relevant programming language, RISC-V, or the target codebase can help you prepare a stronger proposal.
-
-Before applying:
-
-* Read the documentation and contribution guidelines for the project.
-
-* Study the code related to the project that interests you.
-
-* Discuss the project scope, your understanding of the problem, and your proposed approach with the prospective mentor.
-
-* Make normal community contributions when they help you become familiar with the project and its development workflow.
-
-You may contribute to openRuyi while preparing your application. However, do not start the work described in your OSPP proposal before the organizing committee officially announces your selection. OSPP will not count work completed before selection toward the final evaluation of your project.
-
-### Find a project
-
-You can find openRuyi project proposals on the [openRuyi OSPP organization page](https://summer.ospp.ac.cn/org/orgdetail/59ab01aa-4c76-4f61-834f-ac4c636267bf?lang=en).
-
-Before submitting an application, we recommend discussing the project with its mentor. Early discussion can help you understand the requirements, choose an appropriate scope, and improve your proposal.
-
-To contact a mentor, comment on the corresponding issue in the [openRuyi OSPP repository](https://github.com/openRuyi-Project/ospp/issues). You may also contact the mentor by email if the project proposal provides an email address.
-
-## For mentors
-
-Before participating as a mentor, read the [OSPP Organization Guide](https://docs2026-en.summer.ospp.ac.cn/archives/community-guide) and [OSPP FAQ](https://docs2026-en.summer.ospp.ac.cn/archives/FAQ).
-
-You should also read the [Mentor Guide](https://docs2026-en.summer.ospp.ac.cn/archives/mentor-guide) and [Pioneer Program Guide](https://docs2026-en.summer.ospp.ac.cn/archives/Pioneer-guide) for the model in which you participate.
-
-Mentors help students understand the project, define a practical development plan, review their work, and resolve technical problems during the development period.
-
-We will publish a detailed guide for openRuyi mentors on this site soon.
-
-For general questions about openRuyi's participation in OSPP, contact [contact@openruyi.cn](mailto:contact@openruyi.cn).
+For questions about openRuyi's participation in OSPP, email [contact@openruyi.cn](mailto:contact@openruyi.cn). For questions about program rules or the OSPP system, contact the OSPP Committee at [org@summer-ospp.ac.cn](mailto:org@summer-ospp.ac.cn).
