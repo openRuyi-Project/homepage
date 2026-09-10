@@ -11,13 +11,15 @@ This document describes the package-naming policy used by openRuyi.
 
 ## General Naming Rules
 
-In general, package names should follow the upstream name whenever possible.
+In general, package names SHOULD follow the upstream project's canonical name whenever possible.
 
-You should use lowercase for package names, and prefer hyphens (`-`) over underscores (`_`). You may find useful clues in the upstream source tarball name, the software source project name, and the names that other distributions or packagers historically used for the package.
+You should use lowercase for package names, and prefer hyphens (`-`) over underscores (`_`). See [Letter Case](#letter-case) for the detailed capitalization rules. You may find useful clues in the upstream source tarball name, the software source project name, and the names that other distributions or packagers historically used for the package.
 
 At the same time, always check whether the package type you are building already has its own specific naming rules. Such specific rules apply, for example, to Perl packages and font packages.
 
 During packaging, do not encode the ABI (SONAME major) or the upstream major version into the package name. For example, if the upstream version is `foo v2.3.4`, do not name the package `libfoo` or `libfoo2`.
+
+Packagers MUST NOT treat digits that form part of an upstream project's canonical name, such as `libxml2`, as ABI or version encoding.
 
 ### Separators
 
