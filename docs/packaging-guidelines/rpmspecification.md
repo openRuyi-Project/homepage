@@ -75,14 +75,6 @@ Version:
 Release:
 Summary:
 License:
-URL:
-VCS:
-Source:
-BuildSystem:
-
-BuildRequires:
-
-Requires:
 
 %description
 
@@ -91,13 +83,89 @@ Requires:
 %changelog
 ```
 
-Other tags MAY be ordered alphabetically from A to Z, unless a specific order is required.
+A package MAY have an empty `%files` section when it intentionally produces an empty package, such as a dependency-only meta-package.
+
+The absence of a conditional tag or section does not by itself make a Spec non-compliant.
+
+Common conditional tags and sections include:
+
+| Tag or section                                                        | When it is required                                                                            |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `URL`                                                                 | When the upstream project provides a meaningful homepage or public source repository           |
+| `VCS`                                                                 | When a usable upstream source repository exists and `URL` does not already point to it         |
+| `Source` / `SourceN` / `%sourcelist`                                  | When the package consumes source files or other source inputs                                  |
+| `BuildArch`                                                           | When the package needs to override the default target architecture behavior                    |
+| `BuildSystem`                                                         | When the Spec uses the declarative build system mechanism                                      |
+| `Patch` / `%patchlist`                                                | When the package applies downstream or backported patches                                      |
+| `BuildOption`                                                         | When a declarative build system needs additional stage-specific options                        |
+| `BuildRequires`                                                       | When the build needs dependencies that the openRuyi basic build environment does not guarantee |
+| `Requires`                                                            | When the package needs explicit runtime dependencies                                           |
+| `Provides` / `Conflicts` / `Obsoletes` / `Recommends` / `Supplements` | When package relationships require them                                                        |
+| `%package`                                                            | When the Spec creates subpackages                                                              |
+| `%prep` / `%build` / `%install` / `%check`                            | When the package needs explicit actions in the corresponding stage                             |
+
+When the following tags are present, they SHOULD appear in the following relative order:
+
+```specfile
+Name:
+Version:
+Release:
+Summary:
+License:
+URL:
+VCS:
+Source:
+BuildArch:
+BuildSystem:
+
+Patch:
+
+BuildOption:
+
+BuildRequires:
+
+Provides:
+Conflicts:
+Obsoletes:
+
+Recommends:
+
+Requires:
+
+Supplements:
+
+%description
+```
+
+The example above defines relative ordering, not a mandatory complete header. A Spec does not need to reserve a position for an omitted conditional tag. `Source`, `Source0`, `Source1`, and similar numbered forms belong to the same position. Equivalent source declarations such as `%sourcelist` also belong to the source declaration block.
+
+The same relative ordering rules SHOULD apply to tags within each subpackage definition. A subpackage only needs tags that apply to that subpackage and does not need to repeat main-package tags.
+
+Package-specific supplementary specifications MAY define additional tags or more specific ordering rules. When a supplementary specification defines such a rule, that rule takes precedence.
+
+For tags that have no specific ordering rule, maintainers SHOULD keep related tags together and MAY order them alphabetically.
 
 Blank lines MUST be used to separate sections.
 
 ### Minimal Skeleton Example
 
-TODO
+The following example shows a valid minimal structure for a package that does not need upstream source input, a build system, build dependencies, or explicit runtime dependencies:
+
+```specfile
+Name:           <package-name>
+Version:        <version>
+Release:        %autorelease
+Summary:        <summary>
+License:        <SPDX-license-expression>
+
+%description
+<package-description>
+
+%files
+
+%changelog
+%autochangelog
+```
 
 ### Formatting and readability
 
@@ -172,9 +240,17 @@ For detailed licensing rules, see the [Licenses](/docs/guide/packaging-guideline
 
 ### URL
 
-1. `URL` MUST point to the upstream project's official homepage; if one does not exist, it MAY point to the source code repository.
+1. `URL` MUST point to the upstream project's official homepage if available.
 
-2. The `URL` tag MUST NOT dynamically construct its value using macros such as `%{name}`.
+2. When the upstream project does not provide an official homepage but provides a public source repository, the Spec MUST set `URL` to the source repository.
+
+3. When no meaningful upstream project URL exists, the Spec MAY omit `URL`. Distribution-specific meta-packages, configuration packages, or similar packages may fall into this category. The Spec MUST include the following exact comment in place of the `URL` tag (the `# URL:` prefix MUST remain intact):
+
+```specfile
+# URL: No URL link available
+```
+
+4. The `URL` tag MUST NOT dynamically construct its value using macros such as `%{name}`.
 
 ### VCS
 
@@ -196,18 +272,34 @@ VCS:            git:https://git.example.org/project.git
 
 ### Source
 
-1. `Source` MUST specify the URI for downloading the upstream source archive (or a mathematically equivalent, reproducible archive).
+1. A Spec that consumes source files or other source inputs MUST declare those inputs using RPM source declarations such as `Source`, `SourceN`, or `%sourcelist`, as appropriate. A package that does not consume any source input MAY omit source declarations entirely.
 
-2. If the `URL` tag value can serve as a valid prefix for the source link, `Source` MAY leverage the `%{url}` macro.
+2. A `Source` that represents upstream source code MUST identify where the upstream source can be obtained, or otherwise identify an equivalent reproducible source archive.
 
-3. For any network-fetched `Source`, a `#!RemoteAsset` comment MUST immediately precede the `Source` declaration. If multiple external sources exist, each MUST be individually annotated.
+3. A local source input MAY use a local file name instead of a URI. The Spec SHOULD include a nearby comment that explains the purpose or origin of a local source input when the file name does not make that information clear.
 
-4. For any `Source` fetched using the HTTP or HTTPS protocol, the SHA-256 checksum of the source archive MUST be documented on the line following the `#!RemoteAsset` comment.
+4. When a Spec contains one `Source` entry, it MAY use either `Source` or `Source0`. Both forms refer to source index `0`.
+
+5. When a Spec uses numbered `SourceN` tags, source indexes SHOULD start at `0` and increase sequentially unless a package-specific reason requires otherwise.
+
+6. If the `URL` tag value can serve as a valid prefix for the source link, `Source` MAY leverage the `%{url}` macro.
+
+7. For any network-fetched `Source`, a `#!RemoteAsset` comment MUST immediately precede the `Source` declaration. If multiple external sources exist, each MUST be individually annotated.
+
+8. For a `Source` fetched over HTTP or HTTPS, the corresponding `#!RemoteAsset` annotation MUST include the SHA-256 checksum on the same line.
    For conveience, it can be generated automatically with [remoteassetify](/docs/guide/remoteassetify-usage-guide).
 
-5. If the tarball filename is obscured or cannot be algorithmically inferred from the URL, `Source` SHOULD explicitly dictate the desired tarball name via a URL fragment (e.g., `#/name.tar.gz`) to guarantee predictable local file naming.
+9. When creates an archive from a remote VCS source, the Spec MUST place `#!CreateArchive` between the corresponding `#!RemoteAsset` annotation and the `Source` declaration:
 
-6. `Source` Indexing Rules:
+```specfile
+#!RemoteAsset:  git+https://example.org/project.git#<revision>
+#!CreateArchive
+Source:         <archive-name>.tar.gz
+```
+
+10. If the tarball filename is obscured or cannot be algorithmically inferred from the URL, `Source` SHOULD explicitly dictate the desired tarball name via a URL fragment (e.g., `#/name.tar.gz`) to guarantee predictable local file naming.
+
+11. `Source` Indexing Rules:
    1. The base index defaults to `0` and increments by 1 for each subsequent source.
    2. If the Spec specifies only a single-source archive, the index MAY be omitted entirely.
 
@@ -218,6 +310,15 @@ Example:
 Source0:        https://example.org/example-%{version}.tar.gz
 #!RemoteAsset:  sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 Source1:        https://example.org/example-%{version}-additional.tar.gz
+```
+
+A Spec MAY also use an RPM source-list mechanism when it better represents a set of local source inputs:
+
+```specfile
+%sourcelist
+file1.conf
+file2.conf
+file3.conf
 ```
 
 For details regarding source URLs, see the [Source Packages](/docs/guide/packaging-guidelines/SourceURL) supplementary specification.
@@ -232,17 +333,15 @@ For details regarding source URLs, see the [Source Packages](/docs/guide/packagi
 
 ### BuildSystem
 
-1. Every Spec MUST declare a `BuildSystem` tag.
+1. A Spec that uses the RPM declarative build system mechanism MUST declare the corresponding build system with `BuildSystem`.
 
-2. `BuildSystem` values SHOULD be restricted to the following supported systems (or formally introduced future systems):
-   - `autotools`
-   - `cmake`
-   - `meson`
-   - `golang`
-   - `golangmodules`
-   - `pyproject`
+2. A Spec that does not use the declarative build system mechanism MAY omit `BuildSystem`. Examples include source-less meta-packages, data-only packages, and packages that implement their required stages explicitly.
 
-3. If the package utilizes an unsupported build system, or requires no configuration phase whatsoever, `BuildSystem` MAY be left blank. However, the Spec MUST include an adjacent comment explicitly justifying this omission.
+3. A Spec MUST NOT add an empty `BuildSystem` tag only to indicate that no declarative build system applies.
+
+4. When present, the `BuildSystem` value MUST identify a supported declarative build system. The [Declarative Build Systems](/docs/guide/packaging-guidelines/BuildSystems) supplementary specification defines the available build systems and their requirements.
+
+The main packaging specification does not maintain a separate list of `BuildSystem` values.
 
 When supplementary pre- or post-stage interventions are required, the Spec MAY deploy modifier tags. For example:
 
@@ -270,13 +369,6 @@ For system-specific build patterns, see the [Declarative Build Systems](/docs/gu
 
    - If `BuildOption` is absent, patches SHOULD be located between `BuildSystem` and `BuildRequires`.
 
-5. `BuildOption` entries SHOULD be written in the same order as the RPM build process, namely:
-```specfile
-%build
-%install
-%check
-```
-
 For the comprehensive patch strategy, see the [Patches](/docs/guide/packaging-guidelines/Patch) supplementary specification.
 
 ### BuildOption (optional)
@@ -289,27 +381,46 @@ For the comprehensive patch strategy, see the [Patches](/docs/guide/packaging-gu
 
 4. When utilized, `BuildOption` SHOULD reside between the `BuildSystem` and `BuildRequires` blocks.
 
+5. `BuildOption` entries SHOULD be written in the same order as the RPM build process, for example:
+
+```specfile
+BuildOption(conf):  <configuration-option>
+BuildOption(build):  <build-option>
+BuildOption(install):  <installation-option>
+BuildOption(check):  <test-option>
+```
+
 ### BuildRequires
 
-1. `BuildRequires` MUST list all build-time dependencies exhaustively.
+1. A Spec MUST ensure that all build-time dependencies are declared through static `BuildRequires`, dynamic build dependency generation, or a combination of both.
 
-2. These dependencies MUST adhere to the "one dependency per line" formatting rule.
+2. When a package uses dynamic build dependency generation, static `BuildRequires` MUST include dependencies required before dependency generation and any required build dependencies that the dynamic mechanism does not provide.
 
-3. For standard C/C++ applications, it is generally unnecessary to explicitly specify a compiler like `gcc`.
+3. When a package requires no additional build-time dependencies beyond the openRuyi basic build environment and dynamically generated dependencies, the Spec MAY omit static `BuildRequires`. For example, for standard C/C++ applications, it is generally unnecessary to explicitly specify a compiler like `gcc`.
 
-4. If a dependency is dynamically resolved via `pkg-config`, `BuildRequires` SHOULD utilize the `pkgconfig(xxx)` syntax rather than hardcoding the `xxx-devel` package name.
+4. static `BuildRequires` entries MUST follow the "one dependency per line" rule.
 
-5. The Spec MUST guarantee absolute completeness of build dependencies; it MUST NOT omit required packages under the assumption that the build root happens to have them pre-installed.
+5. The openRuyi basic build environment consists of packages that the build configuration guarantees before a package build begins. The [preinstall image](https://build.openruyi.cn/projects/openruyi/packages/preinstallimage/files/_preinstallimage?expand=1) is the authoritative source for this set.
+
+6. A Spec MUST NOT omit a required build dependency merely because the dependency happens to be installed in the current build root.
+
+7. If a dependency is dynamically resolved via `pkg-config`, `BuildRequires` SHOULD utilize the `pkgconfig(xxx)` syntax rather than hardcoding the `xxx-devel` package name.
 
 For strategies on resolving dependencies, see the [Using pkgconfig(xxx)](/docs/guide/packaging-guidelines/PkgConfigBuildRequires) supplementary specification.
 
-### Requires / Provides / Conflicts / Obsoletes (optional)
+### Requires / Provides / Conflicts / Obsoletes / Recommends / Supplements (optional)
 
 1. `Requires` dictates runtime dependencies; these MUST also follow the "one dependency per line" rule.
 
-2. During package renaming, logical splitting, or major migrations, the Spec MUST guarantee a seamless upgrade path using Provides and Obsoletes (see the [Package Splitting](/docs/guide/packaging-guidelines/SplitPackage) supplementary specification).
+2. When a package does not need any explicit runtime dependency, the Spec MAY omit `Requires`.
 
-3. If strict incompatibilities exist, `Conflicts` MAY be utilized. However, it SHOULD be applied with extreme caution to prevent creating unresolvable dependency graphs.
+3. The absence of an explicit `Requires` tag does not exempt a package from having correct runtime dependencies. Maintainers MUST ensure that automatic and explicit dependency mechanisms together describe the package's runtime requirements correctly.
+
+4. A Spec MAY use `Provides`, `Recommends`, and `Supplements` when the package needs to express the corresponding package relationship.
+
+5. During package renaming, logical splitting, or major migrations, the Spec MUST guarantee a seamless upgrade path using `Provides` and `Obsoletes` (see the [Package Splitting](/docs/guide/packaging-guidelines/SplitPackage) supplementary specification).
+
+6. If strict incompatibilities exist, `Conflicts` MAY be utilized. However, it SHOULD be applied with extreme caution to prevent creating unresolvable dependency graphs.
 
 ## Section Requirements
 
@@ -325,7 +436,11 @@ The `%description` section MUST provide a comprehensive, informative overview of
 
 ### %files
 
-The `%files` section MUST inventory all artifacts bundled into the resulting binary package, adhering to the following constraints:
+Every binary package produced by a Spec MUST have a corresponding `%files` section. A Spec MAY omit the main package's `%files` section when it intentionally does not produce the main package.
+
+A `%files` section MAY be empty when the corresponding binary package intentionally contains no files, such as a dependency-only meta-package.
+
+The `%files` sections MUST follow these requirements:
 
 1. Licensing documents MUST be tagged with `%license`; standard documentation SHOULD be tagged with `%doc`.
 

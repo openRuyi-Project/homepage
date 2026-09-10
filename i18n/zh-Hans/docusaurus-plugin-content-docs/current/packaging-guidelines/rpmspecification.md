@@ -17,9 +17,9 @@ openRuyi 项目需要大量第三方软件包以构建可用、可维护的发�
 
 本规范由以下两类文档构成：
 
-1. **主规范 (本文件)**: 规定 Spec 的通用结构、关键字段与通用策略 ("必须/应当/不得")。
+1. **主规范 (本文件)**: 规定 Spec 的通用结构、关键字段与通用策略 (“必须/应当/不得”)。
 
-2. **补充规范 (子文档)**: 对特定主题给出更细的约束或范式 (如命名、版本号、语言生态、脚本、补丁等)。主规范只保留必要的"总规则"，细节以补充规范为准。
+2. **补充规范 (子文档)**: 对特定主题给出更细的约束或范式 (如命名、版本号、语言生态、脚本、补丁等)。主规范只保留必要的“总规则”，细节以补充规范为准。
 
 当本文件与补充规范存在冲突时，补充规范优先。
 
@@ -75,14 +75,6 @@ Version:
 Release:
 Summary:
 License:
-URL:
-VCS:
-Source:
-BuildSystem:
-
-BuildRequires:
-
-Requires:
 
 %description
 
@@ -91,13 +83,89 @@ Requires:
 %changelog
 ```
 
-其他情况可以按照 A-Z 的顺序排列。
+当软件包有意生成空包时，例如仅用于表达依赖关系的 meta-package，对应的 `%files` 段可以为空。
+
+缺少一个条件字段或条件段落本身不构成规范违反。
+
+常见的条件字段与段落包括:
+
+| 字段或段落                                                                 | 需要使用的情形                         |
+| --------------------------------------------------------------------- | ------------------------------- |
+| `URL`                                                                 | 上游项目存在有意义的官方网站或公开源码仓库时          |
+| `VCS`                                                                 | 存在可用的上游源码仓库，且 `URL` 未指向该仓库时     |
+| `Source` / `SourceN` / `%sourcelist`                                  | 软件包需要源码文件或其他 source input 时     |
+| `BuildArch`                                                           | 软件包需要覆盖默认目标架构行为时                |
+| `BuildSystem`                                                         | Spec 使用声明式构建系统机制时               |
+| `Patch` / `%patchlist`                                                | 软件包需要应用下游补丁或 backport 时         |
+| `BuildOption`                                                         | 声明式构建系统需要额外的阶段参数时               |
+| `BuildRequires`                                                       | 构建过程需要 openRuyi 基础构建环境不保证提供的依赖时 |
+| `Requires`                                                            | 软件包需要显式声明运行期依赖时                 |
+| `Provides` / `Conflicts` / `Obsoletes` / `Recommends` / `Supplements` | 软件包之间的关系需要对应字段表达时               |
+| `%package`                                                            | Spec 生成子包时                      |
+| `%prep` / `%build` / `%install` / `%check`                            | 软件包需要在对应阶段执行显式操作时               |
+
+下列字段存在时，应当按照如下相对顺序出现:
+
+```specfile
+Name:
+Version:
+Release:
+Summary:
+License:
+URL:
+VCS:
+Source:
+BuildArch:
+BuildSystem:
+
+Patch:
+
+BuildOption:
+
+BuildRequires:
+
+Provides:
+Conflicts:
+Obsoletes:
+
+Recommends:
+
+Requires:
+
+Supplements:
+
+%description
+```
+
+以上示例只规定字段之间的相对顺序，并不表示 Spec 必须包含完整的字段列表。Spec 省略条件字段时，不需要为该字段保留位置。`Source`、`Source0`、`Source1` 等编号形式属于同一位置，`%sourcelist` 等等价的 source declaration 也属于 source declaration block。
+
+相同的字段相对顺序也应当适用于各子包定义中的字段。子包只需要包含适用于该子包的字段，不需要重复主包字段。
+
+特定软件包类型的补充规范可以规定额外字段或更具体的顺序。当补充规范存在相关规则时，以补充规范为准。
+
+对于没有明确顺序要求的字段，维护者应当将语义相关的字段放置在一起，并可以按照 A-Z 顺序排列。
 
 段落与段落之间必须用空行隔开。
 
 ### 最小骨架示例
 
-TODO
+以下示例展示一个不需要上游 source input、构建系统、构建依赖或显式运行期依赖的软件包可以使用的最小结构:
+
+```specfile
+Name:           <package-name>
+Version:        <version>
+Release:        %autorelease
+Summary:        <summary>
+License:        <SPDX-license-expression>
+
+%description
+<package-description>
+
+%files
+
+%changelog
+%autochangelog
+```
 
 ### 排版与可读性
 
@@ -172,9 +240,17 @@ TODO
 
 ### URL
 
-1. `URL` 必须为软件包官方网站链接；若无官方网站，可以使用源代码仓库链接。
+1. 当上游项目有官方网站，`URL` 必须为软件包官方网站链接。
 
-2. `URL` 字段中不得使用 `%{name}` 等宏进行拼接。
+2. 当上游项目没有官方网站，但存在公开的源码仓库时，Spec 必须将 `URL` 设置为有意义的项目地址，通常可以直接使用源码仓库地址。
+
+3. 当软件包不存在有意义的上游项目 URL 时，Spec 可以省略 `URL`。发行版内部的 meta-package、配置软件包等可能属于此类情况。Spec 必须在 `URL` 字段位置写入以下注释 (`# URL:` 前缀必须保留):
+
+```specfile
+# URL: No URL link available
+```
+
+4. `URL` 字段中不得使用 `%{name}` 等宏进行拼接。
 
 ### VCS
 
@@ -196,18 +272,34 @@ VCS:            git:https://git.example.org/project.git
 
 ### Source
 
-1. `Source` 必须提供上游源码 (或等价可重现的源码归档) 的获取位置。
+1. 当 Spec 需要源码文件或其他 source input 时，必须使用适合的 RPM source declaration 声明这些输入，例如 `Source`、`SourceN` 或 `%sourcelist`。当软件包不需要任何 source input 时，可以完全省略 source declaration。
 
-2. 若 `URL` 可复用为 `Source` 的前缀，`Source` 可以复用 `%{url}`。
+2. 当 `Source` 表示上游源码时，必须提供上游源码的获取位置，或提供等价、可重现的源码归档来源。
 
-3. 对于网络来源的 `Source`，其行前必须添加 `#!RemoteAsset` 注释；存在多条网络来源 `Source` 时，每条均必须标识。
+3. 本地 source input 可以直接使用本地文件名而不提供 URI。当文件名本身无法清楚说明用途或来源时，Spec 应当在相邻位置添加注释说明。
 
-4. 对于 HTTP 和 HTTPS 协议来源的 `Source`，在 `#!RemoteAsset` 注释后，必须添加来源文件的 sha256 值。
+4. 当 Spec 只有一个 `Source` 时，可以使用 `Source` 或 `Source0`。两种形式都表示 source index `0`。
+
+5. 当 Spec 使用带编号的 `SourceN` 字段时，source index 应当从 `0` 开始依次递增，除非软件包存在明确理由采用其他编号方式。
+
+6. 若 `URL` 可复用为 `Source` 的前缀，`Source` 可以复用 `%{url}`。
+
+7. 对于网络来源的 `Source`，其行前必须添加 `#!RemoteAsset` 注释；存在多条网络来源 `Source` 时，每条均必须标识。
+
+8. 对于通过 HTTP 或 HTTPS 获取的 `Source`，对应的 `#!RemoteAsset` 注释必须在同一行包含 SHA-256 校验值。
    为了方便，可以使用 [remoteassetify](/docs/guide/remoteassetify-usage-guide) 自动生成。
 
-5. 对于无法从 URL 解析出 tarball 文件名的情形，`Source` 应当使用 URL 片段显式给出 tarball 名称，以保证源文件命名可预测。
+9. 当需要从远程 VCS source 创建归档时，Spec 必须将 `#!CreateArchive` 放置在对应的 `#!RemoteAsset` 注释与 `Source` declaration 之间:
 
-6. `Source` 编号规则:
+```specfile
+#!RemoteAsset:  git+https://example.org/project.git#<revision>
+#!CreateArchive
+Source:         <archive-name>.tar.gz
+```
+
+10. 对于无法从 URL 解析出 tarball 文件名的情形，`Source` 应当使用 URL 片段显式给出 tarball 名称，以保证源文件命名可预测。
+
+11. `Source` 编号规则:
    1. 默认编号为 `0`，每增加一条递增 1。
    2. 若仅有一条源代码文件，编号可以省略。
 
@@ -220,29 +312,36 @@ Source0:        https://example.org/example-%{version}.tar.gz
 Source1:        https://example.org/example-%{version}-additional.tar.gz
 ```
 
+当一组本地 source input 更适合使用 RPM source-list 机制表达时，Spec 也可以使用 `%sourcelist`:
+
+```specfile
+%sourcelist
+file1.conf
+file2.conf
+file3.conf
+```
+
 源码 URL 的细节，请见补充规范[源码包](/docs/guide/packaging-guidelines/SourceURL)。
 
 ### BuildArch (可选)
 
 1. `BuildArch` 用于声明目标架构。
 
-2. `BuildArch` 字段 应当位于最后一个 `Source` 字段与 `BuildSystem` 字段之间。
+2. `BuildArch` 字段应当位于最后一个 `Source` 字段与 `BuildSystem` 字段之间。
 
 3. 若 `BuildArch` 为 `noarch`，表示该软件包与 CPU 架构无关。
 
 ### BuildSystem
 
-1. Spec 必须包含 `BuildSystem` 字段。
+1. 当 Spec 使用 RPM 声明式构建系统机制时，必须通过 `BuildSystem` 声明对应的构建系统。
 
-2. `BuildSystem` 的取值应当为以下之一 (或其它新增的值):
-   - `autotools`
-   - `cmake`
-   - `meson`
-   - `golang`
-   - `golangmodules`
-   - `pyproject`
+2. 当 Spec 不使用声明式构建系统机制时，可以省略 `BuildSystem`。例如 source-less meta-package、仅包含数据的软件包，以及通过显式段落完整实现所需构建阶段的软件包。
 
-3. 当软件包不适用上述类型或不需要配置阶段时，`BuildSystem` 可以为空，但必须以注释说明原因。
+3. Spec 不得仅为了表示“不适用声明式构建系统”而添加空的 `BuildSystem` 字段。
+
+4. 当 `BuildSystem` 存在时，其值必须对应受支持的声明式构建系统。可用的构建系统及其具体要求由补充规范[声明式构建系统](/docs/guide/packaging-guidelines/BuildSystems)定义。
+
+主规范不单独维护 `BuildSystem` 可用值列表。
 
 在需要补充阶段性动作时，Spec 可以使用标签声明附加步骤，例如:
 
@@ -282,34 +381,46 @@ Source1:        https://example.org/example-%{version}-additional.tar.gz
 
 4. 若使用 `BuildOption`，其位置应当位于 `BuildSystem` 与 `BuildRequires` 之间。
 
-5. `BuildOption` 的书写顺序，应当与 RPM 的构建过程保持一致，即:
+5. `BuildOption` 的书写顺序，应当与 RPM 的构建过程保持一致，例如:
+
 ```specfile
-%build
-%install
-%check
+BuildOption(conf):  <configuration-option>
+BuildOption(build):  <build-option>
+BuildOption(install):  <installation-option>
+BuildOption(check):  <test-option>
 ```
 
 ### BuildRequires
 
-1. `BuildRequires` 必须列出构建期依赖。
+1. Spec 必须确保所有构建期依赖通过静态 BuildRequires、动态构建依赖生成机制或两者结合的方式完整声明。
 
-2. 依赖项必须按"一行一个依赖包"的形式书写。
+2. 当软件包使用动态构建依赖生成机制时，静态 BuildRequires 必须包含运行依赖生成机制之前所需的依赖，以及动态机制无法生成的其他必要构建依赖。
 
-3. 对于 C 程序，通常不需要显式声明 `gcc`。
+3. 当软件包除 openRuyi 基础构建环境和动态生成的依赖之外不需要其他构建期依赖时，可以省略静态 BuildRequires。例如，对于 C 程序，通常不需要显式声明 `gcc`。
 
-4. 当依赖通过 `pkg-config` 发现时，`BuildRequires` 应当优先使用 `pkgconfig(xxx)` 形式声明，而不是直接依赖 `xxx-devel`。
+4. 静态 BuildRequires 必须按“一行一个依赖包”的形式书写。
 
-5. Spec 必须确保构建依赖完整；不得依赖构建环境偶然预装而省略必要依赖。
+5. openRuyi 基础构建环境由构建配置保证在软件包构建开始前提供的软件包组成。[Preinstall 镜像](https://build.openruyi.cn/projects/openruyi/packages/preinstallimage/files/_preinstallimage?expand=1)是该集合的权威来源。
+
+6. Spec 不得因为某个依赖碰巧存在于当前 build root 中而省略必要的构建依赖。
+
+7. 当依赖通过 `pkg-config` 发现时，`BuildRequires` 应当优先使用 `pkgconfig(xxx)` 形式声明，而不是直接依赖 `xxx-devel`。
 
 关于 `pkgconfig(xxx)` 的详细策略，请见补充规范[使用 pkgconfig(xxx)](/docs/guide/packaging-guidelines/PkgConfigBuildRequires)。
 
-### Requires / Provides / Conflicts / Obsoletes (可选)
+### Requires / Provides / Conflicts / Obsoletes / Recommends / Supplements (可选)
 
-1. `Requires` 用于列出运行期依赖；依赖项 必须按“一行一个依赖包”的形式书写。
+1. `Requires` 用于列出运行时依赖；依赖项必须按“一行一个依赖包”的形式书写。
 
-2. 当发生包名迁移、拆分或重命名时，Spec 必须使用 `Provides`/`Obsoletes` 等机制提供平滑升级路径 (详见补充规范[软件包拆分](/docs/guide/packaging-guidelines/SplitPackage))。
+2. 当软件包不需要任何显式运行期依赖时，可以省略 `Requires`。
 
-3. 若需要声明冲突关系，可使用 `Conflicts`；其使用应当谨慎，避免造成依赖求解不可用。
+3. 没有显式 `Requires` 字段并不意味着软件包可以缺少正确的运行期依赖。维护者必须确保自动依赖机制与显式依赖声明共同正确表达软件包的运行期要求。
+
+4. 当软件包需要表达对应的软件包关系时，可以使用 `Provides`、`Recommends` 和 `Supplements`。
+
+5. 当发生包名迁移、拆分或重命名时，Spec 必须使用 `Provides`/`Obsoletes` 等机制提供平滑升级路径 (详见补充规范[软件包拆分](/docs/guide/packaging-guidelines/SplitPackage))。
+
+6. 若需要声明冲突关系，可使用 `Conflicts`；其使用应当谨慎，避免造成依赖求解不可用。
 
 ## 段落规范
 
@@ -325,7 +436,11 @@ Source1:        https://example.org/example-%{version}-additional.tar.gz
 
 ### %files
 
-`%files` 段 必须定义该二进制包包含的文件清单，并满足以下要求：
+Spec 实际生成的每个二进制包都必须具有对应的 `%files` 段。当 Spec 有意不生成主包时，可以省略主包的 `%files` 段。
+
+当对应的二进制包有意不包含任何文件时，例如仅用于表达依赖关系的 meta-package，`%files` 段可以为空。
+
+各 `%files` 段必须满足以下要求:
 
 1. 许可证文本文件必须使用 `%license` 标记；文档文件应当使用 `%doc` 标记。
 
