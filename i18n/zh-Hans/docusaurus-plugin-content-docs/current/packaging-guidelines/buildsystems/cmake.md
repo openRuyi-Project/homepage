@@ -73,6 +73,22 @@ rm -v %{buildroot}%{_libdir}/*.a
 rm -v %{buildroot}%{_libdir}/*.a
 ```
 
+假设原有的测试 (`%check`) 配置如下:
+
+```specfile
+%check
+ctest --test-dir %{__cmake_builddir}/tests --output-on-failure
+```
+
+使用 `cmake` 构建系统后，`%check` 默认调用 `%ctest`，因此将额外参数移到 `BuildOption(check)`，修改为如下:
+
+```specfile
+# Upstream enables CTest only in the tests subdirectory.
+BuildOption(check):  --test-dir %{__cmake_builddir}/tests
+```
+
+这个示例适用于仅在 `tests` 子目录启用测试的项目。额外传入的 `--test-dir` 会覆盖宏的默认测试目录，因此无需单独的 `%check` 配置部分。如果没有附加参数，也不需要添加 `BuildOption(check)`。
+
 ## 构建系统说明
 
 cmake 的相关构建系统宏在 `/usr/lib/rpm/macros.d/macros.cmake` 内。
@@ -97,3 +113,13 @@ cmake 的相关构建系统宏在 `/usr/lib/rpm/macros.d/macros.cmake` 内。
  - `SHARE_INSTALL_PREFIX:PATH=%{_datadir}`
    - 将上游项目的安装路径对齐到相应的位置。
  - `LIB_SUFFIX=64`: 对某些认 LIB_SUFFIX 的上游项目，告知当前 64 位库的目录后缀位 `64`。
+
+测试部分 (`%check`) 通过 `%ctest` 执行，已经预先设置了以下参数:
+
+ - `--test-dir "%{__cmake_builddir}"`: 在 CMake 构建目录中运行测试。
+ - `--output-on-failure`: 输出失败测试的日志。
+ - `--force-new-ctest-process`: 以独立进程运行子 CTest 实例。
+ - `%{?_smp_mflags}`: 使用构建环境配置的并行任务数。
+ - `--timeout 6000`: 在 RISC-V (`riscv64`) 上，将单项测试的默认超时时间设为 6000 秒。
+
+需要先通过上游配置启用并构建所需测试，再执行这个阶段。应检查构建日志中的测试数量和结果是否符合预期，因为 CTest 在未找到测试时也可能成功退出。

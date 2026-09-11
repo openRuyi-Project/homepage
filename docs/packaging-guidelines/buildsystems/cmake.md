@@ -72,6 +72,22 @@ The updated configuration is:
 rm -v %{buildroot}%{_libdir}/*.a
 ```
 
+Assume the original test configuration in `%check` is as follows:
+
+```specfile
+%check
+ctest --test-dir %{__cmake_builddir}/tests --output-on-failure
+```
+
+After switching to the `cmake` build system, the `%check` stage invokes `%ctest` by default. Move the additional arguments to `BuildOption(check)`:
+
+```specfile
+# Upstream enables CTest only in the tests subdirectory.
+BuildOption(check):  --test-dir %{__cmake_builddir}/tests
+```
+
+This example applies to projects that enable testing only in their `tests` subdirectory. The additional `--test-dir` overrides the macro's default directory, so no separate `%check` section is needed. If no additional arguments are required, omit `BuildOption(check)` as well.
+
 ## Build System Notes
 
 The file `/usr/lib/rpm/macros.d/macros.cmake` defines macros for the `cmake` build system.
@@ -113,3 +129,17 @@ For the configuration phase (%conf), the system presets the following values by 
   * These settings align upstream project installation paths with the appropriate system locations.
 
 * `LIB_SUFFIX=64`: For upstream projects that recognize `LIB_SUFFIX`, this value indicates that the directory suffix for 64-bit libraries is `64`.
+
+For the test phase (`%check`), `%ctest` supplies the following default arguments:
+
+* `--test-dir "%{__cmake_builddir}"`: Run tests from the CMake build directory.
+
+* `--output-on-failure`: Show output from failing tests.
+
+* `--force-new-ctest-process`: Run child CTest instances as new processes.
+
+* `%{?_smp_mflags}`: Use the build environment's parallel job settings.
+
+* `--timeout 6000`: Set a default per-test timeout of 6,000 seconds on RISC-V (`riscv64`).
+
+Ensure that the upstream configuration enables and builds the required tests before this phase. Check the build log for the expected test count and results, because CTest may exit successfully when no tests are found.
