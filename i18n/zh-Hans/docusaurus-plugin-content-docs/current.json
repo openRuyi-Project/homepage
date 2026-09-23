@@ -66,5 +66,13 @@
   "sidebar.docSidebar.category.openRuyi RISC-V Firmware Interface Specification.link.generated-index.description": {
     "message": "本节提供 openRuyi RISC-V 固件接口规范文档。",
     "description": "The generated-index page description for category 'openRuyi RISC-V Firmware Interface Specification' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Tutorial": {
+    "message": "教程",
+    "description": "The label for category 'Tutorial' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Tutorial.link.generated-index.description": {
+    "message": "本节介绍如何在 openRuyi 上部署应用栈。",
+    "description": "The generated-index page description for category 'Tutorial' in sidebar 'docSidebar'"
   }
 }
