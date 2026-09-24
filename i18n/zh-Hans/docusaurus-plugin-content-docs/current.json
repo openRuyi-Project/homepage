@@ -59,6 +59,14 @@
     "message": "本节提供了关于如何使用和自定义 openRuyi 所提供的桌面环境的指南。",
     "description": "The generated-index page description for category 'Desktop Environments' in sidebar 'docSidebar'"
   },
+  "sidebar.docSidebar.category.Storage Stack": {
+    "message": "存储软件栈",
+    "description": "The label for category 'Storage Stack' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Storage Stack.link.generated-index.description": {
+    "message": "本节介绍 openRuyi 提供的存储软件栈，以及如何在 RISC-V 上使用它。",
+    "description": "The generated-index page description for category 'Storage Stack' in sidebar 'docSidebar'"
+  },
   "sidebar.docSidebar.category.openRuyi RISC-V Firmware Interface Specification": {
     "message": "openRuyi RISC-V 固件接口规范",
     "description": "The label for category 'openRuyi RISC-V Firmware Interface Specification' in sidebar 'docSidebar'"

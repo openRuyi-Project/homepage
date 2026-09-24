@@ -1,0 +1,8 @@
+{
+  "label": "Storage Stack",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "This section introduces the storage software stack shipped by openRuyi and how to use it on RISC-V."
+  }
+}
