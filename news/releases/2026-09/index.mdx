@@ -1,0 +1,949 @@
+---
+title: openRuyi 2026.09 Release
+authors: [z572]
+tags: [release]
+image: /img/openRuyi-social-card.png
+date: 2026-09-30
+slug: 2026-09/release
+---
+
+We are pleased to announce the September 2026 release of openRuyi. This release improves RVA23 support, expands the cloud and storage software stacks, upgrades the Go 1.27 build environment, and ships a batch of security updates.
+
+{/* truncate */}
+
+## RVA23: Improving Build, Data Plane, and Container Support
+
+The RVA23 improvements in this release cover three areas: BCLR code generation fixes, RVV-based data-plane paths, and container hardware probing. On the compilation side, the release fixes a BCLR code generation problem that could break correctness. On the runtime side, OpenJDK and DPDK gain vectorized optimization paths. On the container side, allowing `riscv_hwprobe` lets programs inside containers read real CPU capabilities and choose the matching optimization branch.
+
+### Compilers and Data Plane
+
+| Component (Version) | September Change | User Problem Solved |
+|---------------------|------------------|---------------------|
+| GCC 16 (16.2.0) | Backports upstream BCLR fixes and fixes RISC-V BCLR sign extension | When compiling with the `zbb,zbs` extensions, GCC 16 optimizes the code to include the `bclr` instruction. Because `bclr` does not keep a 32-bit value sign-extended, loops such as `m &= m - 1` fail to terminate, and DPDK hangs in `rte_softrss()`. On RVA23 with an AMD GPU, the GCC 16 RISC-V backend `bclr_lowest_set_bit` miscompiles a bit-traversal loop in the Mesa ACO ILP scheduler, which finally reads a null pointer and raises SIGSEGV, making the graphics stack unusable. |
+| DPDK (25.07) | Builds on RVA23 with `-Dcpu_instruction_set=rva23u64` to enable vector paths; patches cover RISC-V vector implementations of lpm lookup, fib lookup, node lookup, and ACL | The lpm, fib, acl, and node lookup paths gain RVV implementations |
+| DPDK (25.07) | Links against libarchive so the EAL can load compressed firmware | The E810 DDP package ships as `ice.pkg.xz`, which `rte_firmware_read()` previously could not decompress, so ice PMD probing failed |
+| containers-common (0.67.0) | The default seccomp profile allows `riscv_hwprobe` | OpenSSL inside containers can recognize vector and vector-crypto extensions, and zlib-ng can enable the Zbc-accelerated crc32 |
+| OpenJDK | Merges 15 RISC-V patches: Zbs / Zfa instruction generation, RVV vset state optimization, CRC32C intrinsic, and slicing-by-8 CRC32 | Adds instruction support for RVA23 and optimizes the CRC32 and vector state handling paths |
+| linux / linux-lts | 7.2.6 / 6.18.54, with refreshed patchsets and configs | Tracks the upstream stable releases |
+
+### Container Hardware Probing: Measured on SpacemiT V100
+
+Measured inside a container on SpacemiT V100 (RVA23): after allowing `riscv_hwprobe`, OpenSSL 3.6.3 recognizes and enables vector-crypto extensions such as Zvkned, Zvknhb, and Zvksed, and zlib-ng enables the Zbc-accelerated crc32. Verified with openssl, python3 zlib, and pigz.
+
+## Cloudpods 4.0.3: A Multi-Cloud and Private-Cloud Platform in the Distribution
+
+Users can install the Cloudpods core components from the openRuyi repository, targeting high-availability multi-node and bare-metal deployment forms.
+
+| Package | Version | Description |
+|---------|---------|-------------|
+| cloudpods | 4.0.3 | Multi-cloud and virtualization platform, including cloudpods-cli and cloudpods-executor |
+| cloudpods-operator | 4.0.3 | Kubernetes Operator |
+| cloudpods-dashboard | 4.0.3 | Web console, built with yarn 1.22.22 |
+
+- The build-time dependency closure completed around it consists mainly of Go source packages: `containernetworking-plugins` (a runtime package providing the CNI binaries and a DHCP systemd unit), the Kubernetes KMS API, the konnectivity client, the etcd v3 client and raft, cloud provider SDKs, and client libraries such as Vault and VictoriaMetrics. These are build-time dependencies and do not include the corresponding server programs.
+
+## Ceph and SPDK: Block Storage and User-Space Storage Backends
+
+SPDK can directly attach to local io_uring and Ceph RBD backends and enables a remote management agent; Ceph service accounts, mgr modules, and CephFS components are available.
+
+### SPDK (25.09, enabling --with-uring --with-rbd --with-sma)
+
+- Adds an io_uring bdev module (local asynchronous block device)
+- Adds a Ceph RBD bdev module (attaching to Ceph backends)
+- Enables SMA (Storage Management Agent, remote storage management)
+- Fixes spdk-tools dependencies: adds python-configshell-fb and upgrades python-grpcio-tools to 1.82.1 to match protobuf 7
+
+### Ceph (21.3.0+git20260917.35ae586), updated to an upstream main-branch development snapshot (v21.3.0-3295-g35ae586)
+
+- Switches to `systemd-sysusers` to create the ceph and cephadm users; the previous `%pre` called shadow's `useradd` without declaring the dependency, which left `/var/lib/ceph` owned by root
+- Adds cherrypy and pyyaml for mgr modules, so the prometheus module can be enabled
+- Backports fixes for `ceph-fuse@.service`, cephfs-shell, and ceph-crash
+
+### Measured on SpacemiT V100 (RVA23) with a 3-mon / 9-OSD (NVMe) three-replica cluster
+
+- RBD (librbd / krbd / rbd-nbd), CephFS (kernel and FUSE clients, snapshots, quotas, subvolumes), and RGW (S3 multipart / versioning / lifecycle) all passed functional verification
+- Erasure coding isa / jerasure / clay and snappy / zstd / lz4 / zlib compression are available
+- Common mgr modules can be enabled; prometheus and ceph-exporter export metrics, and monitoring is provided through the CLI and Prometheus; cephadm can bootstrap a single node and manage mon / mgr
+- SPDK io_uring bdev and RBD bdev run on RISC-V; the SMA gRPC interface (device creation, volume attachment, QoS) is verified as usable
+
+## Graphics Stack: NVK Included in the Build, Vulkan SDK Unified at 1.4.357.0
+
+NVK, the open-source NVIDIA Vulkan driver, is included in the build for the first time.
+
+- Mesa 26.2.2, with NVK included in the build (`-Dvulkan-drivers=...,nouveau`). NVK is produced together with mesa-vulkan-drivers. Hardware runtime and CTS verification will follow in a later release.
+- Nine Vulkan SDK components are upgraded to 1.4.357.0 in unison.
+- Adds vkmark: a lightweight Vulkan benchmark suite supporting X11, Wayland, KMS, direct display, and headless modes; backports a lavapipe crash fix.
+- glmark2 enables GBM variants (headless/DRM scenarios); adds assimp and glm (3D graphics development).
+- Qt 6 Base enables the Accessibility API.
+
+## Go 1.27: Cloud-Native and Observability Build Environment
+
+Solutions such as Cloudpods, MinIO/KES, Kubernetes, OpenTelemetry, and multi-cloud SDKs can now resolve dependencies, build offline, and be maintained as a coherent set on openRuyi.
+
+- Go toolchain: 1.27.0 → 1.27.1.
+- September added *325* Go source packages and updated *203* Go source packages (of which 30 were both added and updated within September, and 173 were updated only).
+- Go 1.27 compatibility fixes: #1254 fixes 11 modules, #1271 fixes several modules, and #1279 fixes go-honnef-go-tools 0.8.1, gonum/plot, go4, and the Azure AD MSAL `x/sync` dependency.
+- The solutions these modules serve (grouped by PR):
+  - MinIO/KES object storage: #1243, #1247, #1248, #1259, #1262, #1266, #1267
+  - Prometheus v3.13.1 observability: #994, #1117–#1126 (layered by dependency DAG), #1242
+  - Kubernetes and containers: konnectivity-client, go-k8s-kms, CRI, api-machinery, kube-openapi, structured-merge-diff, CNI, containerd, Moby, OpenShift API, etcd raft
+  - Multi-cloud and secrets: Azure SDK/Storage/Key Vault, GCP Storage/Compute/Logging/Monitoring/IAM/Secret Manager, AWS SDK, HashiCorp Vault/Consul, DigitalOcean/Linode/Vultr
+  - gRPC/Protobuf: gRPC, protobuf, Envoy control-plane, xDS, protovalidate, CEL, JSON Patch
+- Monthly routine update volume for verification: #1257 touches 72 Go packages, #1263 touches 80, and #1280 touches 32.
+
+## Software Supply Chain: Repository GPG Signature Verification and Security Updates
+
+Packages in the repository enable GPG verification by default, so the install and upgrade paths can validate signatures; affected packages moved to upstream versions that contain the fixes.
+
+- openruyi-repos ships `RPM-GPG-KEY-openruyi` and `RPM-GPG-KEY-openruyi-obs`, and writes `gpgcheck=1` and `gpgkey=file://.../RPM-GPG-KEY-openruyi*` into the repo file
+- rpm adds a gnupg runtime dependency
+- openruyi-minimal adds gnupg to its recommended dependencies
+
+### Security Updates
+
+| Component | Version | Fixes |
+|-----------|---------|-------|
+| expat | 2.8.5 (via 2.8.4) | 2.8.4: CVE-2026-66046, CVE-2026-76641, CVE-2026-76956, CVE-2026-76957; 2.8.5: CVE-2026-93990 |
+| jq | 1.8.2 | 9 CVEs + 4 GHSAs |
+| vim | 9.2.1090 | CVE-2026-52860/73070/73071/73072/73073/57451/57452; GHSA-cvc5-p4x9-3f9f |
+| imagemagick | 7.1.2.31 | GHSA-3rjr-534c-8v67, GHSA-4gg2-hfgh-6f5c, GHSA-7hjx-392p-f8cm, GHSA-89wq-f8f6-2j2v, GHSA-92rw-c5mw-27v4 |
+| pcre2 | 10.48 | GHSA-q7rw-r7qq-2hx6, GHSA-2p8c-ff85-vh9x, GHSA-9qww-pwc4-77qq |
+| runc | 1.4.3 | CVE-2026-41579 |
+| crun | 1.28 | CVE-2026-47766 |
+| libass | 0.17.5 | GHSA-5gf7-wjfm-vmvm |
+| editorconfig-core-c | 0.12.11 | CVE-2026-40489 |
+| btrbk | 0.32.7 | GHSA-pf45-7g54-65h5 |
+| python-datasets | 5.0.1 | CVE-2026-66007 |
+| python-pytorch-lightning | 2.6.6 | CVE-2026-58659 |
+| python-ujson | 6.0.0 | GHSA-8g3h-c45c-7pg3 |
+| python-virtualenv | 21.7.4 | CVE-2026-22702 |
+| python-mcp | 2.0.0 | GHSA-hvrp-rf83-w775, GHSA-jpw9-pfvf-9f58 |
+
+## KDE Desktop
+
+- 64 KDE Frameworks components updated to 6.29
+- 13 KDE Gear components updated to 26.08.1: dolphin, konsole, kate, falkon, konqueror, kdialog, kio-extras, dolphin-plugins, kaccounts-providers, kaccounts-integration, baloo-widgets, kpmcore, signon-kwallet-extension
+
+## Experimental RVA20 Release
+
+This release also offers an experimental RVA20 build, available as Server, Container, and Desktop; Zero is not provided for this variant. you can try it from the: [openRuyi RVA20 release site](https://releases.openruyi.cn/creek/2026.09/rva20/).
+
+## Download link
+
+openRuyi continues to provide four builds for different scenarios: **Server**, **Container**, **Desktop**, and **Zero (BSP validation)**. You can download this release from the [openRuyi release site](https://releases.openruyi.cn/creek/2026.09/rva23/).
+
+Existing users can complete the upgrade by simply running `dnf update`.
+
+***
+
+We welcome community testing and feedback on this release.
+
+## Changelog
+
+For the full package-level change details, see the complete changelog below, organized into updated and added packages.
+
+<details>
+<summary>Updated packages</summary>
+- baloo-widgets: 26.04.2 -> 26.08.1
+- btrbk: 0.32.6 -> 0.32.7
+- cbindgen: 0.29.2 -> 0.29.4
+- ccid: 1.7.0 -> 1.8.3
+- ceph: 21.3.0+git20260811.7abb41e -> 21.3.0+git20260917.35ae586
+- conntrack-tools: 1.4.8 -> 1.4.9
+- crun: 1.27.1 -> 1.28
+- db-ip: 2026.05 -> 2026.09
+- dolphin: 26.04.2 -> 26.08.1
+- dolphin-plugins: 26.04.2 -> 26.08.1
+- dos2unix: 7.5.5 -> 7.5.7
+- dotnet10.0: 10.0.110 -> 10.0.112
+- editorconfig-core-c: 0.12.10 -> 0.12.11
+- expat: 2.8.1 -> 2.8.5
+- fakeroot: 1.37.2 -> 2.1.4
+- falkon: 26.04.2 -> 26.08.1
+- firefox: 152.0.5 -> 155.0
+- fuse3: 3.17.4 -> 3.18.2
+- genimage: 19 -> 20
+- glibc: 2.44 -> 2.44+git20260918.1f5026241027
+- glslang: 1.4.335.0 -> 1.4.357.0
+- gnulib: 0+git20260316.4e11e3d -> 0+git20260821.ef765f1
+- go: 1.26.5 -> 1.27.1
+- go-cel-expr: 0.25.2 -> 0.25.3
+- go-github-ajg-form: 1.7.1 -> 1.9.0
+- go-github-alecthomas-kong: 1.15.0 -> 1.16.1
+- go-github-alecthomas-repr: 0.5.2 -> 0.5.4
+- go-github-andybalholm-brotli: 1.2.1 -> 1.2.4
+- go-github-anishathalye-porcupine: 1.2.0 -> 1.3.0
+- go-github-apache-beam: 2.74.0 -> 2.76.0
+- go-github-apache-thrift: 0.23.0 -> 0.24.0
+- go-github-aperturerobotics-protobuf-go-lite: 0.17.0 -> 0.18.0
+- go-github-armon-go-metrics: 0.5.4 -> 0.6.1
+- go-github-aws-smithy-go: 2025.12.01 -> 1.28.1
+- go-github-azure-azure-sdk-for-go: 20260416 -> 20260615
+- go-github-azuread-microsoft-authentication-library-for-go: 1.6.0 -> 1.9.0
+- go-github-basgys-goxml2json: 1.1.0 -> 1.1.1+git20260721.e66ee54
+- go-github-bits-and-blooms-bitset: 1.24.5 -> 1.25.0
+- go-github-brianvoe-gofakeit-v7: 7.15.0 -> 7.17.0
+- go-github-bwesterb-go-ristretto: 1.2.3 -> 1.2.4
+- go-github-cheggaaa-pb-v1: 1.0.29 -> 1.0.30
+- go-github-cilium-ebpf: 0.9.1 -> 0.22.0
+- go-github-clipperhouse-displaywidth: 0.6.2 -> 0.11.0
+- go-github-clipperhouse-uax29-v2: 2.3.0 -> 2.7.0
+- go-github-cloudflare-circl: 1.6.3 -> 1.6.5
+- go-github-cncf-xds: 0+git20260107.ee656c7 -> 0+git20260721.dba9d58
+- go-github-containerd-go-runc: 1.0.0 -> 1.2.1
+- go-github-containerd-ttrpc: 1.2.7 -> 1.2.9
+- go-github-containerd-typeurl-v2: 2.2.3 -> 2.3.0
+- go-github-containernetworking-cni: 1.1.2 -> 1.3.1
+- go-github-cpuguy83-tar2go: 0.3.1 -> 0.4.0
+- go-github-datadog-datadog-go: 3.2.0 -> 4.8.3
+- go-github-davecgh-go-spew: 1.1.1 -> 1.1.2+git20260721.d8f796a
+- go-github-digitalocean-godo: 1.193.0 -> 1.206.0
+- go-github-docker-go-connections: 0.7.0 -> 0.8.1
+- go-github-docker-go-metrics: 0.0.1 -> 0.1.0
+- go-github-edsrzf-mmap-go: 1.2.0 -> 1.2.1+git20260721.fad1cd1
+- go-github-elazarl-goproxy: 1.8.4 -> 1.9.1
+- go-github-envoyproxy-go-control-plane-envoy: 1.37.0 -> 1.39.0
+- go-github-envoyproxy-protoc-gen-validate: 1.3.0 -> 1.3.3
+- go-github-fxamacker-cbor-v2: 2.9.2 -> 2.9.3
+- go-github-getkin-kin-openapi: 0.140.0 -> 0.149.0
+- go-github-gin-contrib-cors: 1.7.7 -> 1.7.8
+- go-github-gin-contrib-sse: 1.1.1 -> 1.1.2
+- go-github-go-git-go-billy-v5: 5.9.0 -> 5.9.1
+- go-github-go-git-go-git-v5: 5.19.1 -> 5.19.2
+- go-github-go-loger-logr: 1.4.3 -> 1.4.4
+- go-github-go-openapi-errors: 0.22.7 -> 0.22.8
+- go-github-go-openapi-jsonpointer: 0.23.1 -> 1.0.1
+- go-github-go-openapi-jsonreference: 0.21.6 -> 1.0.2
+- go-github-go-openapi-loads: 0.23.3 -> 0.25.3
+- go-github-go-openapi-strfmt: 0.26.2 -> 0.26.3
+- go-github-go-openapi-testify-v2: 2.4.2 -> 2.8.0
+- go-github-go-playground-validator-v10: 10.30.3 -> 10.30.4
+- go-github-go-sql-driver-mysql: 1.10.0 -> 1.10.1
+- go-github-googleapis-enterprise-certificate-proxy: 0.3.16 -> 0.3.22
+- go-github-googlecloudplatform-opentelemetry-operations-go-exporter-metric: 0.57.0 -> 0.62.0
+- go-github-googlecloudplatform-opentelemetry-operations-go-internal-cloudmock: 0.57.0 -> 0.62.0
+- go-github-googlecloudplatform-opentelemetry-operations-go-internal-resourcemapping: 0.57.0 -> 0.62.0
+- go-github-gophercloud-gophercloud-v2: 2.12.0 -> 2.14.0
+- go-github-gorilla-websocket: 1.5.3 -> 1.5.4+git20260721.e064f32
+- go-github-grpc-ecosystem-go-grpc-middleware: 1.3.0 -> 1.4.0
+- go-github-grpc-ecosystem-go-grpc-middleware-v2: 2.3.3 -> 2.3.4
+- go-github-hashicorp-consul-api: 1.32.1 -> 1.34.5
+- go-github-hashicorp-consul-sdk: 0.18.1 -> 0.18.2
+- go-github-hashicorp-go-immutable-radix: 2.1.0 -> 1.3.1
+- go-github-hashicorp-go-secure-stdlib: 0.1.0 -> 0.3.0
+- go-github-hashicorp-golang-lru: 2.0.7 -> 1.0.2
+- go-github-hashicorp-mdns: 1.0.4 -> 1.0.7
+- go-github-hashicorp-memberlist: 0.5.0 -> 0.6.0
+- go-github-hashicorp-nomad-api: 0+git20260615.5b02773 -> 0+git20260721.ea1ca2d
+- go-github-hashicorp-terraform-plugin-log: 0.10.0 -> 0.11.0
+- go-github-henvic-httpretty: 0.1.4 -> 0.2.0
+- go-github-hetznercloud-hcloud-go-v2: 2.42.0 -> 2.47.0
+- go-github-ionos-cloud-sdk-go-v6: 6.3.7 -> 6.3.11
+- go-github-jarcoal-httpmock: 1.4.1 -> 1.4.2
+- go-github-kimmachinegun-automemlimit: 0.7.5 -> 1.0.0
+- go-github-klauspost-compress: 1.19.0 -> 1.20.0
+- go-github-klauspost-cpuid-v2: 2.3.0 -> 2.4.0
+- go-github-klauspost-reedsolomon: 1.14.1 -> 1.14.2
+- go-github-knadh-koanf-maps: 0.1.2 -> 0.1.3
+- go-github-knadh-koanf-providers-confmap: 1.0.0 -> 1.0.1
+- go-github-knadh-koanf-v2: 2.3.5 -> 2.3.6
+- go-github-leodido-go-urn: 1.4.0 -> 1.5.0
+- go-github-lesismal-llib: 1.2.2 -> 1.2.4
+- go-github-lesismal-nbio: 1.6.9 -> 1.6.12
+- go-github-linode-linodego: 1.66.0 -> 1.69.1
+- go-github-lucasb-eyer-go-colorful: 1.4.0 -> 1.4.1
+- go-github-mattn-go-isatty: 0.0.22 -> 0.0.24
+- go-github-mattn-go-runewidth: 0.0.24 -> 0.0.30
+- go-github-maxatome-go-testdeep: 1.15.0 -> 1.16.0
+- go-github-mdlayher-socket: 0.6.1 -> 0.7.0
+- go-github-microsoft-hcsshim: 0.11.7 -> 0.14.1
+- go-github-miekg-dns: 1.1.72 -> 1.1.73
+- go-github-minio-mux: 1.10.0 -> 1.10.1
+- go-github-minio-sha256-simd: 1.0.0 -> 1.0.1
+- go-github-mitchellh-cli: 1.1.0 -> 1.1.5
+- go-github-modelcontextprotocol-go-sdk: 1.6.1 -> 1.7.0
+- go-github-modern-go-reflect2: 1.0.2 -> 1.0.3+git20260721.35a7c28
+- go-github-nwaples-rardecode-v2: 2.2.5 -> 2.4.1
+- go-github-oapi-codegen-runtime: 1.0.0 -> 1.3.1
+- go-github-oasdiff-yaml3: 0.0.13 -> 0.0.14
+- go-github-oklog-ulid-v2: 2.1.1 -> 2.1.2
+- go-github-onsi-gomega: 1.42.0 -> 1.43.0
+- go-github-opencontainers-go-digest: 1.0.0~rc1 -> 1.0.0
+- go-github-pb33f-jsonpath: 0.8.2 -> 0.8.3
+- go-github-pelletier-go-toml-v2: 2.4.0 -> 2.4.3
+- go-github-pierrec-lz4-v4: 4.1.27 -> 4.1.29
+- go-github-pkg-sftp: 1.13.10 -> 1.13.11
+- go-github-planetscale-vtprotobuf: 0.6.0 -> 0.6.1+git20260721.0393e58
+- go-github-pmezard-go-difflib: 1.0.0 -> 1.0.1+git20260721.5d4384e
+- go-github-prometheus-client-model: 0.6.2 -> 0.6.3
+- go-github-prometheus-common: 0.69.0 -> 0.71.0
+- go-github-prometheus-procfs: 0.19.2+git20260702.3c943fd -> 0.22.0
+- go-github-rabbitmq-amqp091-go: 1.12.0 -> 1.14.0
+- go-github-santhosh-tekuri-jsonschema-v6: 6.0.2 -> 6.0.3
+- go-github-secure-systems-lab-go-securesystemslib: 0.11.0 -> 0.11.1
+- go-github-sirupsen-logrus: 1.9.4 -> 1.10.2
+- go-github-skeema-knownhosts: 1.3.2 -> 1.3.3
+- go-github-smallstep-pkcs7: 0.2.1 -> 0.2.3
+- go-github-stackexchange-wmi: 1.1.0 -> 1.2.1
+- go-github-stretchr-testify: 1.11.1 -> 1.12.1
+- go-github-urfave-cli: 1.22.12 -> 1.22.17
+- go-github-vultr-govultr-v3: 3.32.0 -> 3.33.0
+- go-github-woodsbury-decimal128: 1.4.0 -> 1.5.0
+- go-github-yuin-goldmark: 1.8.2 -> 1.8.6
+- go-golang-x-arch: 0.28.0 -> 0.31.0
+- go-golang-x-crypto: 0.53.0 -> 0.57.0
+- go-golang-x-exp: 0+git20260107.944ab1f -> 0+git20260721.3dfff04
+- go-golang-x-mod: 0.37.0 -> 0.41.0
+- go-golang-x-net: 0.56.0 -> 0.59.0
+- go-golang-x-oauth2: 0.36.0 -> 0.37.0
+- go-golang-x-sync: 0.21.0 -> 0.23.0
+- go-golang-x-sys: 0.46.0 -> 0.48.0
+- go-golang-x-term: 0.44.0 -> 0.46.0
+- go-golang-x-text: 0.38.0 -> 0.42.0
+- go-golang-x-time: 0.15.0 -> 0.16.0
+- go-golang-x-tools: 0.40.0 -> 0.50.0
+- go-gonum-v1-gonum: 0.16.0 -> 0.17.0
+- go-google-api: 0.285.0 -> 0.297.0
+- go-google-api-support: 0.285.0 -> 0.297.0
+- go-google-genproto: 0+git20260107.e7812ac -> 0+git20260722.62b3387
+- go-google-grpc: 1.81.1 -> 1.83.2
+- go-google-protobuf: 1.36.11 -> 1.36.12
+- go-googlecloud-go-compute: 1.64.0 -> 1.68.0
+- go-googlecloud-go-iam: 1.11.0 -> 1.13.0
+- go-googlecloud-go-logging: 1.18.0 -> 1.19.1
+- go-googlecloud-go-longrunning: 1.0.0 -> 1.2.0
+- go-googlecloud-go-monitoring: 1.29.0 -> 1.30.0
+- go-googlecloud-go-storage: 1.62.3 -> 1.67.1
+- go-googlecloud-go-translate: 1.17.0 -> 1.18.0
+- go-gopkg-dnaeon-go-vcr.v4: 4.0.6 -> 4.0.7
+- go-gopkg-yaml.v2: 2.4.0 -> 2.4.4
+- go-gopkg-yaml.v3: 3.0.4 -> 3.0.5
+- go-honnef-go-tools: 0.7.0~0.dev -> 0.8.1
+- go-k8s-cri-api: 0.36.3 -> 0.37.0
+- go-k8s-cri-streaming: 0.36.3 -> 0.37.0
+- go-k8s-sigs-json: 0+git20250730.2d32026 -> 0+git20260909.2d32026
+- go-k8s-sigs-structured-merge-diff-v6: 6.4.0 -> 6.4.2
+- go-k8s-streaming: 0.36.3 -> 0.37.0
+- go-opentelemetry-collector-component: 1.60.0 -> 1.66.0
+- go-opentelemetry-collector-confmap: 1.60.0 -> 1.66.0
+- go-opentelemetry-collector-confmap-xconfmap: 0.154.0 -> 0.160.0
+- go-opentelemetry-collector-consumer: 1.60.0 -> 1.66.0
+- go-opentelemetry-collector-consumer-consumertest: 0.154.0 -> 0.160.0
+- go-opentelemetry-collector-featuregate: 1.60.0 -> 1.66.0
+- go-opentelemetry-collector-internal-componentalias: 0.154.0 -> 0.160.0
+- go-opentelemetry-collector-internal-testutil: 0.154.0 -> 0.160.0
+- go-opentelemetry-collector-pdata: 1.60.0 -> 1.66.0
+- go-opentelemetry-collector-pipeline: 1.60.0 -> 1.66.0
+- go-opentelemetry-collector-processor: 1.60.0 -> 1.66.0
+- go-opentelemetry-contrib: 0.68.0 -> 0.69.0
+- go-opentelemetry-otel-exporters-otlp-otlptrace: 1.43.0 -> 1.46.0
+- go-opentelemetry-proto: 1.9.0 -> 1.10.0
+- httpd: 2.4.66 -> 2.4.68
+- imagemagick: 7.1.2.25 -> 7.1.2.31
+- iptables: 1.8.11 -> 1.8.13
+- jemalloc: 5.3.1 -> 5.4.0
+- jq: 1.8.1 -> 1.8.2
+- jsoncpp: 1.9.7 -> 1.9.8
+- kaccounts-integration: 26.04.2 -> 26.08.1
+- kaccounts-providers: 26.04.2 -> 26.08.1
+- kate: 26.04.2 -> 26.08.1
+- kdialog: 26.04.2 -> 26.08.1
+- kf6-attica: 6.28.0 -> 6.29.0
+- kf6-baloo: 6.28.0 -> 6.29.0
+- kf6-breeze-icons: 6.28.0 -> 6.29.0
+- kf6-extra-cmake-modules: 6.28.0 -> 6.29.0
+- kf6-frameworkintegration: 6.28.0 -> 6.29.0
+- kf6-karchive: 6.28.0 -> 6.29.0
+- kf6-kauth: 6.28.0 -> 6.29.0
+- kf6-kbookmarks: 6.28.0 -> 6.29.0
+- kf6-kcmutils: 6.28.0 -> 6.29.0
+- kf6-kcodecs: 6.28.0 -> 6.29.0
+- kf6-kcolorscheme: 6.28.0 -> 6.29.0
+- kf6-kcompletion: 6.28.0 -> 6.29.0
+- kf6-kconfig: 6.28.0 -> 6.29.0
+- kf6-kconfigwidgets: 6.28.0 -> 6.29.0
+- kf6-kcoreaddons: 6.28.0 -> 6.29.0
+- kf6-kcrash: 6.28.0 -> 6.29.0
+- kf6-kdbusaddons: 6.28.0 -> 6.29.0
+- kf6-kdeclarative: 6.28.0 -> 6.29.0
+- kf6-kded: 6.28.0 -> 6.29.0
+- kf6-kdesu: 6.28.0 -> 6.29.0
+- kf6-kdnssd: 6.28.0 -> 6.29.0
+- kf6-kdoctools: 6.28.0 -> 6.29.0
+- kf6-kfilemetadata: 6.28.0 -> 6.29.0
+- kf6-kglobalaccel: 6.28.0 -> 6.29.0
+- kf6-kguiaddons: 6.28.0 -> 6.29.0
+- kf6-kholidays: 6.28.0 -> 6.29.0
+- kf6-ki18n: 6.28.0 -> 6.29.0
+- kf6-kiconthemes: 6.28.0 -> 6.29.0
+- kf6-kidletime: 6.28.0 -> 6.29.0
+- kf6-kimageformats: 6.28.0 -> 6.29.0
+- kf6-kio: 6.28.0 -> 6.29.0
+- kf6-kirigami: 6.28.0 -> 6.29.0
+- kf6-kitemmodels: 6.28.0 -> 6.29.0
+- kf6-kitemviews: 6.28.0 -> 6.29.0
+- kf6-kjobwidgets: 6.28.0 -> 6.29.0
+- kf6-knewstuff: 6.28.0 -> 6.29.0
+- kf6-knotifications: 6.28.0 -> 6.29.0
+- kf6-knotifyconfig: 6.28.0 -> 6.29.0
+- kf6-kpackage: 6.28.0 -> 6.29.0
+- kf6-kparts: 6.28.0 -> 6.29.0
+- kf6-kpty: 6.28.0 -> 6.29.0
+- kf6-kquickcharts: 6.28.0 -> 6.29.0
+- kf6-krunner: 6.28.0 -> 6.29.0
+- kf6-kservice: 6.28.0 -> 6.29.0
+- kf6-kstatusnotifieritem: 6.28.0 -> 6.29.0
+- kf6-ksvg: 6.28.0 -> 6.29.0
+- kf6-ktexteditor: 6.28.0 -> 6.29.0
+- kf6-ktextwidgets: 6.28.0 -> 6.29.0
+- kf6-kunitconversion: 6.28.0 -> 6.29.0
+- kf6-kuserfeedback: 6.28.0 -> 6.29.0
+- kf6-kwallet: 6.28.0 -> 6.29.0
+- kf6-kwidgetsaddons: 6.28.0 -> 6.29.0
+- kf6-kwindowsystem: 6.28.0 -> 6.29.0
+- kf6-kxmlgui: 6.28.0 -> 6.29.0
+- kf6-modemmanager-qt: 6.28.0 -> 6.29.0
+- kf6-networkmanager-qt: 6.28.0 -> 6.29.0
+- kf6-prison: 6.28.0 -> 6.29.0
+- kf6-purpose: 6.28.0 -> 6.29.0
+- kf6-qqc2-desktop-style: 6.28.0 -> 6.29.0
+- kf6-solid: 6.28.0 -> 6.29.0
+- kf6-sonnet: 6.28.0 -> 6.29.0
+- kf6-syndication: 6.28.0 -> 6.29.0
+- kf6-syntax-highlighting: 6.28.0 -> 6.29.0
+- kf6-threadweaver: 6.28.0 -> 6.29.0
+- kio-extras: 26.04.2 -> 26.08.1
+- konqueror: 26.04.2 -> 26.08.1
+- konsole: 26.04.2 -> 26.08.1
+- kpmcore: 26.04.2 -> 26.08.1
+- libXi: 1.8.2 -> 1.8.3
+- libXres: 1.2.2 -> 1.2.3
+- libarchive: 3.8.7 -> 3.8.9
+- libass: 0.17.4 -> 0.17.5
+- libcdata: 20240414 -> 20260703
+- libcerror: 20240413 -> 20260703
+- libcnotify: 20240414 -> 20260703
+- libcthreads: 20240413 -> 20260703
+- libfcache: 20240414 -> 20260520
+- libfdata: 20240415 -> 20260521
+- libffi: 3.5.2 -> 3.8.0
+- libheif: 1.21.2 -> 1.23.4
+- libjaylink: 0.4.0 -> 0.5.0
+- libjwt: 3.2.2 -> 3.6.1
+- libnftnl: 1.3.0 -> 1.3.2
+- libpcap: 1.10.5 -> 1.10.7
+- librepo: 1.20.0 -> 1.21.1
+- libxkbfile: 1.1.3 -> 1.2.0
+- linux: 7.2.0 -> 7.2.6
+- linux-lts: 6.18.46 -> 6.18.54
+- lmdb: 0.9.33 -> 0.9.36
+- lua-json: 1.3.4 -> 1.3.5
+- luajit: 2.1+openresty20260114 -> 2.1+openresty20260824
+- lxc: 6.0.6 -> 7.0.0
+- lxcfs: 6.0.6 -> 7.0.0
+- mesa: 26.2.1 -> 26.2.2
+- nftables: 1.1.5 -> 1.1.6
+- nss: 3.124.0 -> 3.127.0
+- openruyi-repos: 3 -> 4
+- pcre2: 10.47 -> 10.48
+- pcsc-lite: 2.3.3 -> 2.5.1
+- python-ansible-core: 2.20.5 -> 2.21.4
+- python-datasets: 4.8.5 -> 5.0.1
+- python-grpcio-status: 1.80.0 -> 1.82.1
+- python-grpcio-tools: 1.80.0 -> 1.82.1
+- python-inscriptis: 2.7.1 -> 2.7.4
+- python-mcp: 1.26.0 -> 2.0.0
+- python-pytorch-lightning: 2.6.4 -> 2.6.6
+- python-ujson: 5.13.0 -> 6.0.0
+- python-virtualenv: 20.35.4 -> 21.7.4
+- runc: 1.4.0 -> 1.4.3
+- rust-clap-complete-4: 4.6.3 -> 4.6.5
+- rust-jiff-0.2: 0.2.24 -> 0.2.27
+- rust-jiff-static-0.2: 0.2.24 -> 0.2.27
+- rust-normpath-1: 1.5.0 -> 1.5.1
+- rust-ratatui-0.30: 0.30.1 -> 0.30.2
+- rust-ratatui-core-0.1: 0.1.1 -> 0.1.2
+- rust-ratatui-crossterm-0.1: 0.1.1 -> 0.1.2
+- rust-ratatui-macros-0.7: 0.7.1 -> 0.7.2
+- rust-ratatui-termion-0.1: 0.1.1 -> 0.1.2
+- rust-ratatui-termwiz-0.1: 0.1.1 -> 0.1.2
+- rust-ratatui-widgets-0.3: 0.3.1 -> 0.3.2
+- signon-kwallet-extension: 26.04.2 -> 26.08.1
+- skopeo: 1.23.0 -> 1.24.0
+- spirv-cross: 1.4.335.0 -> 1.4.357.0
+- spirv-headers: 1.4.350.0 -> 1.4.357.0
+- spirv-tools: 1.4.350.0 -> 1.4.357.0
+- vim: 9.2.0593 -> 9.2.1090
+- vulkan-headers: 1.4.335.0 -> 1.4.357.0
+- vulkan-loader: 1.4.335.0 -> 1.4.357.0
+- vulkan-tools: 1.4.335 -> 1.4.357.0
+- vulkan-utility-libraries: 1.4.335.0 -> 1.4.357.0
+- vulkan-validation-layers: 1.4.335.0 -> 1.4.357.0
+- xorgproto: 2024.1 -> 2025.1
+- xrdb: 1.2.2 -> 1.2.3
+- xz: 5.8.3 -> 5.8.4
+</details>
+
+<details>
+<summary>Added packages</summary>
+- assimp
+- chroma
+- cloudpods
+- cloudpods-dashboard
+- cloudpods-operator
+- containernetworking-plugins
+- dperf
+- fd
+- flashrom
+- glm
+- go-buf-gen-go-bufbuild-protovalidate-protocolbuffers-go
+- go-c2sp-cctv
+- go-etcd-io-etcd
+- go-filippo-age
+- go-filippo-hpke
+- go-filippo-nistec
+- go-github-acarl005-stripansi
+- go-github-adrg-xdg
+- go-github-alecaivazis-survey-v2
+- go-github-alecthomas-assert-v2
+- go-github-alecthomas-jsonschema
+- go-github-alecthomas-participle
+- go-github-alibabacloud-go-debug
+- go-github-alibabacloud-go-tea
+- go-github-allegro-bigcache-v3
+- go-github-andybalholm-cascadia
+- go-github-antchfx-xmlquery
+- go-github-antchfx-xpath
+- go-github-antithesishq-antithesis-sdk-go
+- go-github-antlr4-go-antlr-v4
+- go-github-araddon-dateparse
+- go-github-atotto-clipboard
+- go-github-aws-aws-lambda-go
+- go-github-aws-aws-msk-iam-sasl-signer-go
+- go-github-aybabtme-rgbterm
+- go-github-azure-azure-kusto-go
+- go-github-azure-go-ansiterm
+- go-github-azure-go-ntlmssp
+- go-github-bazelbuild-rules-go
+- go-github-benbjohnson-clock
+- go-github-bitly-go-hostpool
+- go-github-bmatcuk-doublestar-v4
+- go-github-bmizerany-assert
+- go-github-bombsimon-logrusr-v4
+- go-github-bygui86-multi-profile-v2
+- go-github-cactus-go-statsd-client
+- go-github-casbin-casbin-v2
+- go-github-casbin-govaluate
+- go-github-cenkalti-backoff-v3
+- go-github-charmbracelet-bubbles
+- go-github-charmbracelet-glamour
+- go-github-charmbracelet-harmonica
+- go-github-cheggaaa-pb-v3
+- go-github-cihub-seelog
+- go-github-clbanning-mxj
+- go-github-clbanning-mxj-v2
+- go-github-cli-browser
+- go-github-cli-go-gh-v2
+- go-github-cli-safeexec
+- go-github-cli-shurcool-graphql
+- go-github-cloudflare-golibs
+- go-github-cloudfoundry-jibber-jabber
+- go-github-coocood-freecache
+- go-github-coreos-go-oidc-v3
+- go-github-coreos-go-semver
+- go-github-cosnicolaou-pbzip2
+- go-github-cucumber-gherkin-go-v33
+- go-github-cucumber-messages-go-v12
+- go-github-cucumber-messages-go-v28
+- go-github-data-dog-go-sqlmock
+- go-github-datadog-datadog-go-v5
+- go-github-datadog-go-sqllexer
+- go-github-datadog-gostackparse
+- go-github-datadog-mmh3
+- go-github-datadog-sketches-go
+- go-github-datadog-viper
+- go-github-decred-dcrd-crypto-blake256
+- go-github-decred-dcrd-dcrec-secp256k1-v4
+- go-github-deruina-timberjack
+- go-github-dgraph-io-ristretto-v2
+- go-github-dgryski-go-farm
+- go-github-dgryski-go-rendezvous
+- go-github-digitalocean-go-metadata
+- go-github-dmarkham-enumer
+- go-github-docopt-docopt-go
+- go-github-dolthub-maphash
+- go-github-eapache-go-resiliency
+- go-github-eapache-go-xerial-snappy
+- go-github-eapache-queue
+- go-github-ebitengine-purego
+- go-github-eclipse-paho.mqtt.golang
+- go-github-elastic-go-elasticsearch-v7
+- go-github-elastic-go-perf
+- go-github-elastic-go-structform
+- go-github-elastic-lunes
+- go-github-erikgeiser-coninput
+- go-github-ettle-strcase
+- go-github-evanphx-json-patch
+- go-github-evanw-esbuild
+- go-github-fastly-go-utils
+- go-github-fatih-camelcase
+- go-github-flynn-go-docopt
+- go-github-fortytw2-leaktest
+- go-github-franela-goblin
+- go-github-franela-goreq
+- go-github-fraugster-parquet-go
+- go-github-gdamore-tcell-v3
+- go-github-gehirninc-crypt
+- go-github-go-asn1-ber-asn1-ber
+- go-github-go-bdd-assert
+- go-github-go-faster-city
+- go-github-go-faster-errors
+- go-github-go-kit-log
+- go-github-go-quicktest-qt
+- go-github-go-redis-redis-v8
+- go-github-gofrs-flock
+- go-github-gofrs-uuid
+- go-github-gokillers-libsodium-go
+- go-github-golang-jwt-jwt-v4
+- go-github-golang-mock
+- go-github-goodsign-monday
+- go-github-google-go-tpm
+- go-github-google-renameio-v2
+- go-github-google-shlex
+- go-github-gorilla-csrf
+- go-github-gorilla-css
+- go-github-gorilla-handlers
+- go-github-gorilla-securecookie
+- go-github-gorilla-sessions
+- go-github-grbit-go-json
+- go-github-h2non-filetype
+- go-github-h2non-parth
+- go-github-hailocab-go-hostpool
+- go-github-hashicorp-go-immutable-radix-v2
+- go-github-hashicorp-hcl
+- go-github-hashicorp-hcl-v2
+- go-github-hashicorp-raft
+- go-github-hashicorp-vault
+- go-github-hdevalence-ed25519consensus
+- go-github-hdrhistogram-hdrhistogram-go
+- go-github-hjson-hjson-go-v4
+- go-github-huandu-go-assert
+- go-github-huandu-go-clone
+- go-github-huml-lang-go-huml
+- go-github-iancoleman-orderedmap
+- go-github-ibm-sarama
+- go-github-influxdata-influxdb1-client
+- go-github-integrii-flaggy
+- go-github-itchyny-go-yaml
+- go-github-itchyny-timefmt-go
+- go-github-jackc-puddle-v2
+- go-github-jbuchbinder-go-gmetric
+- go-github-jcmturner-aescts-v2
+- go-github-jcmturner-dnsutils-v2
+- go-github-jcmturner-gofork
+- go-github-jcmturner-goidentity-v6
+- go-github-jcmturner-gokrb5-v8
+- go-github-jcmturner-rpc-v2
+- go-github-jehiah-go-strftime
+- go-github-jesseduffield-generics
+- go-github-jesseduffield-lazycore
+- go-github-jlaffaye-ftp
+- go-github-joho-godotenv
+- go-github-jonboulle-clockwork
+- go-github-jsimonetti-rtnetlink-v2
+- go-github-jtolds-gls
+- go-github-juju-ratelimit
+- go-github-kardianos-osext
+- go-github-karimkhaleel-jsonschema
+- go-github-kballard-go-shellquote
+- go-github-kisielk-sqlstruct
+- go-github-konsorten-go-windows-terminal-sequences
+- go-github-kr-logfmt
+- go-github-kyokomi-emoji-v2
+- go-github-leaanthony-go-ansi-parser
+- go-github-lestrrat-go-blackmagic
+- go-github-lestrrat-go-envload
+- go-github-lestrrat-go-httpcc
+- go-github-lestrrat-go-httprc
+- go-github-lestrrat-go-iter
+- go-github-lestrrat-go-jwx-v2
+- go-github-lestrrat-go-option
+- go-github-lightstep-go-expohisto
+- go-github-lithammer-shortuuid-v4
+- go-github-lmittmann-tint
+- go-github-lufia-plan9stats
+- go-github-madflojo-testcerts
+- go-github-magefile-mage
+- go-github-makenowjust-heredoc
+- go-github-masterminds-sprig-v3
+- go-github-matryer-is
+- go-github-mattn-go-ieproxy
+- go-github-mattn-go-localereader
+- go-github-mattn-go-sqlite3
+- go-github-mdlayher-kobject
+- go-github-mdlayher-netlink
+- go-github-mgutz-str
+- go-github-michel-laterman-proxy-connect-dialer-go
+- go-github-microcosm-cc-bluemonday
+- go-github-miekg-pcap
+- go-github-minio-cli
+- go-github-minio-colorjson
+- go-github-minio-crc64nvme
+- go-github-minio-filepath
+- go-github-minio-kms-go-kes
+- go-github-minio-kms-go-kms
+- go-github-minio-md5-simd
+- go-github-minio-minio-go-v6
+- go-github-minio-minio-go-v7
+- go-github-minio-pkg-v3
+- go-github-moby-go-archive
+- go-github-montanaflynn-stats
+- go-github-mymmrac-telego
+- go-github-natefinch-atomic
+- go-github-nats-io-jwt-v2
+- go-github-nats-io-nats.go
+- go-github-nats-io-nkeys
+- go-github-nats-io-nuid
+- go-github-nats-io-stan.go
+- go-github-nbio-st
+- go-github-ncruces-go-strftime
+- go-github-netflix-go-env
+- go-github-niemeyer-pretty
+- go-github-npillmayer-nestext
+- go-github-nsqio-go-nsq
+- go-github-oklog-ulid
+- go-github-op-go-logging
+- go-github-open-dingtalk-dingtalk-stream-sdk-go
+- go-github-openai-openai-go-v3
+- go-github-openshift-api
+- go-github-openshift-build-machinery-go
+- go-github-orcaman-concurrent-map-v2
+- go-github-outcaste-io-ristretto
+- go-github-pascaldekloe-name
+- go-github-patrickmn-go-cache
+- go-github-paulmach-protoscan
+- go-github-performancecopilot-speed-v4
+- go-github-peterbourgon-ff-v3
+- go-github-petermattis-goid
+- go-github-phuslu-log
+- go-github-phuslu-lru
+- go-github-power-devops-perfstat
+- go-github-prometheus-exporter-toolkit
+- go-github-prometheus-sigv4
+- go-github-puerkitobio-goquery
+- go-github-puzpuzpuz-xsync-v3
+- go-github-relvacode-iso8601
+- go-github-rhnvrm-simples3
+- go-github-richardartoul-molecule
+- go-github-rivo-tview
+- go-github-rs-zerolog
+- go-github-ryanuber-go-glob
+- go-github-safchain-ethtool
+- go-github-sahilm-fuzzy
+- go-github-samber-lo
+- go-github-sasha-s-go-deadlock
+- go-github-sblinch-kdl-go
+- go-github-scalyr-dataset-go
+- go-github-secure-io-sio-go
+- go-github-segmentio-go-camelcase
+- go-github-shirou-gopsutil-v3
+- go-github-shirou-w32
+- go-github-shoenig-go-m1cpu
+- go-github-skip2-go-qrcode
+- go-github-slack-go-slack
+- go-github-smarty-assertions
+- go-github-smartystreets-goconvey
+- go-github-soheilhy-cmux
+- go-github-sony-gobreaker
+- go-github-spf13-jwalterweatherman
+- go-github-stefanhaller-git-todo-parser
+- go-github-stoewer-go-strcase
+- go-github-streadway-handy
+- go-github-tebeka-strftime
+- go-github-tencent-connect-botgo
+- go-github-tg123-go-htpasswd
+- go-github-thlib-go-timezone-local
+- go-github-thunderbottom-kiln
+- go-github-tidwall-tinylru
+- go-github-tidwall-wal
+- go-github-tilinna-clock
+- go-github-tj-assert
+- go-github-tmc-grpc-websocket-proxy
+- go-github-trivago-grok
+- go-github-trivago-tgo
+- go-github-twitchyliquid64-golang-asm
+- go-github-twmb-murmur3
+- go-github-ua-parser-uap-go
+- go-github-unrolled-secure
+- go-github-urfave-cli-v3
+- go-github-valyala-fasthttp
+- go-github-valyala-fastrand
+- go-github-valyala-histogram
+- go-github-vbauerster-mpb-v8
+- go-github-victoriametrics-metrics
+- go-github-vividcortex-ewma
+- go-github-vividcortex-gohistogram
+- go-github-vjeantet-grok
+- go-github-wk8-go-ordered-map-v2
+- go-github-xdg-go-pbkdf2
+- go-github-xdg-go-scram
+- go-github-xdg-go-stringprep
+- go-github-xlzd-gotp
+- go-github-youmark-pkcs8
+- go-github-yuin-goldmark-emoji
+- go-github-yusufpapurcu-wmi
+- go-github-zclconf-go-cty-debug
+- go-go-mau-util
+- go-go-mau-zeroconfig
+- go-go.elastic-fastjson
+- go-go.etcd-raft-v3
+- go-goftp-server-v2
+- go-gomodules-jsonpatch-v2
+- go-gopkg-datadog-dd-trace-go.v1
+- go-gopkg-dnaeon-go-vcr.v3
+- go-gopkg-fsnotify-v1
+- go-gopkg-gcfg.v1
+- go-gopkg-go-jose-go-jose.v2
+- go-gopkg-h2non-gock-v1
+- go-gopkg-h2non-gock.v1
+- go-gopkg-natefinch-lumberjack.v2
+- go-gopkg-ozeidan-fuzzy-patricia-v3
+- go-gopkg-telebot.v3
+- go-gotest-tools
+- go-k8s-code-generator
+- go-k8s-kms
+- go-k8s-sigs-apiserver-network-proxy-konnectivity-client
+- go-maunium-go-mauflag
+- go-maunium-go-mautrix
+- go-mongodb-mongo-driver
+- go-mvdan-editorconfig
+- go-mvdan-sh-v3
+- go-opentelemetry-collector-semconv
+- go-uber-dig
+- go-uber-fx
+- gojq
+- humanlog
+- kes
+- lapack
+- lazygit
+- lua-filesystem
+- nats-server
+- olm
+- openruyi-linux-build
+- pngquant
+- pprof
+- python-configshell-fb
+- python-deepspeed
+- python-hjson
+- python-httpx2
+- python-ninja
+- python-python-discovery
+- python-pyzmq
+- ripgrep
+- rust-aead-0.6.0-rc.10
+- rust-aead-0.6.0-rc.3
+- rust-aes-0.9.0-rc.2
+- rust-aes-0.9.0-rc.4
+- rust-aes-gcm-0.11.0-rc.2
+- rust-aes-gcm-0.11.0-rc.3
+- rust-ansi-term-0.12
+- rust-argmax-0.4
+- rust-block-buffer-0.11
+- rust-block-buffer-0.11.0-rc.5
+- rust-cbc-0.2.0-rc.2
+- rust-cipher-0.5.0-rc.2
+- rust-cipher-0.5.0-rc.8
+- rust-cloudflare-zlib-sys-0.3
+- rust-completest-1
+- rust-completest-pty-1
+- rust-cpubits-0.1.0-rc.2
+- rust-cpubits-0.1.0-rc.3
+- rust-crypto-bigint-0.7.0-rc.25
+- rust-crypto-bigint-0.7.0-rc.27
+- rust-crypto-bigint-0.7.0-rc.28
+- rust-crypto-common-0.2.0-rc.13
+- rust-crypto-common-0.2.0-rc.15
+- rust-crypto-common-0.2.0-rc.5
+- rust-crypto-primes-0.7.0-pre.9
+- rust-ctr-0.10.0-rc.2
+- rust-ctr-0.10.0-rc.3
+- rust-curve25519-dalek-5.0.0-pre.6
+- rust-der-0.8.0-rc.10
+- rust-der-0.8.0-rc.12
+- rust-der-0.8.0-rc.7
+- rust-der-0.8.0-rc.9
+- rust-digest-0.11.0-rc.11
+- rust-digest-0.11.0-rc.4
+- rust-digest-0.11.0-rc.8
+- rust-ecdsa-0.17.0-rc.16
+- rust-ed25519-3.0.0-rc.4
+- rust-ed25519-dalek-3.0.0-pre.6
+- rust-elliptic-curve-0.14.0-rc.28
+- rust-encoding-rs-io-0.1
+- rust-etcetera-0.11
+- rust-faccess-0.2
+- rust-getopts-0.2
+- rust-ghash-0.6.0-rc.3
+- rust-ghash-0.6.0-rc.5
+- rust-hkdf-0.13.0-rc.5
+- rust-hmac-0.13.0-rc.3
+- rust-hmac-0.13.0-rc.5
+- rust-imagequant-sys-4
+- rust-internal-russh-forked-ssh-key-0.6
+- rust-keccak-0.2.0-rc.2
+- rust-kem-0.3.0-rc.6
+- rust-lcms2-sys-4
+- rust-lexopt-0.3
+- rust-libpng-sys-1
+- rust-lscolors-0.21
+- rust-memoffset-0.7
+- rust-ml-kem-0.3.0-rc.1
+- rust-os-str-bytes-7
+- rust-p256-0.14.0-rc.7
+- rust-p384-0.14.0-rc.7
+- rust-p521-0.14.0-rc.7
+- rust-pbkdf2-0.13.0-rc.8
+- rust-pcre2-0.2
+- rust-pcre2-sys-0.2
+- rust-pem-rfc7468-1.0.0-rc.3
+- rust-pkcs1-0.8.0-rc.4
+- rust-pkcs5-0.8.0-rc.13
+- rust-pkcs8-0.11
+- rust-pkcs8-0.11.0-rc.10
+- rust-pkcs8-0.11.0-rc.11
+- rust-polyval-0.7.0-rc.3
+- rust-polyval-0.7.0-rc.7
+- rust-primefield-0.14.0-rc.7
+- rust-primeorder-0.14.0-rc.7
+- rust-print-bytes-2
+- rust-ptyprocess-0.5
+- rust-rand-core-0.10.0-rc.6
+- rust-ratatui-termina-0.1
+- rust-rfc6979-0.5.0-rc.5
+- rust-rsa-0.10.0-rc.16
+- rust-russh-0.60
+- rust-rustcrypto-ff-0.14.0-rc.0
+- rust-rustcrypto-group-0.14.0-rc.0
+- rust-salsa20-0.11.0-rc.2
+- rust-scrypt-0.12.0-rc.9
+- rust-sec1-0.8.0-rc.13
+- rust-sha1-0.11.0-rc.5
+- rust-sha2-0.11.0-rc.3
+- rust-sha2-0.11.0-rc.4
+- rust-sha2-0.11.0-rc.5
+- rust-sha3-0.11.0-rc.9
+- rust-signature-3.0.0-rc.10
+- rust-spki-0.8.0-rc.4
+- rust-termina-0.3
+- rust-test-case-3
+- rust-test-case-core-3
+- rust-test-case-macros-3
+- rust-uniquote-5
+- rust-universal-hash-0.6.0-rc.10
+- rust-universal-hash-0.6.0-rc.3
+- rust-vt100-0.16
+- rust-vte-0.15
+- tio
+- vkmark
+- yazi
+</details>
