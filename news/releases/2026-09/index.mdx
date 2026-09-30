@@ -19,7 +19,7 @@ The RVA23 improvements in this release cover three areas: BCLR code generation f
 
 | Component (Version) | September Change | User Problem Solved |
 |---------------------|------------------|---------------------|
-| GCC 16 (16.2.0) | Backports upstream BCLR fixes and fixes RISC-V BCLR sign extension | When compiling with the `zbb,zbs` extensions, GCC 16 optimizes the code to include the `bclr` instruction. Because `bclr` does not keep a 32-bit value sign-extended, loops such as `m &= m - 1` fail to terminate, and DPDK hangs in `rte_softrss()`. On RVA23 with an AMD GPU, the GCC 16 RISC-V backend `bclr_lowest_set_bit` miscompiles a bit-traversal loop in the Mesa ACO ILP scheduler, which finally reads a null pointer and raises SIGSEGV, making the graphics stack unusable. |
+| GCC 16 (16.2.0) | Backports upstream BCLR fixes and fixes RISC-V BCLR sign extension | When compiling with the `zbb,zbs` extensions, GCC 16 optimizes the code to include the `bclr` instruction. Because `bclr` does not keep a 32-bit value sign-extended, loops such as `m &= m - 1` fail to terminate, and DPDK hangs in `rte_softrss()`. On RVA23 with an AMD GPU, the GCC 16 RISC-V backend `bclr_lowest_set_bit` miscompiles a bit-traversal loop in the Mesa ACO ILP scheduler, which finally reads a null pointer and raises SIGSEGV, making the graphics stack unusable |
 | DPDK (25.07) | Builds on RVA23 with `-Dcpu_instruction_set=rva23u64` to enable vector paths; patches cover RISC-V vector implementations of lpm lookup, fib lookup, node lookup, and ACL | The lpm, fib, acl, and node lookup paths gain RVV implementations |
 | DPDK (25.07) | Links against libarchive so the EAL can load compressed firmware | The E810 DDP package ships as `ice.pkg.xz`, which `rte_firmware_read()` previously could not decompress, so ice PMD probing failed |
 | containers-common (0.67.0) | The default seccomp profile allows `riscv_hwprobe` | OpenSSL inside containers can recognize vector and vector-crypto extensions, and zlib-ng can enable the Zbc-accelerated crc32 |
@@ -48,23 +48,23 @@ SPDK can directly attach to local io_uring and Ceph RBD backends and enables a r
 
 ### SPDK (25.09, enabling --with-uring --with-rbd --with-sma)
 
-- Adds an io_uring bdev module (local asynchronous block device)
-- Adds a Ceph RBD bdev module (attaching to Ceph backends)
-- Enables SMA (Storage Management Agent, remote storage management)
-- Fixes spdk-tools dependencies: adds python-configshell-fb and upgrades python-grpcio-tools to 1.82.1 to match protobuf 7
+- Adds an io_uring bdev module (local asynchronous block device).
+- Adds a Ceph RBD bdev module (attaching to Ceph backends).
+- Enables SMA (Storage Management Agent, remote storage management).
+- Fixes spdk-tools dependencies: adds python-configshell-fb and upgrades python-grpcio-tools to 1.82.1 to match protobuf 7.
 
 ### Ceph (21.3.0+git20260917.35ae586), updated to an upstream main-branch development snapshot (v21.3.0-3295-g35ae586)
 
-- Switches to `systemd-sysusers` to create the ceph and cephadm users; the previous `%pre` called shadow's `useradd` without declaring the dependency, which left `/var/lib/ceph` owned by root
-- Adds cherrypy and pyyaml for mgr modules, so the prometheus module can be enabled
-- Backports fixes for `ceph-fuse@.service`, cephfs-shell, and ceph-crash
+- Switches to `systemd-sysusers` to create the ceph and cephadm users; the previous `%pre` called shadow's `useradd` without declaring the dependency, which left `/var/lib/ceph` owned by root.
+- Adds cherrypy and pyyaml for mgr modules, so the prometheus module can be enabled.
+- Backports fixes for `ceph-fuse@.service`, cephfs-shell, and ceph-crash.
 
 ### Measured on SpacemiT V100 (RVA23) with a 3-mon / 9-OSD (NVMe) three-replica cluster
 
-- RBD (librbd / krbd / rbd-nbd), CephFS (kernel and FUSE clients, snapshots, quotas, subvolumes), and RGW (S3 multipart / versioning / lifecycle) all passed functional verification
-- Erasure coding isa / jerasure / clay and snappy / zstd / lz4 / zlib compression are available
-- Common mgr modules can be enabled; prometheus and ceph-exporter export metrics, and monitoring is provided through the CLI and Prometheus; cephadm can bootstrap a single node and manage mon / mgr
-- SPDK io_uring bdev and RBD bdev run on RISC-V; the SMA gRPC interface (device creation, volume attachment, QoS) is verified as usable
+- RBD (librbd / krbd / rbd-nbd), CephFS (kernel and FUSE clients, snapshots, quotas, subvolumes), and RGW (S3 multipart / versioning / lifecycle) all passed functional verification.
+- Erasure coding isa / jerasure / clay and snappy / zstd / lz4 / zlib compression are available.
+- Common mgr modules can be enabled; prometheus and ceph-exporter export metrics, and monitoring is provided through the CLI and Prometheus; cephadm can bootstrap a single node and manage mon / mgr.
+- SPDK io_uring bdev and RBD bdev run on RISC-V; the SMA gRPC interface (device creation, volume attachment, QoS) is verified as usable.
 
 ## Graphics Stack: NVK Included in the Build, Vulkan SDK Unified at 1.4.357.0
 
@@ -84,20 +84,20 @@ Solutions such as Cloudpods, MinIO/KES, Kubernetes, OpenTelemetry, and multi-clo
 - September added *325* Go source packages and updated *203* Go source packages (of which 30 were both added and updated within September, and 173 were updated only).
 - Go 1.27 compatibility fixes: #1254 fixes 11 modules, #1271 fixes several modules, and #1279 fixes go-honnef-go-tools 0.8.1, gonum/plot, go4, and the Azure AD MSAL `x/sync` dependency.
 - The solutions these modules serve (grouped by PR):
-  - MinIO/KES object storage: #1243, #1247, #1248, #1259, #1262, #1266, #1267
-  - Prometheus v3.13.1 observability: #994, #1117–#1126 (layered by dependency DAG), #1242
-  - Kubernetes and containers: konnectivity-client, go-k8s-kms, CRI, api-machinery, kube-openapi, structured-merge-diff, CNI, containerd, Moby, OpenShift API, etcd raft
-  - Multi-cloud and secrets: Azure SDK/Storage/Key Vault, GCP Storage/Compute/Logging/Monitoring/IAM/Secret Manager, AWS SDK, HashiCorp Vault/Consul, DigitalOcean/Linode/Vultr
-  - gRPC/Protobuf: gRPC, protobuf, Envoy control-plane, xDS, protovalidate, CEL, JSON Patch
+  - MinIO/KES object storage: #1243, #1247, #1248, #1259, #1262, #1266, #1267.
+  - Prometheus v3.13.1 observability: #994, #1117–#1126 (layered by dependency DAG), #1242.
+  - Kubernetes and containers: konnectivity-client, go-k8s-kms, CRI, api-machinery, kube-openapi, structured-merge-diff, CNI, containerd, Moby, OpenShift API, etcd raft.
+  - Multi-cloud and secrets: Azure SDK/Storage/Key Vault, GCP Storage/Compute/Logging/Monitoring/IAM/Secret Manager, AWS SDK, HashiCorp Vault/Consul, DigitalOcean/Linode/Vultr.
+  - gRPC/Protobuf: gRPC, protobuf, Envoy control-plane, xDS, protovalidate, CEL, JSON Patch.
 - Monthly routine update volume for verification: #1257 touches 72 Go packages, #1263 touches 80, and #1280 touches 32.
 
 ## Software Supply Chain: Repository GPG Signature Verification and Security Updates
 
 Packages in the repository enable GPG verification by default, so the install and upgrade paths can validate signatures; affected packages moved to upstream versions that contain the fixes.
 
-- openruyi-repos ships `RPM-GPG-KEY-openruyi` and `RPM-GPG-KEY-openruyi-obs`, and writes `gpgcheck=1` and `gpgkey=file://.../RPM-GPG-KEY-openruyi*` into the repo file
-- rpm adds a gnupg runtime dependency
-- openruyi-minimal adds gnupg to its recommended dependencies
+- openruyi-repos ships `RPM-GPG-KEY-openruyi` and `RPM-GPG-KEY-openruyi-obs`, and writes `gpgcheck=1` and `gpgkey=file://.../RPM-GPG-KEY-openruyi*` into the repo file.
+- rpm adds a gnupg runtime dependency.
+- openruyi-minimal adds gnupg to its recommended dependencies.
 
 ### Security Updates
 

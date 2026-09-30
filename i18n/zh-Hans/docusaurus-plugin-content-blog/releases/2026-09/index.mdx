@@ -20,7 +20,7 @@ slug: 2026-09/release
 ### 编译器与数据面
 | 组件（版本）                | 9 月变更                                                                                                                        | 解决的用户问题                                                                                                                                                                                                                                                       |
 |-----------------------------|---------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| GCC 16（16.2.0）            | 回移上游 BCLR 修复，并修复 RISC-V BCLR 符号扩展                                                                                 | 在使用 `zbb,zbs` 拓展编译时 gcc16会优化出包含 `bclr` 指令的代码, 因为 `bclr` 未保持32 位值符号扩展，导致 `m &= m - 1` 类循环不终止，DPDK 在 `rte_softrss()` 中挂死。在RVA23+AMD显卡的情况下,GCC 16 的 RISC-V 后端 bclr_lowest_set_bit 误编译了 Mesa ACO ILP 调度器中的位遍历循环，最终导致读到空指针并 SIGSEGV 造成图形部分无法使用。 |
+| GCC 16（16.2.0）            | 回移上游 BCLR 修复，并修复 RISC-V BCLR 符号扩展                                                                                 | 在使用 `zbb,zbs` 拓展编译时 gcc16会优化出包含 `bclr` 指令的代码, 因为 `bclr` 未保持32 位值符号扩展，导致 `m &= m - 1` 类循环不终止，DPDK 在 `rte_softrss()` 中挂死。在RVA23+AMD显卡的情况下，GCC 16 的 RISC-V 后端 `bclr_lowest_set_bit` 误编译了 Mesa ACO ILP 调度器中的位遍历循环，最终导致读到空指针并 SIGSEGV 造成图形部分无法使用 |
 | DPDK（25.07）               | 在 RVA23 上以 -Dcpu_instruction_set=rva23u64 构建，启用向量路径；补丁覆盖 lpm 查表、fib 查表、node 查表、ACL 的 RISC-V 向量实现 | lpm / fib / acl / node 查找路径提供 RVV 实现                                                                                                                                                                                                                         |
 | DPDK（25.07）               | 链接 libarchive，EAL 可加载压缩固件                                                                                             | E810 的 DDP 包以 ice.pkg.xz 发布，原先 rte_firmware_read() 无法解压，ice PMD 探测失败                                                                                                                                                                                |
 | containers-common（0.67.0） | 默认 seccomp profile 放行 riscv_hwprobe                                                                                         | 容器内 OpenSSL 可识别向量与向量密码扩展，zlib-ng 可启用 Zbc 加速的 crc32                                                                                                                                                                                             |
@@ -48,28 +48,28 @@ slug: 2026-09/release
 SPDK 可直接对接本地 io_uring 与 Ceph RBD 后端并启用远程管理代理；Ceph 的服务账户、mgr 模块与 CephFS 组件可用。
 
 ### SPDK（25.09，启用 --with-uring --with-rbd --with-sma）
-- 新增 io_uring bdev 模块（本地异步块设备）
-- 新增 Ceph RBD bdev 模块（对接 Ceph 后端）
-- 启用 SMA（Storage Management Agent，远程存储管理）
-- 修复 spdk-tools 依赖：新增 python-configshell-fb，python-grpcio-tools 升级至 1.82.1 以匹配 protobuf 7
+- 新增 io_uring bdev 模块（本地异步块设备）。
+- 新增 Ceph RBD bdev 模块（对接 Ceph 后端）。
+- 启用 SMA（Storage Management Agent，远程存储管理）。
+- 修复 spdk-tools 依赖：新增 python-configshell-fb，python-grpcio-tools 升级至 1.82.1 以匹配 protobuf 7。
 
 ### Ceph（21.3.0+git20260917.35ae586）更新至上游 main 分支开发快照（v21.3.0-3295-g35ae586）
-- 改用 systemd-sysusers 创建 ceph、cephadm 用户；原 %pre 调用 shadow 的 useradd 未声明依赖，导致 /var/lib/ceph 归属 root
-- 为 mgr 模块补充 cherrypy、pyyaml，使 prometheus 模块可启用
-- 回移 `ceph-fuse@.service`、`cephfs-shell`、`ceph-crash` 修复
+- 改用 systemd-sysusers 创建 ceph、cephadm 用户；原 %pre 调用 shadow 的 useradd 未声明依赖，导致 /var/lib/ceph 归属 root。
+- 为 mgr 模块补充 cherrypy、pyyaml，使 prometheus 模块可启用。
+- 回移 `ceph-fuse@.service`、`cephfs-shell`、`ceph-crash` 修复。
 
 ### 在 SpacemiT V100（RVA23）上以 3 mon / 9 OSD（NVMe）三副本集群实测：
-- RBD（librbd / krbd / rbd-nbd）、CephFS（内核与 FUSE 客户端、快照、配额、subvolume）、RGW（S3 multipart / versioning / lifecycle）功能验证通过
-- 纠删码 isa / jerasure / clay 与 snappy / zstd / lz4 / zlib 压缩可用
-- mgr 常用模块可启用，prometheus 与 ceph-exporter 导出指标，监控通过 CLI 与 Prometheus 提供；cephadm 可单机 bootstrap 并管理 mon / mgr
-- SPDK io_uring bdev 与 RBD bdev 在 RISC-V 上跑通；SMA gRPC 接口（设备创建、卷挂载、QoS）验证可用
+- RBD（librbd / krbd / rbd-nbd）、CephFS（内核与 FUSE 客户端、快照、配额、subvolume）、RGW（S3 multipart / versioning / lifecycle）功能验证通过。
+- 纠删码 isa / jerasure / clay 与 snappy / zstd / lz4 / zlib 压缩可用。
+- mgr 常用模块可启用，prometheus 与 ceph-exporter 导出指标，监控通过 CLI 与 Prometheus 提供；cephadm 可单机 bootstrap 并管理 mon / mgr。
+- SPDK io_uring bdev 与 RBD bdev 在 RISC-V 上跑通；SMA gRPC 接口（设备创建、卷挂载、QoS）验证可用。
 
 ## 图形栈：NVK纳入构建, Vulkan SDK 统一到 1.4.357.0
 
 首次将 NVK 开源 NVIDIA Vulkan 驱动纳入构建。
 
 - Mesa 26.2.2，并将 NVK 纳入构建（-Dvulkan-drivers=...,nouveau）。NVK 随 mesa-vulkan-drivers 产出。硬件运行与 CTS 验证待后续版本跟进。
-- Vulkan SDK 9 个组件统一升级到 1.4.357.0
+- Vulkan SDK 9 个组件统一升级到 1.4.357.0。
 - 新增 vkmark：轻量 Vulkan 基准测试套件，支持 X11、Wayland、KMS、直显与无头模式；回移 lavapipe 崩溃修复。
 - glmark2 启用 GBM 变体（无头/DRM 场景）；新增 assimp、glm（三维图形开发）。
 - Qt 6 Base 启用 Accessibility API。
@@ -77,24 +77,24 @@ SPDK 可直接对接本地 io_uring 与 Ceph RBD 后端并启用远程管理代�
 ## Go 1.27 云原生与可观测性构建环境
 Cloudpods、MinIO/KES、Kubernetes、OpenTelemetry、多云 SDK 这些解决方案在 openRuyi 上可解析依赖、离线构建、成体系维护。
 
-- Go 工具链：1.27.0→ 1.27.1。
+- Go 工具链：1.27.0 → 1.27.1。
 - 9 月新增 Go 源码包 *325* 个；更新 Go 源码包 *203* 个（其中 9 月内既有新增又有更新的 30 个，仅更新的 173 个）。
 - Go 1.27 兼容性修复：#1254 修 11 个模块，#1271 修若干模块，#1279 修 go-honnef-go-tools 0.8.1、gonum/plot、go4、Azure AD MSAL 的 x/sync 依赖。
 - 这些模块服务的解决方案（按 PR 归属）：
-  - MinIO/KES 对象存储：#1243、#1247、#1248、#1259、#1262、#1266、#1267
-  - Prometheus v3.13.1 可观测性：#994、#1117~#1126（按依赖 DAG 分层）、#1242
-  - Kubernetes 与容器：konnectivity-client、go-k8s-kms、CRI、api-machinery、kube-openapi、structured-merge-diff、CNI、containerd、Moby、OpenShift API、etcd raft
-  - 多云与密钥：Azure SDK/Storage/Key Vault、GCP Storage/Compute/Logging/Monitoring/IAM/Secret Manager、AWS SDK、HashiCorp Vault/Consul、DigitalOcean/Linode/Vultr
-  - gRPC/Protobuf：gRPC、protobuf、Envoy control-plane、xDS、protovalidate、CEL、JSON Patch
+  - MinIO/KES 对象存储：#1243、#1247、#1248、#1259、#1262、#1266、#1267.
+  - Prometheus v3.13.1 可观测性：#994、#1117~#1126（按依赖 DAG 分层）、#1242.
+  - Kubernetes 与容器：konnectivity-client、go-k8s-kms、CRI、api-machinery、kube-openapi、structured-merge-diff、CNI、containerd、Moby、OpenShift API、etcd raft.
+  - 多云与密钥：Azure SDK/Storage/Key Vault、GCP Storage/Compute/Logging/Monitoring/IAM/Secret Manager、AWS SDK、HashiCorp Vault/Consul、DigitalOcean/Linode/Vultr.
+  - gRPC/Protobuf：gRPC、protobuf、Envoy control-plane、xDS、protovalidate、CEL、JSON Patch.
 - 月度例行更新规模可核对：#1257 涉及 72 个 Go 包、#1263 涉及 80 个、#1280 涉及 32 个。
 
 ## 软件供应链：仓库 GPG 签名验证 + 安全更新
 
 仓库中的软件包默认启用 GPG 校验，安装/升级链路可验证签名；受影响软件包换到含修复的上游版本。
 
-- openruyi-repos 内置 `RPM-GPG-KEY-openruyi`、`RPM-GPG-KEY-openruyi-obs`，repo 文件写入 `gpgcheck=1` 与 `gpgkey=file://.../RPM-GPG-KEY-openruyi*`
-- rpm 增加 gnupg 运行依赖
-- openruyi-minimal 将 gnupg 加入推荐依赖
+- openruyi-repos 内置 `RPM-GPG-KEY-openruyi`、`RPM-GPG-KEY-openruyi-obs`，repo 文件写入 `gpgcheck=1` 与 `gpgkey=file://.../RPM-GPG-KEY-openruyi*`.
+- rpm 增加 gnupg 运行依赖。
+- openruyi-minimal 将 gnupg 加入推荐依赖。
 
 ### 安全更新
 
