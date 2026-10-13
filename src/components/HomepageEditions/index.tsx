@@ -72,7 +72,7 @@ const EditionList: EditionItem[] = [
                 development, especially in the pre-Silicon stage.
             </Translate>
         ),
-        downloadLink: '//docs/guide/how-to-install/zero',
+        downloadLink: '/docs/guide/how-to-install/zero',
     },
 ];
 
