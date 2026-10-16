@@ -7,7 +7,7 @@ slug: /guide/packaging-guidelines/languages/Rust
 
 # Rust Packaging Guide
 
-This document describes the Rust packaging guidelines for openRuyi. For the related build systems, see [Rust](/docs/guide/packaging-guidelines/BuildSystems/rust).
+This document describes the Rust packaging guidelines for openRuyi. For the related build systems, see [Rust](/docs/packaging-guidelines/buildsystems/rust.md).
 
 Rust packages in openRuyi usually fall into the following categories:
 
