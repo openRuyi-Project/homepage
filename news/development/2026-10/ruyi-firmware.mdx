@@ -1,0 +1,108 @@
+---
+title: "openRuyi Introduces Ruyi Firmware: An Open UEFI Firmware Solution for RISC-V Platforms"
+tags: [development]
+date: 2026-10-19
+slug: 2026-10/ruyi-firmware
+---
+
+As an important part of openRuyi's work on the firmware ecosystem, Ruyi Firmware expands the open firmware capabilities available for RISC-V platforms. Built on coreboot, OpenSBI, and EDK2, it provides an open UEFI firmware solution with optional compatibility for x64 UEFI graphics components, new K3 CPU mode configuration support, and complete build, flashing, and recovery procedures.
+
+Ruyi Firmware has been validated on SpacemiT K3 Pico ITX hardware, demonstrating the complete process of booting openRuyi from firmware through to a running desktop environment.
+
+<!-- truncate -->
+
+**01 / ECOSYSTEM FOUNDATION**
+
+## Building an Open, Maintainable RISC-V Firmware Stack
+
+Firmware is essential infrastructure connecting hardware and the operating system. It initializes hardware and hands control to the next stages of the boot process, and its implementation also affects operating system porting and maintenance. As the RISC-V ecosystem develops, hardware platforms have adopted different firmware architectures and boot flows, including U-Boot-based boot processes and UEFI environments provided by EDK2.
+
+These differences increase the work required to support an operating system across platforms. When porting an operating system, developers often need to adjust device trees, boot parameters, and firmware configurations for the target hardware, while also learning the corresponding flashing and recovery procedures. When a system fails to boot, troubleshooting may require examining firmware initialization, OpenSBI, the bootloader, and the operating system in turn, making diagnosis and ongoing maintenance more complex.
+
+To address these challenges, openRuyi introduces Ruyi Firmware. Through an open firmware build process and a consistent environment for software adaptation, the project aims to make RISC-V platform development, porting, and validation more accessible, while providing developers with an open, customizable, and maintainable firmware foundation.
+
+**02 / UEFI COMPATIBILITY**
+
+## Improving UEFI Graphics Compatibility During RISC-V Boot
+
+One of the key capabilities in Ruyi Firmware 20261015 is compatibility with x64 UEFI graphics components. Some PCIe expansion devices, including graphics cards, rely on UEFI graphics drivers during startup, and some of these components are compiled for the x64 architecture. Because RISC-V and x86 use different instruction sets, these x64 UEFI components cannot execute directly on RISC-V, which may affect device initialization during the UEFI stage.
+
+This release integrates **MultiArchUefiPkg**. Its optional **x64emu** component allows a RISC-V UEFI environment to execute certain x64 UEFI graphics components, providing a compatibility solution during device startup.
+
+x64emu has been tested with the **AMD Radeon RX 6400**, validating compatibility with x64 UEFI graphics components in a RISC-V boot environment.
+
+In addition, because the K3 platform does not support DMA32, it cannot properly use the RX 550 graphics card's built-in option ROM. This release integrates an AMD AArch64 option ROM EFI component as an alternative, resolving display compatibility issues for the RX 550 during the EDK2 stage. The firmware also supports the K3 platform's native display controller driver, enabling display output during the EDK2 stage.
+
+**03 / OPEN FIRMWARE**
+
+## An Open Source Firmware Architecture and Complete Build Process
+
+Ruyi Firmware is openRuyi's open firmware solution for RISC-V platforms. It combines coreboot, OpenSBI, and EDK2, with a publicly available build and packaging process that developers can use to build and extend the firmware from source.
+
+The architecture covers the complete firmware flow, from hardware initialization to the UEFI boot environment, providing a common firmware foundation for openRuyi porting and development. coreboot contributes to the underlying firmware, OpenSBI provides the SBI runtime services required by RISC-V systems, and EDK2 supplies the UEFI environment. Developers can use the published source code and build configurations for customization, debugging, and feature validation, without being limited to prebuilt firmware.
+
+![Ruyi Firmware boot screen](/article-images/2026-10/firmware-1.png)
+<p align="center">Ruyi Firmware boot screen</p>
+
+The firmware provides a UEFI setup interface, a boot menu, and an interactive shell. These tools allow users to adjust firmware settings, select boot entries, inspect devices, and troubleshoot issues before the operating system starts.
+
+![UEFI Boot Manager menu](/article-images/2026-10/firmware-2.png)
+<p align="center">UEFI Boot Manager menu</p>
+
+**04 / FLASH & RECOVERY**
+
+## Complete Firmware Update and Recovery Procedures
+
+Unlike ordinary software updates, flashing firmware directly affects how a device boots. Reliable update and recovery mechanisms are therefore an essential part of delivering firmware.
+
+This release provides two types of images: **normal-spi.bin** and **recovery-bootrom.bin**. Firmware can be flashed over USB Fastboot, and the documentation also describes how to use BootROM to enter the recovery boot process. Normal firmware updates preserve UEFI variables, reducing the need to reconfigure boot entries. After flashing, readback verification confirms the result.
+
+For developers who need to test firmware repeatedly, these procedures cover the main steps from compilation and flashing to recovery. This helps developers iterate on firmware more safely and speeds up RISC-V platform adaptation and troubleshooting.
+
+**05 / RELEASE PACKAGE**
+
+## Build Configurations for Everyday Use and Debugging
+
+To meet the needs of different development stages, Ruyi Firmware provides RELEASE and DEBUG builds, resulting in two firmware packages.
+
+DEBUG builds are intended for firmware debugging. The default configuration is suitable for scenarios that do not require x64 emulation; the graphics emulation driver must be enabled manually. These build and configuration choices provide flexibility for development validation, system tuning, and everyday use.
+
+This update also adds CPU mode configuration support. UEFI Setup allows users to select among X100 only (default), X100 + A100, and A100 only modes. A100 only mode supports vector extensions, providing a test environment for validating system operation with a vector length (VLEN) of 1024 bits.
+
+![Ruyi Firmware CPU mode settings](/article-images/2026-10/firmware-3.jpg)
+<p align="center">Ruyi Firmware 20261014 CPU mode settings</p>
+
+![Ruyi Firmware Platform Settings screen](/article-images/2026-10/firmware-4.jpg)
+<p align="center">Ruyi Firmware 20261015 Platform Settings screen</p>
+
+The build repository is licensed under MIT, pins component versions through Git submodules, and uses GitHub Actions for automated builds. Release packages also include checksums, build information, and flashing instructions to help users verify files, reproduce environments, and trace issues.
+
+**06 / HARDWARE DEMO**
+
+## Hardware Demonstration: Running openRuyi Creek
+
+Ruyi Firmware has been validated on the **SpacemiT K3 Pico ITX** platform and supports booting and running openRuyi Creek. Using this firmware, openRuyi Creek successfully boots into a **Wayland desktop environment** and runs the **glmark2-wayland graphics benchmark**. The demonstration also shows OpenGL rendering information and system status, offering a direct view of the system's graphics stack in operation.
+
+![openRuyi running on SpacemiT K3 Pico ITX](/article-images/2026-10/firmware-5.jpg)
+<p align="center">openRuyi@SpacemiT K3 Pico ITX</p>
+
+![openRuyi Creek running on hardware](/article-images/2026-10/firmware-6.jpg)
+<p align="center">openRuyi Creek in operation: Wayland desktop, glmark2-wayland, and system information</p>
+
+The project has also published a hardware demonstration video, "SpacemiT K3 EDK2 with openRuyi," showing the complete process from firmware startup to a running openRuyi system on the K3 platform.
+
+**Hardware demonstration on Bilibili:**
+
+https://www.bilibili.com/video/BV1pdpZ6hEnF
+
+## Download and Contribute
+
+Ruyi Firmware's source code, build instructions, and firmware release packages are publicly available. You are welcome to download and try the firmware, report issues through the project repository, or contribute to future improvements.
+
+**Ruyi Firmware releases:**
+
+https://github.com/openRuyi-Project/ruyifirmware/releases
+
+**Project repository and build instructions:**
+
+https://github.com/openRuyi-Project/ruyifirmware

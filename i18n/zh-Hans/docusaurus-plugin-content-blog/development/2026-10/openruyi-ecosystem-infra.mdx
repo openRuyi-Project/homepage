@@ -1,0 +1,98 @@
+---
+title: openRuyi-Project：RISC-V 软件生态的公共基础设施
+tags: [development]
+date: 2026-10-19
+slug: 2026-10/openruyi-ecosystem-infra
+---
+从 Linux Kernel、GCC、Glibc 等基础软件逐步实现对 riscv64 的原生支持，到 RISC-V Server Platform 1.0 规范正式获批，RISC-V 生态建设正从基础适配阶段走向系统性优化阶段。为实现操作系统对不同硬件平台兼容适配、应用在多样性环境的高效可靠运行与便捷部署维护的目标，需要固件、内核、工具链与应用的协同优化和实机验证。为保证各前沿的适配与优化成果随软件迭代持续维护，并供更多平台和应用复用，还需要将经验证的修复、优化与回归测试持续贡献上游。建设聚合 RISC-V 下游需求、硬件现实与上游共识的公共工程平台，是现阶段加速 RISC-V 生态的进一步完善的关键支撑。
+
+<!-- truncate -->
+
+围绕以上目标，中国科学院软件研究所发起面向 RISC-V 软件生态全链路建设的开源项目 openRuyi Project，并依托持续迭代的 Linux 系统，打造面向 RISC-V 新标准与新特性超前探索和高效验证的操作系统参考平台。项目致力于使开箱即用的系统环境同时成为规范实践和软硬件联合验证的载体：将新规范与硬件特性落实到固件、内核、工具链和应用环境，再通过 AI 推理、存储与网络、云原生和桌面图形等真实负载，检验各层组件能否协同工作、发挥硬件能力。围绕其中暴露的兼容性与性能问题，联合厂商与上游社区开展适配、修复和持续维护，支持包括硅前、硅后的 RISC-V 各研发阶段，最终构建解决长期范畴 RISC-V 软件生态问题的工程基础。
+
+截至 2026 年 9 月 30 日，openRuyi 已累计发布 7 个月度滚动版本[1]，汇集了从固件接口、内核到应用软件栈的持续建设成果。项目在系统内部推进各层组件的适配与集成，同时结合 RuyiRepo、RuyiCI、Ruyifirmware 及开发工具、基础设施等配套项目，完善系统构建与测试环境。上述工作经过多轮验证与迭代，形成支持硬件早期验证、软件开发和应用部署的系列版本。
+
+![openRuyi 的生态建设的聚合](/article-images/2026-10/openruyi-ecosystem-infra-1.png) 
+
+<p align="center">openRuyi 的生态建设的聚合</p>
+
+## 四大核心亮点
+
+### 开箱即用：让 RISC-V 硬件更快用起来
+
+openRuyi 全方位推进 RISC-V 开箱即用能力，让用户更快从拿到硬件进入开发和使用。围绕服务器、桌面、开发板和 FPGA 的不同需要，项目将固件、操作系统与应用环境协同适配，兼顾标准接口与定制启动方案。openRuyi Zero 面向 CPU 与 SoC 的系统启动和内核开发，尤其适用于硅前 FPGA 原型环境，提供验证所需软件，并支持接入自有内核及模块。Ruyifirmware 项目面向开发板使用，将开放固件与构建、刷写、恢复流程配套提供，支持用户便捷地完成启动环境部署与调试。
+
+![openRuyi 针对不同场景的发布件设计](/article-images/2026-10/openruyi-ecosystem-infra-2.png) 
+
+<p align="center">openRuyi 针对不同场景的发布件设计</p>
+
+### 规范实践：承接上游新规范的落地与演进
+
+openRuyi 紧跟 RISC-V 上游新规范，为规范的落地与演进提供可运行、可验证的系统平台。为衔接固件开发与系统适配，项目深度参与 RISC-V BRS 规范的测试补全与验证工作，并结合 openRuyi 实际制定《openRuyi RISC-V 固件接口规范》[2]，将上游的启动与硬件描述要求落实到接口约定和系统验证。在指令集架构测试方面，团队持续参与上游 ACT 的开发与维护，完善测试覆盖，并推进 openRuyi 集成 ACT 开发环境，为测试开发与运行提供配套的软件支持。
+
+### 上游协作：紧跟技术演进，让验证成果回到社区
+
+openRuyi 持续向关键上游项目贡献适配、修复补丁与回归用例，并在 DPDK、ISA-L、Golang 等项目中承担或参与 RISC-V 架构维护职责。围绕设备适配、IOMMU 和硬件勘误处理等需求，项目在基于最新版本内核和最新 LTS 内核中，分别超前集成 207 个和 766 个补丁。
+
+RuyiCI 支持优先覆盖存储与网络、虚拟化和 AI 等重点软件栈的关键依赖。团队已经为 OpenSSL、ISA-L、rust-vmm、Cloud Hypervisor 等项目提供原生集成的 RISC-V CI 能力，并持续承担环境维护与实机回归测试，反馈兼容性与性能变化；同时，为 PyTorch、Rust 等重要项目持续开展 RISC-V CI 适配与运行验证，为 RISC-V 捕捉上游最新迭代状态和问题。
+
+![DPDK 测试暴露 GCC 符号扩展错误，导致程序死循环；相关修复与回归用例已进入 GCC 主线](/article-images/2026-10/openruyi-ecosystem-infra-3.PNG) 
+<p align="center">DPDK 测试暴露 GCC 符号扩展错误，导致程序死循环；相关修复与回归用例已进入 GCC 主线</p>
+
+### 厂商联合验证：让平台经验成为共同的软件成果
+
+openRuyi 与北京开源芯片研究院、中兴通讯、玄铁（达摩院）、进迭时空、算能、蓝芯算力等主流 RISC-V 厂商协作，围绕硬件配套的软件环境开展适配、验证与优化，将平台实践转化为可共享的系统改进。项目与香山团队围绕 FPGA 系统运行和 Java 工作负载开展联合验证，持续改进启动、内核与应用兼容性；同时中兴通讯贡献的 Java 优化补丁已合入 openRuyi，随系统版本向用户提供。
+
+![基于 XSCC 的 openRuyi 在 V100 上做计算性能验证](/article-images/2026-10/openruyi-ecosystem-infra-4.PNG) 
+<p align="center">基于 XSCC 的 openRuyi 在 V100 上做计算性能验证</p>
+
+## 从生态问题切入的软件栈构建
+
+真实应用中的功能缺口、运行异常与性能瓶颈，往往牵涉应用之外的软硬件环节，需要沿依赖关系定位根因，并联合厂商与上游社区推进修复与优化。
+
+### AI： GPU 推理中的主机兼容性问题
+
+推理服务的计算任务由 GPU 承担，但是其正常运行主要依赖 RISC-V 主机侧软件栈的兼容性。ROCm 的 RISC-V 移植过程中，运行时出现的访存异常，需要结合内核内存管理的修复来解决。团队在适配 HIP、ROCr 等核心组件的同时，也重新梳理了编译器、计算库与运行时之间的依赖关系，将复杂的软件栈组织为可维护、可部署的组件组合。openRuyi 集成 ROCm 及其配套软件，在已验证的 RISC-V 主机与 AMD GPU 组合上提供模型运行与推理部署环境。
+
+![基于 RVA23 硬件环境下 vllm 到 ROCm 的推理演示](/article-images/2026-10/openruyi-ecosystem-infra-5.png) 
+<p align="center">基于 RVA23 硬件环境下 vllm 到 ROCm 的推理演示</p>
+
+### 存储与网络：RVV 优化真的生效了吗？
+
+在构建 RISC-V 的 Ceph 存储验证场景时，团队发现，底层固件、内核或编译器的缺陷都可能引发数据写入错误和服务停顿，容器配置也可能让已有的向量优化无法生效。openRuyi 从实际存储负载出发，沿 Ceph 的依赖关系验证 I/O 框架、加速库、工具链与部署环境，联合厂商定位软硬件问题，并推动针对 RISC-V 的相关修复与回归用例进入上游。
+
+![openRuyi 对 Ceph 的 RISC-V 软件生态建设图谱](/article-images/2026-10/openruyi-ecosystem-infra-6.png) 
+<p align="center">openRuyi 对 Ceph 的 RISC-V 软件生态建设图谱</p>
+
+### 虚拟化与云原生：RISC-V KVM 虚拟化离云平台部署还有多远？
+
+RISC-V KVM 已在上游移除实验性标记，但在一些云平台的实机场景部署中仍暴露出虚拟机启动停滞、容器运行受限和软件依赖缺漏等问题。团队借助 Kubernetes 验证容器编排与应用部署，通过 Cloudpods 检验虚拟机的创建、启动和管理，从实际运行流程追查固件、QEMU、内核与基础软件之间的适配问题。openRuyi 也与硬件厂商联合开展定位和验证，持续完善系统配置、组件依赖和部署流程，并将相关改进反馈上游。
+
+![在 K3 RISC-V 服务器上完成 openRuyi Cloudpods 适配和部署](/article-images/2026-10/openruyi-ecosystem-infra-7.png) 
+<p align="center">在 K3 RISC-V 服务器上完成 openRuyi Cloudpods 适配和部署</p>
+
+### 桌面：有 GPU 也不一定有图形加速
+
+部分 GPU 缺少完善的开源驱动支持，是 RISC-V 桌面生态长期存在的已知问题。 团队与 Imagination 及 Mesa 社区合作，推进基于 Zink 将 OpenGL 调用转换为 Vulkan 的实现，并完善渲染与显示之间的衔接，让更多的既有图形应用通过开源驱动获得 GPU 加速。团队已在实机上运行复杂图形程序，相关修复与适配成果已陆续进入 Mesa 上游。
+
+![openRuyi 提供 RISC-V 环境的全套 KDE 桌面体验，并持续优化运行效率](/article-images/2026-10/openruyi-ecosystem-infra-8.png) 
+<p align="center">openRuyi 提供 RISC-V 环境的全套 KDE 桌面体验，并持续优化运行效率</p>
+
+openRuyi 以生态痛点难点作为具体应用需求，并以此构建验证方式，沿软硬件依赖定位问题，联合厂商与上游社区推进适配、修复和优化。项目持续推动补丁与回归用例进入上游，通过滚动集成将经过验证的改进纳入系统，并以实机测试跟踪后续版本的兼容性与性能变化。系统环境、构建与测试设施及验证成果向社区开放，支持各方复用已有工程积累。
+
+## 长期生态建设目标
+
+立足工程实践，openRuyi Project 持续建设面向 RISC-V 硬件厂商、上游软件开发者和科研创新人员的开放协作与研究平台，共享系统环境、工程设施与验证成果，并围绕以下问题开展长期研究，明确生态建设的方向与重点：
+
+- 如何在标准化的兼容基础上，支持面向不同 RISC-V 硬件的按需优化，兼顾软件的跨平台复用、硬件差异化能力的发挥与适配维护成本的控制？
+- 如何通过结构化知识、可复用自动化流程和实机测试反馈，减少 RISC-V 软件生态完善工作的重复探索与返工，提高 AI 辅助软件适配与维护的效率和可靠性？
+- 如何建立针对 RISC-V 的跨研发阶段、跨硬件平台的芯片验证迁移机制，实现测试用例与问题复现方法的持续复用，减少重复适配，缩短软硬件兼容性问题的定位与修复周期？
+- 如何将 RISC-V 前沿软件栈的持续验证与对比评估结果转化为工程依据，支撑下一代国产操作系统的组件选型、集成与优化？
+
+openRuyi 将结合实践进展陆续推出系列专题文章，分享针对不同关键方向的生态投入思路，为 RISC-V 生态建设提供参考建议。
+
+## 相关链接
+
+[1] openRuyi 版本发布公告：https://www.openruyi.cn/zh-Hans/news
+
+[2] openRuyi RISC-V 固件接口规范: https://www.openruyi.cn/zh-Hans/docs/guide/recommended-practices/openruyi-risc-v-firmware-interface-specification/standard-server-platform-firmware-interface-specification/

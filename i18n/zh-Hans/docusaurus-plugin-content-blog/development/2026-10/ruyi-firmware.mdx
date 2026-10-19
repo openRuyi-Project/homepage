@@ -1,0 +1,108 @@
+---
+title: openRuyi 发布 Ruyi Firmware：为 RISC-V 平台提供开放 UEFI 固件方案
+tags: [development]
+date: 2026-10-19
+slug: 2026-10/ruyi-firmware
+---
+作为 openRuyi 在固件生态方向的重要组成部分，Ruyi Firmware 进一步完善了 RISC-V 平台开放固件能力。该固件基于 coreboot、OpenSBI 和 EDK2 提供开放 UEFI 固件方案，引入可选的 x64 UEFI 显卡组件兼容能力，并新增 K3 CPU mode 配置支持，配套完整的构建、刷写和恢复流程。
+
+目前，Ruyi Firmware 已在 SpacemiT K3 Pico ITX 平台完成实际硬件验证，展示 openRuyi 系统从固件启动到桌面环境运行的完整流程。
+
+<!-- truncate -->
+
+**01 / ECOSYSTEM FOUNDATION**
+
+## **构建开放、可维护的 RISC-V 固件体系**
+
+固件是连接硬件与操作系统的重要基础设施，负责硬件初始化并衔接后续启动流程，其实现方式也会影响操作系统的适配与维护。随着 RISC-V 生态不断发展，不同硬件平台在固件架构和启动流程上形成了各自的实现方案，例如采用以 U-Boot 为主的启动流程，或通过 EDK2 提供 UEFI 启动环境。
+
+这些差异增加了跨平台系统适配的工作量。开发者在移植操作系统时，往往需要针对目标硬件调整设备树、启动参数及固件配置，并熟悉对应的刷写和恢复流程。当系统启动异常时，还需要逐级排查固件初始化、OpenSBI、引导程序及操作系统等环节，增加了问题定位和后续维护的复杂度。
+
+针对上述适配与维护难题，openRuyi 推出 Ruyi Firmware，希望通过开放的固件构建流程和统一的软件适配环境，降低 RISC-V 平台开发、适配和验证的门槛，为开发者提供更加开放、可定制和可维护的固件基础。
+
+**02 / UEFI COMPATIBILITY**
+
+## 增强 RISC-V 启动阶段的显卡 UEFI 兼容能力
+
+作为 Ruyi Firmware 20261015 的重要能力之一，本版本引入 x64 UEFI 显卡组件兼容能力。部分显卡等 PCIe 扩展设备在开机阶段依赖 UEFI 图形驱动，其中部分组件面向 x64 架构编译。由于 RISC-V 与 x86 使用不同的指令集，这类 x64 UEFI 组件无法直接执行，可能影响相关设备在 UEFI 阶段的初始化。
+
+此次发布集成 **MultiArchUefiPkg**，通过可选的 **x64emu** 组件，让 RISC-V UEFI 环境能够执行部分 x64 架构的显卡 UEFI 组件，为相关设备提供启动阶段兼容方案。
+
+目前，x64emu 已在 **AMD Radeon RX 6400** 上完成组合测试，验证了 x64 UEFI 显卡组件在 RISC-V 平台启动环境中的兼容性。
+
+此外，针对 K3 平台因不支持 DMA32 而无法正常使用 RX 550 显卡自带 oprom 的问题，本版本集成 AMD AArch64 oprom EFI 组件作为替代方案，解决 RX550 在 EDK2 阶段的显示兼容问题。同时，固件也支持 K3 原生提供的显示控制器驱动，可在 EDK2 阶段实现显示输出。
+
+**03 / OPEN FIRMWARE**
+
+## 提供开源固件架构与完整构建流程
+
+Ruyi Firmware 是 openRuyi 面向 RISC-V 平台建设的开放固件方案。该方案采用 coreboot、OpenSBI 和 EDK2 组合架构，公开完整构建和打包流程，支持开发者基于源码进行构建和扩展。
+
+该固件架构覆盖从硬件初始化到 UEFI 启动环境的完整固件流程，为 openRuyi 系统适配和开发提供统一的固件支撑。其中，coreboot 参与底层固件构建，OpenSBI 提供 RISC-V 系统所需的 SBI 运行时服务，EDK2 提供 UEFI 环境。开发者可以基于公开的源码和构建配置进行定制、调试和功能验证，而不必局限于使用预编译固件。
+
+![Ruyi Firmware 启动画面](/article-images/2026-10/firmware-1.png)
+<p align="center">Ruyi Firmware 启动画面</p>
+
+固件提供 UEFI 设置界面、启动菜单和交互式 Shell，可用于调整固件配置、选择启动项，以及在操作系统启动前检查设备和排查问题。
+
+![UEFI Boot Manager 启动菜单](/article-images/2026-10/firmware-2.png)
+<p align="center">UEFI Boot Manager 启动菜单</p>
+
+**04 / FLASH & RECOVERY**
+
+## 提供完整的固件更新与恢复流程
+
+与普通软件更新不同，固件刷写直接影响设备启动流程，因此可靠的更新和恢复机制是固件交付的重要组成部分。
+
+此次发布配套 **normal-spi.bin** 与 **recovery-bootrom.bin** 两类镜像，支持通过 USB Fastboot 写入固件，也可以按文档利用 BootROM 进入恢复启动流程。正常固件更新会保留 UEFI 变量，减少重复配置启动项的操作；写入后通过读回校验确认刷写结果。
+
+对于需要反复测试固件的开发者，该流程覆盖了从编译、刷写到恢复的主要环节，这使开发者能够更安全地进行固件迭代测试，加快 RISC-V 平台适配和问题定位过程。
+
+**05 / RELEASE PACKAGE**
+
+## 提供多种构建配置，满足使用与调试需求
+
+为满足不同开发阶段的需求，Ruyi Firmware 提供 RELEASE 和 DEBUG 两类构建，共形成两种固件包。
+
+DEBUG 构建适用于固件调试场景，默认配置适用于不需要 x64 模拟功能的场景，显卡模拟驱动需要手动开启。多种构建组合为开发验证、系统调优和日常使用提供更灵活的选择。
+
+此外，本次更新新增 CPU mode 配置支持，可在 UEFI Setup 中选择不同 CPU 工作模式，包括 X100 only（default）、X100 + A100 以及 A100 only 模式。其中，A100 only 模式支持向量扩展，可为验证 1024-bit vlen 超长向量在系统中的运行提供测试环境。
+
+![Ruyi Firmware CPU mode 配置界面](/article-images/2026-10/firmware-3.jpg)
+<p align="center">Ruyi Firmware 20261014 CPU mode 配置界面</p>
+
+![Ruyi Firmware Platform Settings 配置界面](/article-images/2026-10/firmware-4.jpg)
+<p align="center">Ruyi Firmware 20261015 Platform Settings 配置界面</p>
+
+构建仓库采用 MIT 许可证，通过 Git submodule 固定组件版本，并使用 GitHub Actions 自动构建。发布包还附带校验值、构建信息和刷写说明，方便核对文件、复现环境及追溯问题。
+
+**06 / HARDWARE DEMO**
+
+## 真机演示：openRuyi Creek 运行验证
+
+Ruyi Firmware 已在 **SpacemiT K3 Pico ITX** 平台完成实际硬件验证，并支持 openRuyi Creek 系统启动运行。基于该固件方案，openRuyi Creek 成功启动 **Wayland 桌面环境**，并运行 **glmark2-wayland 图形测试**。同时展示了 OpenGL 渲染信息及系统运行状态，可直观了解系统图形栈的实际运行情况。
+
+![openRuyi 在 SpacemiT K3 Pico ITX 上运行](/article-images/2026-10/firmware-5.jpg)
+<p align="center">openRuyi@SpacemiT K3 Pico ITX</p>
+
+![openRuyi Creek 运行状态](/article-images/2026-10/firmware-6.jpg)
+<p align="center">openRuyi Creek 运行状态：Wayland 桌面、glmark2-wayland 与系统运行信息</p>
+
+此外，项目已发布《SpacemiT K3 EDK2 with openRuyi》真机演示视频，展示 K3 平台从固件启动到 openRuyi 系统运行的完整过程。
+
+**Bilibili 真机演示：**
+
+https://www.bilibili.com/video/BV1pdpZ6hEnF
+
+## 下载与参与
+
+Ruyi Firmware 已公开源码、构建说明及固件发布包，欢迎下载试用，并通过项目仓库反馈问题或参与后续改进。
+
+**Ruyi Firmware 发布页：**
+
+https://github.com/openRuyi-Project/ruyifirmware/releases
+
+
+**项目仓库及构建说明：**
+
+https://github.com/openRuyi-Project/ruyifirmware

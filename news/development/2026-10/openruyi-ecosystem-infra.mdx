@@ -1,0 +1,99 @@
+---
+title: "openRuyi-Project: Public Infrastructure for the RISC-V Software Ecosystem"
+tags: [development]
+date: 2026-10-19
+slug: 2026-10/openruyi-ecosystem-infra
+---
+
+From the gradual introduction of native riscv64 support in foundational software such as the Linux kernel, GCC, and glibc to the ratification of the RISC-V Server Platform 1.0 specification, work on the RISC-V ecosystem is moving from basic enablement toward systematic optimization. Making operating systems compatible with different hardware platforms, and ensuring that applications run efficiently and reliably across diverse environments while remaining easy to deploy and maintain, requires coordinated optimization and hardware validation across firmware, kernels, toolchains, and applications. To keep these advances working as software evolves and make them reusable across more platforms and applications, validated fixes, optimizations, and regression tests must also be contributed upstream continuously. A shared engineering platform that brings together downstream RISC-V requirements, hardware realities, and upstream consensus is essential to the ecosystem's further development.
+
+<!-- truncate -->
+
+With these goals in mind, the Institute of Software, Chinese Academy of Sciences (ISCAS), launched the open source openRuyi Project to support the RISC-V software ecosystem across the entire stack. Built on a continuously evolving Linux system, openRuyi provides an operating system reference platform for early exploration and efficient validation of new RISC-V standards and features. The project aims to make a ready-to-use system environment a vehicle for putting specifications into practice and validating hardware and software together: new specifications and hardware features are implemented across firmware, kernels, toolchains, and application environments, then exercised with real workloads in AI inference, storage and networking, cloud native computing, and desktop graphics to assess how well the components work together and enable the hardware's full capabilities. Working with vendors and upstream communities, the project addresses the compatibility and performance issues revealed through this process, supporting RISC-V development from pre-silicon to post-silicon stages and building an engineering foundation for solving long-term ecosystem challenges.
+
+As of September 30, 2026, openRuyi had published seven monthly rolling releases[1], bringing together ongoing work from firmware interfaces and kernels to application software stacks. Alongside adapting and integrating components within the system, the project improves its build and test environments through supporting projects such as RuyiRepo, RuyiCI, Ruyifirmware, development tools, and infrastructure. Multiple rounds of validation and iteration have produced a series of releases supporting early hardware validation, software development, and application deployment.
+
+![How openRuyi brings ecosystem development efforts together](/article-images/2026-10/openruyi-ecosystem-infra-1.png)
+
+<p align="center">How openRuyi brings ecosystem development efforts together</p>
+
+## Four Core Strengths
+
+### Ready to Use: Getting RISC-V Hardware Up and Running Faster
+
+openRuyi works across the stack to make RISC-V systems usable out of the box, helping users move from receiving hardware to development and everyday use more quickly. To meet the differing needs of servers, desktops, development boards, and FPGAs, the project adapts firmware, operating systems, and application environments together, supporting both standard interfaces and customized boot solutions. openRuyi Zero targets system bring-up and kernel development for CPUs and SoCs, particularly in pre-silicon FPGA prototyping environments. It provides the software needed for validation and supports using custom kernels and modules. For development board users, Ruyifirmware provides open firmware together with build, flashing, and recovery procedures, simplifying boot environment deployment and debugging.
+
+![openRuyi release artifacts designed for different use cases](/article-images/2026-10/openruyi-ecosystem-infra-2.png)
+
+<p align="center">openRuyi release artifacts designed for different use cases</p>
+
+### Putting Specifications into Practice: Supporting New Upstream Standards as They Evolve
+
+openRuyi tracks new upstream RISC-V specifications and provides a runnable, verifiable system platform for their implementation and evolution. To connect firmware development with system adaptation, the project actively contributes to extending and validating tests for the RISC-V BRS specification. It has also developed the openRuyi RISC-V Firmware Interface Specification[2] based on practical system requirements, translating upstream boot and hardware description requirements into interface contracts and system validation. For instruction set architecture testing, the team continuously contributes to upstream ACT development and maintenance, expands test coverage, and works to integrate an ACT development environment into openRuyi, providing software support for developing and running tests.
+
+### Upstream Collaboration: Keeping Pace with Technology and Sharing Validation Results
+
+openRuyi continuously contributes enablement patches, fixes, and regression tests to key upstream projects, and takes on or participates in RISC-V architecture maintenance responsibilities in projects such as DPDK, ISA-L, and Go. To address device support, IOMMU requirements, hardware errata, and related needs, the project integrates 207 patches ahead of upstream inclusion in its kernel based on the latest release, and 766 in its kernel based on the latest LTS release.
+
+RuyiCI prioritizes critical dependencies in major software stacks, including storage and networking, virtualization, and AI. The team has provided natively integrated RISC-V CI capabilities for projects such as OpenSSL, ISA-L, rust-vmm, and Cloud Hypervisor. It continues to maintain these environments and run regression tests on real hardware, reporting compatibility and performance changes. The team also carries out ongoing RISC-V CI adaptation and execution validation for important projects such as PyTorch and Rust, tracking the latest upstream changes and identifying issues affecting RISC-V.
+
+![DPDK testing exposed a GCC sign-extension bug that caused an infinite loop; the fix and regression test have been merged into GCC mainline](/article-images/2026-10/openruyi-ecosystem-infra-3.PNG)
+<p align="center">DPDK testing exposed a GCC sign-extension bug that caused an infinite loop; the fix and regression test have been merged into GCC mainline</p>
+
+### Joint Validation with Vendors: Turning Platform Experience into Shared Software Improvements
+
+openRuyi collaborates with major RISC-V vendors and organizations, including the Beijing Institute of Open Source Chip, ZTE, T-Head (DAMO Academy), SpacemiT, SOPHGO, and Lanxin Computing. Together, they adapt, validate, and optimize the software environments supporting hardware platforms, turning platform experience into system improvements that others can share. The project works with the XiangShan team on joint validation of system operation on FPGAs and Java workloads, continuously improving boot, kernel, and application compatibility. Java optimization patches contributed by ZTE have also been merged into openRuyi and are delivered to users through system releases.
+
+![Computational performance validation on a V100 using XSCC-based openRuyi](/article-images/2026-10/openruyi-ecosystem-infra-4.PNG)
+<p align="center">Computational performance validation on a V100 using XSCC-based openRuyi</p>
+
+## Building Software Stacks Around Ecosystem Challenges
+
+Missing functionality, runtime failures, and performance bottlenecks in real applications often involve hardware and software beyond the application itself. Resolving them requires tracing dependencies to identify root causes and working with vendors and upstream communities on fixes and optimizations.
+
+### AI: Host Compatibility Issues in GPU Inference
+
+Although inference computation runs on GPUs, successful operation depends heavily on the compatibility of the RISC-V host software stack. During the ROCm port to RISC-V, runtime memory access faults required fixes to kernel memory management. While adapting core components such as HIP and ROCr, the team also reviewed the dependencies among compilers, compute libraries, and runtimes, organizing the complex stack into a maintainable, deployable set of components. openRuyi integrates ROCm and its supporting software to provide an environment for running models and deploying inference on validated combinations of RISC-V hosts and AMD GPUs.
+
+![An inference demonstration using vLLM with ROCm on RVA23 hardware](/article-images/2026-10/openruyi-ecosystem-infra-5.png)
+<p align="center">An inference demonstration using vLLM with ROCm on RVA23 hardware</p>
+
+### Storage and Networking: Are RVV Optimizations Actually Taking Effect?
+
+While building a Ceph storage validation environment for RISC-V, the team found that defects in underlying firmware, kernels, or compilers could cause incorrect data writes and service stalls. Container configurations could also prevent existing vector optimizations from taking effect. Starting with real storage workloads, openRuyi follows Ceph's dependencies to validate I/O frameworks, acceleration libraries, toolchains, and deployment environments. The project works with vendors to identify hardware and software issues and contributes RISC-V fixes and regression tests upstream.
+
+![openRuyi's RISC-V software ecosystem work supporting Ceph](/article-images/2026-10/openruyi-ecosystem-infra-6.png)
+<p align="center">openRuyi's RISC-V software ecosystem work supporting Ceph</p>
+
+### Virtualization and Cloud Native Computing: How Close Is RISC-V KVM to Cloud Platform Deployment?
+
+RISC-V KVM is no longer marked experimental upstream, but deployments on real hardware in some cloud platform scenarios still reveal issues such as stalled virtual machine startup, restrictions on container execution, and missing software dependencies. The team uses Kubernetes to validate container orchestration and application deployment, and Cloudpods to test virtual machine creation, startup, and management. By following actual execution flows, it traces integration problems across firmware, QEMU, kernels, and foundational software. openRuyi also works with hardware vendors on diagnosis and validation, continuously improving system configuration, component dependencies, and deployment procedures while contributing improvements upstream.
+
+![Adapting and deploying openRuyi with Cloudpods on a K3 RISC-V server](/article-images/2026-10/openruyi-ecosystem-infra-7.png)
+<p align="center">Adapting and deploying openRuyi with Cloudpods on a K3 RISC-V server</p>
+
+### Desktop: Having a GPU Does Not Always Mean Having Graphics Acceleration
+
+Incomplete open source driver support for some GPUs has long been a known issue in the RISC-V desktop ecosystem. The team works with Imagination and the Mesa community on using Zink to translate OpenGL calls into Vulkan, while improving the integration between rendering and display so that more existing graphics applications can benefit from GPU acceleration through open source drivers. The team has run complex graphics applications on real hardware, and the resulting fixes and adaptations are being merged into upstream Mesa.
+
+![openRuyi provides a full KDE desktop experience on RISC-V and continuously improves runtime efficiency](/article-images/2026-10/openruyi-ecosystem-infra-8.png)
+<p align="center">openRuyi provides a full KDE desktop experience on RISC-V and continuously improves runtime efficiency</p>
+
+openRuyi turns ecosystem challenges into concrete application requirements and uses them to design validation methods. By tracing hardware and software dependencies, it identifies problems and works with vendors and upstream communities on adaptation, fixes, and optimization. The project continuously contributes patches and regression tests upstream, incorporates validated improvements into the system through rolling integration, and uses hardware tests to track compatibility and performance changes in subsequent versions. System environments, build and test facilities, and validation results are open to the community, enabling others to reuse this accumulated engineering work.
+
+## Long-Term Ecosystem Development Goals
+
+Grounded in engineering practice, the openRuyi Project continues to build an open platform for collaboration and research serving RISC-V hardware vendors, upstream software developers, and researchers. It shares system environments, engineering infrastructure, and validation results, while pursuing long-term research on the following questions to guide ecosystem development:
+
+- How can a standardized compatibility baseline support targeted optimization for different RISC-V hardware, balancing software reuse across platforms, the use of distinctive hardware capabilities, and the cost of adaptation and maintenance?
+- How can structured knowledge, reusable automated workflows, and feedback from hardware testing reduce repeated exploration and rework in RISC-V ecosystem development, improving the efficiency and reliability of AI-assisted software adaptation and maintenance?
+- How can RISC-V chip validation methods be transferred across development stages and hardware platforms, allowing continued reuse of test cases and issue reproduction procedures, reducing repeated adaptation work, and shortening the time needed to diagnose and fix hardware-software compatibility issues?
+- How can continuous validation and comparative evaluation of emerging RISC-V software stacks provide an engineering basis for component selection, integration, and optimization in next-generation operating systems developed in China?
+
+As this work progresses, openRuyi will publish a series of articles sharing its approach to ecosystem development in key areas and offering insights for the broader RISC-V community.
+
+## Related Links
+
+[1] openRuyi release announcements: https://www.openruyi.cn/news/
+
+[2] openRuyi RISC-V Firmware Interface Specification: https://www.openruyi.cn/docs/guide/recommended-practices/openruyi-risc-v-firmware-interface-specification/standard-server-platform-firmware-interface-specification/
