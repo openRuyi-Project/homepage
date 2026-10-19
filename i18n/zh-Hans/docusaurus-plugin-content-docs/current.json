@@ -67,6 +67,14 @@
     "message": "本节介绍 openRuyi 提供的存储软件栈，以及如何在 RISC-V 上使用它。",
     "description": "The generated-index page description for category 'Storage' in sidebar 'docSidebar'"
   },
+  "sidebar.docSidebar.category.AI": {
+    "message": "AI",
+    "description": "The label for category 'AI' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.AI.link.generated-index.description": {
+    "message": "本节介绍 openRuyi 提供的 AI 软件栈，以及如何在 RISC-V 上使用它。",
+    "description": "The generated-index page description for category 'AI' in sidebar 'docSidebar'"
+  },
   "sidebar.docSidebar.category.openRuyi RISC-V Firmware Interface Specification": {
     "message": "openRuyi RISC-V 固件接口规范",
     "description": "The label for category 'openRuyi RISC-V Firmware Interface Specification' in sidebar 'docSidebar'"
