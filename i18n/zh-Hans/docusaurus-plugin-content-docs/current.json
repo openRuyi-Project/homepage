@@ -64,7 +64,7 @@
     "description": "The label for category 'Tutorial' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Tutorial.link.generated-index.description": {
-    "message": "本节介绍如何在 openRuyi 上部署应用栈。",
+    "message": "在 openRuyi 上完成常见任务的分步教程。",
     "description": "The generated-index page description for category 'Tutorial' in sidebar 'docSidebar'"
   }
 }

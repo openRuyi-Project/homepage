@@ -2,7 +2,7 @@
 id: deploy-multinode-kubernetes-on-openruyi-riscv
 title: Deploy Multi-node Kubernetes on openRuyi RISC-V
 description: Deploy a two-node Kubernetes cluster with Calico and Kata Containers on openRuyi RISC-V.
-slug: /guide/application-stacks/deploy-multinode-kubernetes-on-openruyi-riscv
+slug: /guide/tutorial/deploy-multinode-kubernetes-on-openruyi-riscv
 ---
 
 # Deploy Multi-node Kubernetes on openRuyi RISC-V
@@ -107,10 +107,19 @@ Install time synchronization and verify the clock:
 
 ```bash
 dnf install -y chrony
+install -d -o chrony -g chrony /var/lib/chrony
+cat >/etc/chrony.conf <<'EOF'
+server ntp.aliyun.com iburst
+driftfile /var/lib/chrony/drift
+makestep 1.0 3
+rtcsync
+EOF
 systemctl enable --now chronyd
 chronyc waitsync 30
 date -u
 ```
+
+Use a reachable NTP server in place of `ntp.aliyun.com` if necessary.
 
 Install the required openRuyi packages:
 
@@ -122,13 +131,13 @@ dnf install -y runc iptables-nft nftables conntrack-tools socat jq \
   tar gzip findutils procps iproute2 xfsprogs openssl curl
 
 dnf install -y kata-containers cloud-hypervisor virtiofsd containerd \
-  etcd kubernetes calico
+  etcd kubernetes calico cri-tools containernetworking-plugins
 
 rpm -q kata-containers cloud-hypervisor virtiofsd containerd \
-  etcd kubernetes calico
+  etcd kubernetes calico cri-tools containernetworking-plugins
 ```
 
-Download some binaries, the required images, and the Kata guest artifacts from
+Download the required images and Kata guest artifacts from
 the supplemental repository:
 
 The supplemental repository is a public test-asset mirror. Always complete the
@@ -138,8 +147,6 @@ checksum step below.
 source /root/openruyi-k8s.env
 
 assets=(
-  bin/crictl-riscv64.tar.gz
-  bin/cni-plugins-riscv64.tar.gz
   images/openruyi-k8s-demo-images-riscv64.tar
   images/calico-v3.32.0-riscv64.tar
   images/local-path-provisioner-v0.0.36-riscv64.tar
@@ -162,8 +169,6 @@ Verify the supplemental artifacts:
 
 ```bash
 cat >"$ASSET_DIR/SHA256SUMS.selected" <<'EOF'
-1539c0ca377dc92e57628523a7d1551b7571e176e10fcd6d9290f01e15d4d7ce  bin/cni-plugins-riscv64.tar.gz
-21ad0777d760950a1db0d07fba939d45621bb5b55f23c32ca655352adcb37dc5  bin/crictl-riscv64.tar.gz
 2e1bb22cbfc7c82680db39732af2917866d812e3852d911adf36186799db01f6  images/openruyi-k8s-demo-images-riscv64.tar
 cf6eecc28bfc25695ac198fdb9c1d2b763638ed9a678f03d51d4f45f17a61076  images/calico-v3.32.0-riscv64.tar
 44f0a6313cc91287deb23f2eea0dbb84e8e2c7662aa6516b145da91a6469bf13  images/local-path-provisioner-v0.0.36-riscv64.tar
@@ -179,12 +184,11 @@ cd "$ASSET_DIR" || exit 1
 sha256sum -c SHA256SUMS.selected
 ```
 
-Install `crictl` and the CNI plugins:
+Configure `crictl` and verify the CNI plugins installed by the RPM:
 
 ```bash
-install -d /usr/local/bin /opt/cni/bin
-tar -C /usr/local/bin -xf "$ASSET_DIR/bin/crictl-riscv64.tar.gz"
-tar -C /opt/cni/bin -xf "$ASSET_DIR/bin/cni-plugins-riscv64.tar.gz"
+test -x /usr/bin/crictl
+test -x /opt/cni/bin/bridge
 
 cat >/etc/crictl.yaml <<'EOF'
 runtime-endpoint: unix:///run/containerd/containerd.sock
