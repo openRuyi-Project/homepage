@@ -1,0 +1,19 @@
+# Default owner for the repository
+* @openRuyi-Project/captains
+
+# News
+/news/ @openRuyi-Project/captains @JoannaWu84
+/i18n/zh-Hans/docusaurus-plugin-content-blog/ @openRuyi-Project/captains @JoannaWu84
+
+# Guides
+/docs/guide/desktop-environments/ @openRuyi-Project/captains @openRuyi-Project/desktop
+/i18n/zh-Hans/docusaurus-plugin-content-docs/current/guide/desktop-environments/ @openRuyi-Project/captains @openRuyi-Project/desktop
+/docs/guide/storage/ @openRuyi-Project/captains @openRuyi-Project/storage
+/i18n/zh-Hans/docusaurus-plugin-content-docs/current/guide/storage/ @openRuyi-Project/captains @openRuyi-Project/storage
+
+# Community docs
+/community/ @openRuyi-Project/captains @JoannaWu84
+/i18n/zh-Hans/docusaurus-plugin-content-docs-community/ @openRuyi-Project/captains @JoannaWu84
+
+# Protect the CODEOWNERS file itself
+/CODEOWNERS @openRuyi-Project/captains
