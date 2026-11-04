@@ -1,0 +1,8 @@
+{
+  "label": "云原生",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "本节介绍如何在 openRuyi RISC-V 上部署云原生软件。"
+  }
+}

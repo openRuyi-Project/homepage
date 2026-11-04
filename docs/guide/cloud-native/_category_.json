@@ -1,0 +1,8 @@
+{
+  "label": "Cloud Native",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "This section covers deploying cloud-native software on openRuyi RISC-V."
+  }
+}
