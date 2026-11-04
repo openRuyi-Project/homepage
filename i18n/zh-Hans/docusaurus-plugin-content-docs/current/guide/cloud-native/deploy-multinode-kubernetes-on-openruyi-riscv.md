@@ -1,47 +1,39 @@
 ---
 id: deploy-multinode-kubernetes-on-openruyi-riscv
-title: Deploy Multi-node Kubernetes on openRuyi RISC-V
-description: Deploy a two-node Kubernetes cluster with Calico and Kata Containers on openRuyi RISC-V.
-slug: /guide/tutorial/deploy-multinode-kubernetes-on-openruyi-riscv
+title: 在 openRuyi RISC-V 上部署多节点 Kubernetes
+description: 在 openRuyi RISC-V 上部署使用 Calico 和 Kata Containers 的双节点 Kubernetes 集群。
+slug: /guide/cloud-native/deploy-multinode-kubernetes-on-openruyi-riscv
 ---
 
-# Deploy Multi-node Kubernetes on openRuyi RISC-V
+# 在 openRuyi RISC-V 上部署多节点 Kubernetes
 
-This guide deploys a two-node Kubernetes cluster on openRuyi RISC-V. The
-cluster uses containerd as the Container Runtime Interface (CRI) runtime,
-Calico for cross-node networking, and Kata Containers with Cloud Hypervisor
-for isolated workloads.
+本文介绍如何在 openRuyi RISC-V 上部署双节点 Kubernetes 集群。集群使用 containerd 作为容器运行时接口 (Container Runtime Interface，CRI) 运行时，使用 Calico 实现跨节点网络，并通过 Kata Containers 和 Cloud Hypervisor 运行隔离工作负载。
 
-The commands use packages from the openRuyi `Base` repository whenever those
-packages are available. A supplemental asset repository provides only the
-RISC-V artifacts that are not yet available from `Base`.
+安装过程优先使用 openRuyi `Base` 仓库中的软件包。补充物料仓库只提供 `Base` 尚未包含的 RISC-V 物料。
 
-## Before You Begin
+## 开始前准备
 
-Prepare two openRuyi RISC-V nodes with the following resources:
+准备两个 openRuyi RISC-V 节点:
 
-| Item | Control-plane node | Worker node |
+| 项目 | 控制平面节点 | Worker 节点 |
 | --- | --- | --- |
-| Hostname | `openruyi-master` | `openruyi-worker` |
-| Example node IP | `192.168.77.11` | `192.168.77.12` |
-| CPU | 8 or more cores | 8 or more cores |
-| Memory | 16 GiB or more | 16 GiB or more |
-| Storage | 80 GiB or more | 80 GiB or more |
+| 主机名 | `openruyi-master` | `openruyi-worker` |
+| 节点 IP 示例 | `192.168.77.11` | `192.168.77.12` |
+| CPU | 不少于 8 核 | 不少于 8 核 |
+| 内存 | 不少于 16 GiB | 不少于 16 GiB |
+| 存储 | 不少于 80 GiB | 不少于 80 GiB |
 
-The two node IP addresses must be mutually reachable. The examples use these network ranges:
+两个节点的节点 IP 必须互通。本文使用以下网段:
 
 ```text
-Node network: 192.168.77.0/24
+节点网络: 192.168.77.0/24
 Service CIDR: 10.96.0.0/12
 Pod CIDR: 10.244.0.0/16
 ```
 
-Replace the example node IP addresses throughout this guide if your network differs.
+如果实际网络不同，请替换本文中的节点 IP 示例。
 
-Kata Containers starts a lightweight virtual machine for each sandbox. The
-host that runs the openRuyi virtual machines must expose nested RISC-V KVM and
-AIA/IMSIC interrupt virtualization to both nodes. Confirm that each openRuyi
-node has `/dev/kvm`:
+Kata Containers 会为每个 sandbox 启动一个轻量虚拟机。运行 openRuyi 虚拟机的宿主机必须向两个节点暴露 RISC-V 嵌套 KVM 和 AIA/IMSIC 中断虚拟化能力。请在每个 openRuyi 节点确认 `/dev/kvm` 可用:
 
 ```bash
 uname -m
@@ -49,27 +41,23 @@ test "$(uname -m)" = riscv64
 test -c /dev/kvm
 ```
 
-Configure root SSH access from the control-plane node to the worker node before
-copying Kubernetes credentials. Keep the node clocks synchronized; TLS and
-Kubernetes certificates fail when the clock is incorrect.
+复制 Kubernetes 凭据前，请配置控制平面节点到 Worker 节点的 root SSH 访问。节点时间必须保持同步；时间错误会导致 TLS 和 Kubernetes 证书校验失败。
 
-## Configure the Nodes
+## 配置节点
 
-Set the hostname on each node.
-
-Run on the control-plane node:
+在控制平面节点设置主机名:
 
 ```bash
 hostnamectl set-hostname openruyi-master
 ```
 
-Run on the worker node:
+在 Worker 节点设置主机名:
 
 ```bash
 hostnamectl set-hostname openruyi-worker
 ```
 
-Create a variable file on the control-plane node:
+在控制平面节点创建变量文件:
 
 ```bash
 cat >/root/openruyi-k8s.env <<'EOF'
@@ -85,7 +73,7 @@ export ASSET_DIR=/opt/openruyi-k8s-assets
 EOF
 ```
 
-Create a variable file on the worker node:
+在 Worker 节点创建变量文件:
 
 ```bash
 cat >/root/openruyi-k8s.env <<'EOF'
@@ -101,9 +89,9 @@ export ASSET_DIR=/opt/openruyi-k8s-assets
 EOF
 ```
 
-Run the remaining commands in this section on both nodes.
+本节剩余命令需要在两个节点执行。
 
-Install time synchronization and verify the clock:
+安装时间同步服务并检查时间:
 
 ```bash
 dnf install -y chrony
@@ -119,9 +107,9 @@ chronyc waitsync 30
 date -u
 ```
 
-Use a reachable NTP server in place of `ntp.aliyun.com` if necessary.
+如果无法连接 `ntp.aliyun.com`，请替换为可访问的 NTP 服务器。
 
-Install the required openRuyi packages:
+安装 openRuyi 软件包:
 
 ```bash
 dnf clean metadata
@@ -137,11 +125,9 @@ rpm -q kata-containers cloud-hypervisor virtiofsd containerd \
   etcd kubernetes calico cri-tools containernetworking-plugins
 ```
 
-Download the required images and Kata guest artifacts from
-the supplemental repository:
+从补充物料仓库下载必需镜像和 Kata guest 物料:
 
-The supplemental repository is a public test-asset mirror. Always complete the
-checksum step below.
+补充物料仓库是公开测试物料镜像，请务必完成后续 SHA256 校验。
 
 ```bash
 source /root/openruyi-k8s.env
@@ -165,7 +151,7 @@ for asset in "${assets[@]}"; do
 done
 ```
 
-Verify the supplemental artifacts:
+校验补充物料:
 
 ```bash
 cat >"$ASSET_DIR/SHA256SUMS.selected" <<'EOF'
@@ -184,7 +170,7 @@ cd "$ASSET_DIR" || exit 1
 sha256sum -c SHA256SUMS.selected
 ```
 
-Configure `crictl` and verify the CNI plugins installed by the RPM:
+配置 `crictl` 并检查 RPM 安装的 CNI 插件:
 
 ```bash
 test -x /usr/bin/crictl
@@ -198,7 +184,7 @@ debug: false
 EOF
 ```
 
-Configure the kernel modules and sysctl values:
+配置内核模块和 sysctl:
 
 ```bash
 cat >/etc/modules-load.d/k8s.conf <<'EOF'
@@ -228,7 +214,7 @@ EOF
 sysctl --system
 ```
 
-Enable containerd and import the RISC-V images:
+启用 containerd 并导入 RISC-V 镜像:
 
 ```bash
 systemctl enable --now containerd
@@ -241,11 +227,11 @@ for image in \
 done
 ```
 
-## Configure Kata Containers and containerd
+## 配置 Kata Containers 和 containerd
 
-Run this section on both nodes.
+本节命令需要在两个节点执行。
 
-Install the Kata guest kernel, initrd, and configuration:
+安装 Kata guest kernel、initrd 和配置文件:
 
 ```bash
 source /root/openruyi-k8s.env
@@ -274,7 +260,7 @@ test -x /usr/bin/cloud-hypervisor
 test -x /usr/bin/virtiofsd
 ```
 
-Configure containerd:
+配置 containerd:
 
 ```bash
 install -d /etc/containerd
@@ -313,11 +299,11 @@ systemctl restart containerd
 crictl info >/dev/null
 ```
 
-## Bootstrap the Control Plane
+## 初始化控制平面
 
-Run this section on the control-plane node.
+本节命令需要在控制平面节点执行。
 
-Generate the cluster certificates:
+生成集群证书:
 
 ```bash
 source /root/openruyi-k8s.env
@@ -373,7 +359,7 @@ make_client_cert kubelet-openruyi-master system:node:openruyi-master system:node
 make_client_cert kubelet-openruyi-worker system:node:openruyi-worker system:nodes
 ```
 
-Generate the kubeconfig files:
+生成 kubeconfig 文件:
 
 ```bash
 make_kubeconfig() {
@@ -410,7 +396,7 @@ install -d /root/.kube
 install -m 0600 /etc/kubernetes/admin.conf /root/.kube/config
 ```
 
-Create the control-plane services:
+创建控制平面服务:
 
 ```bash
 cat >/etc/systemd/system/openruyi-etcd.service <<'EOF'
@@ -501,7 +487,7 @@ systemctl enable --now openruyi-etcd openruyi-kube-apiserver \
   openruyi-kube-controller-manager openruyi-kube-scheduler
 ```
 
-Copy the worker credentials from the control-plane node:
+从控制平面节点复制 Worker 节点凭据:
 
 ```bash
 ssh "root@${WORKER_IP}" 'install -d /etc/kubernetes'
@@ -511,9 +497,9 @@ scp /etc/kubernetes/pki/ca.crt \
   "root@${WORKER_IP}:/etc/kubernetes/"
 ```
 
-## Start the Node Services
+## 启动节点服务
 
-Run this section on both nodes:
+本节命令需要在两个节点执行:
 
 ```bash
 source /root/openruyi-k8s.env
@@ -571,22 +557,20 @@ systemctl daemon-reload
 systemctl enable --now kubelet openruyi-kube-proxy
 ```
 
-The `kubernetes` RPM provides `10-kubeadm.conf`. The higher-priority
-`99-openruyi.conf` overrides its `ExecStart` for this manual bootstrap
-procedure.
+`kubernetes` RPM 提供 `10-kubeadm.conf`。本文使用优先级更高的 `99-openruyi.conf`，为手工 bootstrap 流程覆盖其 `ExecStart`。
 
-## Install Cluster Add-ons
+## 安装集群插件
 
-Run this section on the control-plane node.
+本节命令需要在控制平面节点执行。
 
-Install Calico from the openRuyi package:
+使用 openRuyi 软件包安装 Calico:
 
 ```bash
 kubectl apply -f /usr/share/kubernetes/calico/calico-v3.32.0-crds.yaml
 kubectl apply -f /usr/share/kubernetes/calico/calico-v3.32.0-openruyi-riscv64.yaml
 ```
 
-Install CoreDNS with the `kubeadm` binary from the openRuyi `kubernetes` package:
+使用 openRuyi `kubernetes` 软件包中的 `kubeadm` 安装 CoreDNS:
 
 ```bash
 source /root/openruyi-k8s.env
@@ -606,7 +590,7 @@ kubeadm init phase addon coredns \
   --kubeconfig /etc/kubernetes/admin.conf
 ```
 
-Install the Kata runtime class and Local Path Provisioner:
+安装 Kata RuntimeClass 和 Local Path Provisioner:
 
 ```bash
 source /root/openruyi-k8s.env
@@ -617,7 +601,7 @@ kubectl -n local-path-storage rollout status \
   deployment/local-path-provisioner --timeout=300s
 ```
 
-Wait for both nodes and system Pods:
+等待两个节点和系统 Pod 就绪:
 
 ```bash
 kubectl wait --for=condition=Ready node/openruyi-master --timeout=300s
@@ -630,9 +614,9 @@ kubectl -n kube-system get pods -o wide
 kubectl get runtimeclass,storageclass
 ```
 
-## Verify a Kata Containers Workload
+## 验证 Kata Containers 工作负载
 
-Apply the two-node nginx example on the control-plane node:
+在控制平面节点部署双节点 nginx 示例:
 
 ```bash
 source /root/openruyi-k8s.env
@@ -643,7 +627,7 @@ kubectl rollout status deployment/nginx-kata-2 --timeout=20m
 kubectl get pod,service,pvc,pv -o wide
 ```
 
-Confirm that both Pods run as RISC-V Kata sandboxes:
+确认两个 Pod 都运行在 RISC-V Kata sandbox 中:
 
 ```bash
 POD1=$(kubectl get pod -l app=nginx-kata-1 -o jsonpath='{.items[0].metadata.name}')
@@ -653,36 +637,36 @@ kubectl exec "$POD1" -- uname -m
 kubectl exec "$POD2" -- uname -m
 ```
 
-Verify Service DNS and cross-node Calico connectivity:
+验证 Service DNS 和 Calico 跨节点网络:
 
 ```bash
 kubectl exec "$POD2" -- \
   wget -qO- http://nginx-kata-1/data.txt
 ```
 
-Confirm that Cloud Hypervisor created the Kata virtual machines. Run this command on the nodes that host the nginx Pods:
+在 nginx Pod 所在节点确认 Cloud Hypervisor 已启动 Kata 虚拟机:
 
 ```bash
 pgrep -af cloud-hypervisor
 crictl pods | grep nginx-kata
 ```
 
-Remove the example workloads when the test is complete:
+验证完成后删除示例工作负载:
 
 ```bash
 kubectl delete -f "$ASSET_DIR/demo/nginx-kata-multinode.yaml"
 ```
 
-## Troubleshooting
+## 故障排查
 
-Check containerd and kubelet when a Pod remains in `ContainerCreating`:
+Pod 长时间处于 `ContainerCreating` 时，检查 containerd 和 kubelet:
 
 ```bash
 journalctl -u containerd -n 200 --no-pager
 journalctl -u kubelet -n 200 --no-pager
 ```
 
-Check the Kata runtime paths and nested virtualization:
+检查 Kata 运行时路径和嵌套虚拟化:
 
 ```bash
 test -c /dev/kvm
@@ -691,7 +675,7 @@ test -x /usr/bin/virtiofsd
 test -r /boot/openruyi/7.0.2-106.1.or/linux
 ```
 
-Check Calico when cross-node traffic fails:
+跨节点网络失败时检查 Calico:
 
 ```bash
 kubectl -n kube-system get pods -l k8s-app=calico-node -o wide
@@ -699,7 +683,7 @@ kubectl get ippools.crd.projectcalico.org -o yaml
 ip -brief address | grep -E 'vxlan.calico|cali'
 ```
 
-Check time synchronization when TLS reports an expired or not-yet-valid certificate:
+TLS 报告证书已过期或尚未生效时，检查时间同步:
 
 ```bash
 date -u
