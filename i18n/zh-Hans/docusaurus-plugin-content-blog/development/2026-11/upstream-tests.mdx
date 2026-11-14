@@ -1,0 +1,111 @@
+---
+title: openRuyi × 开源之夏｜完善测试验证链路，夯实 RISC-V 基础软件质量保障
+tags: [development]
+date: 2026-11-12
+slug: 2026-11/upstream-tests
+---
+
+在 openRuyi 开源之夏项目中，程祥伦同学承担了四个基础组件的上游测试恢复工作。针对测试依赖缺失、共享库加载问题及跨架构测试结果差异，他逐项分析原因，完善构建配置并修复相关源码，使上游测试重新在 RPM 构建过程中执行。
+
+<!-- truncate -->
+
+## 01 项目背景
+
+openRuyi 是面向 RISC-V 的 Linux 发行版。部分基础软件包虽然能够完成 RPM 构建，但 Spec 文件中仍保留着空的 `%check`、仅返回成功的占位命令或历史测试豁免，导致上游测试未被有效执行。上游测试由软件原项目提供，用于检查功能是否符合预期；构建成功并不意味着这些检查已经通过。
+
+程祥伦参与的 2026 开源之夏项目为“恢复 openRuyi 基础组件的上游测试与构建根适配”，由 openRuyi Maintainer 刘鑫担任导师。项目选取 genimage、lua-json、LMDB 和 LibTomCrypt 四个候选组件，要求至少恢复三个组件的有效上游测试，并为未能恢复的组件留下根因分析和复现记录；测试失败时，也应使 RPM 构建失败<sup>[1]</sup>。
+
+## 02 测试恢复实践
+
+### 核查配置，补齐测试所需条件
+
+程祥伦先检查四个组件的 Spec 文件，在个人 OBS 工程中复现问题，再根据日志补齐测试依赖、调整构建参数。测试在构建根这一隔离环境中运行，不能依赖宿主机中未声明的内容。确认测试目标和运行条件后，他再删除无效的 `%check` 覆盖，让 BuildSystem 调用实际检查目标。
+
+genimage 用于制作文件系统和磁盘镜像，它的测试需要调用多种工具检查生成的镜像。程祥伦通过 BuildRequires 明确声明测试依赖，使构建平台能按配置准备环境。测试还遇到了工具版本差异：相同操作在不同版本下可能有不同输出。他引入上游已有的 EROFS 测试兼容补丁，针对不同版本的 erofs-utils 选择相应的预期输出，避免把正常差异误判为故障<sup>[2]</sup>。
+
+lua-json 用于处理 JSON 格式的数据，其测试依赖 LuaFileSystem 进行文件和目录操作。仓库当时还没有提供这个模块，测试因而缺少运行条件。程祥伦先完成 lua-filesystem 的打包和验证，再把它加入 lua-json 的测试依赖，使测试能够正常执行<sup>[3]</sup>。
+
+LMDB 的测试需要加载构建目录中刚生成的共享库。程祥伦在检查阶段设置 `LD_LIBRARY_PATH=.`，并传入对应的 SOVERSION，让测试加载本次构建生成的共享库<sup>[4]</sup>。LibTomCrypt 的测试则需要与 LibTomMath 数学后端一致地编译和链接，他补齐相应的编译宏和链接库，并在编译后执行 `./test`<sup>[5]</sup>。
+
+![LMDB 在构建环境中执行测试的日志片段](/article-images/2026-11/upstream-tests-1.png)
+<p align="center">LMDB 在构建环境中执行测试的日志片段</p>
+
+### 从跨架构差异追查到源码
+
+恢复测试时，genimage 还出现了一项跨架构差异：即使使用固定随机种子，x86_64 与 RISC-V 上生成的 UUID 仍可能不同。UUID 是用于区分对象的标识。排查发现，原代码将多次 `random32()` 调用直接放在函数参数中，而 C 语言不规定参数求值顺序。求值顺序不同，相同的一组随机数也可能被组合成不同的结果。
+
+程祥伦将多次 `random32()` 调用拆开，先按固定顺序生成并保存随机值，再格式化 UUID。修改后，seeded UUID 不再受函数参数求值顺序影响，同时保持与原有测试结果的兼容性。
+
+![genimage 的 UUID 修复：先按明确顺序保存随机值，再组合生成 UUID](/article-images/2026-11/upstream-tests-2.png)
+<p align="center">genimage 的 UUID 修复：先按明确顺序保存随机值，再组合生成 UUID</p>
+
+### 提交修复，接受社区评审
+
+各组件的修改分别提交为独立 PR，并附有 OBS 构建验证地址，便于维护者核对改动和测试结果。程祥伦根据社区评审意见完善相关修改，并在 openRuyi 社区的支持下，向 genimage 上游提交了短写入及同步错误处理的修复 PR<sup>[6]</sup>。
+
+![向 genimage 上游提交短写入及同步错误处理修复（PR #345）](/article-images/2026-11/upstream-tests-3.png)
+<p align="center">向 genimage 上游提交短写入及同步错误处理修复（PR #345）</p>
+
+## 03 开源面对面
+
+程祥伦，就读于大连海洋大学计算机科学与技术专业，目前主要关注 RISC-V 相关领域。
+
+**Q.1**
+
+### 你是怎样开始参与 openRuyi 的？
+
+程祥伦：我的舍友是 openRuyi 的活跃贡献者。受他影响，我也对国产操作系统和 RISC-V 产生了兴趣，希望能参与社区开发。由于此前没有开源经历，我先从更新软件包入手，参考官方文档和前人的 commit 学习。
+
+**Q.2**
+
+### 哪次排查让你印象最深？
+
+程祥伦：genimage 的排查让我印象最深。在恢复测试时，我意外发现了短写入（Short Write）和 UUID 两个问题，花了不少时间分析代码、定位原因，并分别编写了补丁。没想到，补丁写完后才发现，上游已经有人提交过类似的修复方案，只是实现思路和处理方式有所不同。
+
+当时确实有些哭笑不得。后来我把自己的补丁与上游方案放在一起，比较各自的处理逻辑和优缺点，反而对 genimage 的内部实现和问题原因理解得更清楚了。
+
+**Q.3**
+
+### 这次项目带给你什么收获？
+
+程祥伦：做完第一个 genimage 包后，我一度过度依赖 AI，因此犯了一些低级错误。导师及时指出问题并帮助我改正，也让我认识到，AI 只是辅助工具，不能代替自己的判断。当执行变得不值钱，值钱的便是判断力。
+
+## 04 项目成果
+
+项目原定至少恢复三个组件的上游测试，最终四个候选组件均完成测试恢复，相关修改均已合入 openRuyi 主仓库。通过恢复上游测试、补齐测试依赖并完善构建验证流程，本次工作补齐了基础组件的单包质量验证能力，使测试能够在软件包构建过程中实际执行，并在测试失败时阻断 RPM 构建，为后续组件维护和版本更新提供了可重复执行的测试基础。
+
+## 05 相关链接
+
+[1] OSPP 项目任务说明
+
+[https://summer.ospp.ac.cn/org/prodetail/2659a0007?list=org&navpage=org&lang=zh](https://summer.ospp.ac.cn/org/prodetail/2659a0007?list=org&navpage=org&lang=zh)
+
+[2] genimage 测试恢复与相关修复
+
+[https://github.com/openRuyi-Project/openRuyi/pull/1078](https://github.com/openRuyi-Project/openRuyi/pull/1078)
+
+[3] lua-json 测试恢复及 lua-filesystem 打包
+
+[https://github.com/openRuyi-Project/openRuyi/pull/1095](https://github.com/openRuyi-Project/openRuyi/pull/1095)
+
+[4] LMDB 测试恢复
+
+[https://github.com/openRuyi-Project/openRuyi/pull/1135](https://github.com/openRuyi-Project/openRuyi/pull/1135)
+
+[5] LibTomCrypt 测试恢复
+
+[https://github.com/openRuyi-Project/openRuyi/pull/1240](https://github.com/openRuyi-Project/openRuyi/pull/1240)
+
+[6] genimage 上游修复 PR
+
+[https://github.com/pengutronix/genimage/pull/345](https://github.com/pengutronix/genimage/pull/345)
+
+## 06 欢迎参与
+
+openRuyi 已在开源之夏官网发布多个项目，涉及基础组件测试、社区自动化和开发工具等方向。对 RISC-V、Linux 和基础软件感兴趣的同学，可在项目页了解任务要求，与导师交流，并申请仍在招募的项目。
+
+openRuyi 开源之夏项目页：
+
+[https://summer.ospp.ac.cn/org/orgdetail/59ab01aa-4c76-4f61-834f-ac4c636267bf?lang=zh](https://summer.ospp.ac.cn/org/orgdetail/59ab01aa-4c76-4f61-834f-ac4c636267bf?lang=zh)
+
+欢迎关注 openRuyi 开源项目、查阅项目文档，并加入 Discord 社区参与交流。团队长期招收全职、兼职和实习生，简历可发送至 [wangjingwei@iscas.ac.cn](mailto:wangjingwei@iscas.ac.cn)（王经纬）。

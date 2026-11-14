@@ -1,0 +1,111 @@
+---
+title: openRuyi × OSPP | Strengthening Testing and Validation to Ensure the Quality of Core RISC-V Software
+tags: [development]
+date: 2026-11-12
+slug: 2026-11/upstream-tests
+---
+
+As part of openRuyi's Open Source Promotion Plan (OSPP) project, Xianglun Cheng worked on restoring upstream tests for four core components. He investigated missing test dependencies, shared library loading issues, and differences in test results across architectures, then improved build configurations and patched the source code to get upstream tests running again during RPM builds.
+
+<!-- truncate -->
+
+## 01 Project Background
+
+openRuyi is a Linux distribution for RISC-V. Although some core packages could be built as RPMs, their spec files still contained empty `%check` sections, placeholder commands that always returned success, or legacy test exemptions. As a result, upstream tests were not being run effectively. These tests are provided by the original software projects to check whether functionality behaves as expected; a successful build does not mean those checks have passed.
+
+Cheng's 2026 OSPP project, "Restoring Upstream Tests and Buildroot Compatibility for openRuyi Core Components," was mentored by openRuyi maintainer Xin Liu. The project selected four candidate components—genimage, lua-json, LMDB, and LibTomCrypt—and required working upstream tests to be restored for at least three of them. For any component whose tests could not be restored, the project required a root cause analysis and reproduction records. Test failures were also required to cause the RPM build to fail<sup>[1]</sup>.
+
+## 02 Restoring the Tests
+
+### Reviewing Configurations and Preparing the Test Environment
+
+Cheng first reviewed the spec files for all four components and reproduced the issues in his personal OBS project. He then used the logs to identify missing test dependencies and adjust build parameters. Tests run in an isolated build root and cannot rely on undeclared resources from the host system. After confirming the test targets and their requirements, he removed ineffective `%check` overrides so that BuildSystem could invoke the actual check targets.
+
+genimage creates filesystem and disk images, and its tests use various tools to inspect the generated images. Cheng explicitly declared the test dependencies through BuildRequires so that the build platform could prepare the required environment. The tests also encountered differences between tool versions: the same operation could produce different output depending on the version. He incorporated an existing upstream EROFS test compatibility patch that selects the expected output for different versions of erofs-utils, preventing normal version differences from being mistaken for failures<sup>[2]</sup>.
+
+lua-json processes JSON data, and its tests depend on LuaFileSystem for file and directory operations. The repository did not yet provide this module, leaving the tests without a required dependency. Cheng first packaged and validated lua-filesystem, then added it to lua-json's test dependencies so that the tests could run<sup>[3]</sup>.
+
+LMDB's tests need to load the shared library just generated in the build directory. Cheng set `LD_LIBRARY_PATH=.` during the check phase and passed the corresponding SOVERSION so that the tests would load the library from the current build<sup>[4]</sup>. LibTomCrypt's tests, meanwhile, needed to be compiled and linked consistently with the LibTomMath backend. He added the necessary compilation macros and link libraries, then ran `./test` after compilation<sup>[5]</sup>.
+
+![An excerpt from the LMDB test log in the build environment](/article-images/2026-11/upstream-tests-1.png)
+<p align="center">An excerpt from the LMDB test log in the build environment</p>
+
+### Tracing Cross-Architecture Differences Back to the Source
+
+While restoring genimage's tests, Cheng also encountered a cross-architecture difference: even with a fixed random seed, the UUIDs generated on x86_64 and RISC-V could differ. A UUID is an identifier used to distinguish objects. Investigation showed that the original code placed multiple `random32()` calls directly in function arguments, but C does not specify the order in which function arguments are evaluated. With a different evaluation order, the same set of random numbers could be combined into different results.
+
+Cheng separated the `random32()` calls, generating and storing the random values in a fixed order before formatting the UUID. After the change, UUIDs generated with a fixed seed no longer depended on function argument evaluation order, while remaining compatible with the existing test results.
+
+![The genimage UUID fix: storing random values in an explicit order before assembling the UUID](/article-images/2026-11/upstream-tests-2.png)
+<p align="center">The genimage UUID fix: storing random values in an explicit order before assembling the UUID</p>
+
+### Submitting Fixes for Community Review
+
+Changes for each component were submitted as separate pull requests, with links to OBS build verification results so that maintainers could review both the changes and the test outcomes. Cheng refined the changes in response to community feedback. With support from the openRuyi community, he also submitted an upstream genimage pull request to fix short write and synchronization error handling<sup>[6]</sup>.
+
+![The upstream genimage pull request for short write and synchronization error handling fixes (PR #345)](/article-images/2026-11/upstream-tests-3.png)
+<p align="center">The upstream genimage pull request for short write and synchronization error handling fixes (PR #345)</p>
+
+## 03 Meet the Contributor
+
+Xianglun Cheng studies Computer Science and Technology at Dalian Ocean University and currently focuses on RISC-V-related work.
+
+**Q.1**
+
+### How did you get involved with openRuyi?
+
+Cheng: My roommate is an active openRuyi contributor. Through him, I became interested in operating systems developed in China and in RISC-V, and wanted to contribute to the community. Since I had no prior open source experience, I started with package updates, learning from the official documentation and earlier contributors' commits.
+
+**Q.2**
+
+### Which investigation left the strongest impression on you?
+
+Cheng: Investigating genimage was the most memorable. While restoring its tests, I unexpectedly discovered two issues involving short writes and UUIDs. I spent quite a bit of time analyzing the code, locating the causes, and writing a patch for each. Only after finishing the patches did I discover that someone upstream had already submitted similar fixes, though their implementation and approach were different.
+
+At the time, I did not know whether to laugh or cry. Later, I compared my patches with the upstream solutions, looking at their logic, strengths, and weaknesses. That gave me a much clearer understanding of genimage's internals and the causes of the issues.
+
+**Q.3**
+
+### What did you learn from this project?
+
+Cheng: After finishing the first package, genimage, I became overly reliant on AI for a while and made some basic mistakes. My mentor promptly pointed them out and helped me correct them. That also taught me that AI is only an aid; it cannot replace my own judgment. When execution becomes inexpensive, judgment is what matters.
+
+## 04 Project Outcomes
+
+The project originally aimed to restore upstream tests for at least three components. In the end, tests were restored for all four candidates, and all related changes were merged into the main openRuyi repository. By restoring upstream tests, adding missing test dependencies, and improving build verification, the project strengthened quality checks for individual core packages. Tests now actually run during package builds, and failures block the RPM build, providing a repeatable testing foundation for future maintenance and version updates.
+
+## 05 Related Links
+
+[1] OSPP project requirements
+
+[https://summer.ospp.ac.cn/org/prodetail/2659a0007?list=org&navpage=org](https://summer.ospp.ac.cn/org/prodetail/2659a0007?list=org&navpage=org&lang=zh)
+
+[2] genimage test restoration and related fixes
+
+[https://github.com/openRuyi-Project/openRuyi/pull/1078](https://github.com/openRuyi-Project/openRuyi/pull/1078)
+
+[3] lua-json test restoration and lua-filesystem packaging
+
+[https://github.com/openRuyi-Project/openRuyi/pull/1095](https://github.com/openRuyi-Project/openRuyi/pull/1095)
+
+[4] LMDB test restoration
+
+[https://github.com/openRuyi-Project/openRuyi/pull/1135](https://github.com/openRuyi-Project/openRuyi/pull/1135)
+
+[5] LibTomCrypt test restoration
+
+[https://github.com/openRuyi-Project/openRuyi/pull/1240](https://github.com/openRuyi-Project/openRuyi/pull/1240)
+
+[6] Upstream genimage fix pull request
+
+[https://github.com/pengutronix/genimage/pull/345](https://github.com/pengutronix/genimage/pull/345)
+
+## 06 Get Involved
+
+openRuyi has published several projects on the OSPP website, covering core component testing, community automation, and developer tools. Students interested in RISC-V, Linux, and foundational software can visit the project pages to learn about the requirements, speak with mentors, and apply for projects that are still accepting applications.
+
+openRuyi's OSPP organization page:
+
+[https://summer.ospp.ac.cn/org/orgdetail/59ab01aa-4c76-4f61-834f-ac4c636267bf?](https://summer.ospp.ac.cn/org/orgdetail/59ab01aa-4c76-4f61-834f-ac4c636267bf?lang=zh)
+
+If you are interested in openRuyi, follow the project on GitHub, visit the openRuyi Documentation Center for more information, or join the Discord community to participate in discussions. The team is continuously recruiting full-time employees, part-time contributors, and interns. Please send your resume to Jingwei Wang at [wangjingwei@iscas.ac.cn](mailto:wangjingwei@iscas.ac.cn).
