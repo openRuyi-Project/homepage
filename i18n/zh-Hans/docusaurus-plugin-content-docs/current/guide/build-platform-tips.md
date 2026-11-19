@@ -9,6 +9,48 @@ slug: /guide/build-platform-tips
 
 openRuyi 使用 Open Build Service (OBS) 作为构建平台，本文主要用于介绍常用的构建平台使用技巧。
 
+## 在 OBS 中快速验证反向依赖
+
+在 OBS 中，可以通过设置元数据，轻松地验证一个或多个软件包发生变更后对 openRuyi 的影响。你可以先在个人 Subproject 中构建修改后的软件包，再通过项目链接和 `linkedbuild="localdep"`，让 OBS 构建依赖这些本地构建结果的链接软件包。本节以 openRuyi 滚动仓为例。
+
+1. 完成一个或多个软件包的修改后，将更改提交并推送到你 Fork 的个人 GitHub 仓库。
+
+2. 登录 OBS，点击右上角的用户菜单，然后选择 **Your Home Project**。
+
+3. 点击页面顶部的 **Subprojects** 选项卡。为减少不必要的测试项目，建议创建一个专用 Subproject，并在后续验证中重复使用。如果尚未创建，请在左侧菜单中选择 **Create Subproject**。
+
+4. 在 **Create Subproject** 页面中，在 **Subproject Name** 字段填写项目名称，然后点击 **Accept**。
+
+5. 如果尚未配置构建目标和仓库路径，请参阅[打包 & 修包快速入门](/zh-Hans/docs/guide/quick-start-for-developers)中的**配置构建架构与元数据**小节，完成 Subproject 的构建配置。确保需要验证的软件包可以在该 Subproject 中成功构建。
+
+6. 确认 Subproject 中所有待验证的本地软件包均已成功构建。如果 OBS 使用 `_service` 从 Git 仓库获取源码，且尚未自动同步最新提交，请在对应软件包页面点击 **Trigger Services**，然后等待源码同步和构建完成。
+
+7. 打开 **Meta** 选项卡。在 `<description>` 元素之后，作为 `<project>` 的直接子元素插入以下配置:
+
+   ```xml
+   <link project="openruyi"/>
+   ```
+
+8. 点击页面右下角的 **Save**。如果页面顶部显示 `Config successfully saved!`，表示 OBS 已保存项目元数据。
+
+9. 再次打开 **Meta** 选项卡。在每个 `<repository>` 元素的开始标签中添加 `linkedbuild="localdep"`。保留现有的 `rebuild`、`block` 等属性。例如:
+
+   ```xml
+   <project name="home:your-username:project-name">
+     <title>Your project title</title>
+     <description>Your project description</description>
+     <link project="openruyi"/>
+     <repository name="riscv64" rebuild="local" linkedbuild="localdep">
+       <path project="openruyi" repository="riscv64"/>
+       <arch>riscv64</arch>
+     </repository>
+   </project>
+   ```
+
+   注意: `rebuild="local"` 和 `linkedbuild="localdep"` 控制不同的构建行为。前者仅针对当前项目中源码发生变化的软件包。后者控制链接项目中的软件包是否参与构建，只有依赖当前项目本地构建结果的链接软件包才会构建。
+
+10. 再次点击页面右下角的 **Save**。如果页面顶部显示 `Config successfully saved!`，表示 OBS 已保存更新后的项目元数据。OBS 随后会根据依赖关系调度符合 `localdep` 条件的链接软件包。你可以在 **Overview** 页面查看构建状态和结果。
+
 ## 控制构建机器配置
 
 在 OBS 里，通过两种方法可以控制构建机器的配置，用来指定构建时的 worker 参数。
