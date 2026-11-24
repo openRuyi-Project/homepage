@@ -7,6 +7,12 @@ slug: /guide/build-platform-tips
 
 # openRuyi 构建系统使用技巧
 
+:::warning 访问限制
+
+本文档仅适用于已有 openRuyi 构建系统账号的用户。受构建资源限制，构建系统目前仅向已有账号的用户开放，暂不开放新用户注册。
+
+:::
+
 openRuyi 使用 Open Build Service (OBS) 作为构建平台，本文主要用于介绍常用的构建平台使用技巧。
 
 ## 控制构建机器配置
