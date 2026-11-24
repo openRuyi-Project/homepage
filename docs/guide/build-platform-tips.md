@@ -9,6 +9,48 @@ slug: /guide/build-platform-tips
 
 openRuyi uses Open Build Service (OBS) as its build platform. This document introduces common tips for working with the build platform.
 
+## Verify Reverse Dependencies in OBS
+
+In OBS, you can use project metadata to easily verify how changes to one or more packages affect openRuyi. First, build the modified packages in your personal Subproject. Then, use a project link and `linkedbuild="localdep"` to have OBS build linked packages that depend on these local build results. This section uses the openRuyi rolling repository as an example.
+
+1. After modifying one or more packages, commit the changes and push them to your personal GitHub fork.
+
+2. Sign in to OBS. Open the user menu in the upper-right corner and select **Your Home Project**.
+
+3. Select **Subprojects** at the top of the page. To avoid creating unnecessary test projects, create one dedicated Subproject and reuse it for subsequent validation runs. If you do not have a suitable Subproject, select **Create Subproject** in the left sidebar.
+
+4. On the **Create Subproject** page, enter a name in the **Subproject Name** field, then click **Accept**.
+
+5. If you have not configured the build targets and repository paths, follow the **Configuring Build Architectures and Metadata** section in [Quick Start for Developers](/docs/guide/quick-start-for-developers). Complete the build configuration for your Subproject. Make sure OBS can build the packages you want to validate.
+
+6. Make sure all local packages under test have built successfully in the Subproject. If OBS uses `_service` to fetch sources from Git and has not fetched the latest commit automatically, open each affected package and click **Trigger Services**. Wait for the source updates and package builds to finish.
+
+7. Open the **Meta** tab. Add the following element after the `<description>` element, as a direct child of `<project>`:
+
+   ```xml
+   <link project="openruyi"/>
+   ```
+
+8. Click **Save** in the lower-right corner. If OBS displays `Config successfully saved!` at the top of the page, OBS has saved the project metadata.
+
+9. Open the **Meta** tab again. Add `linkedbuild="localdep"` to the opening tag of each `<repository>` element. Keep existing attributes such as `rebuild` and `block`. For example:
+
+   ```xml
+   <project name="home:your-username:project-name">
+     <title>Your project title</title>
+     <description>Your project description</description>
+     <link project="openruyi"/>
+     <repository name="riscv64" rebuild="local" linkedbuild="localdep">
+       <path project="openruyi" repository="riscv64"/>
+       <arch>riscv64</arch>
+     </repository>
+   </project>
+   ```
+
+   Note: `rebuild="local"` and `linkedbuild="localdep"` control different build behaviors. The former builds only packages whose sources have changed in the current project. The latter controls whether packages from linked projects are built. OBS builds only linked packages that depend on local build results.
+
+10. Click **Save** again. If OBS displays `Config successfully saved!` at the top of the page, OBS has saved the updated project metadata. OBS will then schedule linked packages that meet the `localdep` condition. Check their build status and results on the **Overview** page.
+
 ## Control Build Worker Configuration
 
 OBS provides two ways to control build worker configuration and specify worker-side parameters for a build.
