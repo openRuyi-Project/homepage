@@ -7,6 +7,18 @@ slug: /guide/quick-start-for-developers
 
 # Quick Start for Developers
 
+:::warning Access Restrictions
+
+This guide primarily describes the packaging and maintenance workflow based on Open Build Service (OBS).
+
+Due to limited build resources, the openRuyi build system is currently available only to users with existing accounts. Public access and new account registration are not available.
+
+Users without a build platform account should prioritize setting up a local RPM build environment. For example, you can set up your own openRuyi environment, install the required build dependencies, and use tools such as rpmbuild to verify your builds.
+
+The OBS project setup, source synchronization, and osc operations in this guide apply only to users with existing accounts. This guide does not provide detailed setup instructions for these local build environments.
+
+:::
+
 This document guides developers through the full workflow of packaging software from source: setting up the environment, writing RPM Spec files, integrating with Open Build Service (OBS), and completing both local and cloud-based builds.
 
 ## Environment Setup and Tool Installation
@@ -57,7 +69,7 @@ To reduce the workload, you may refer to build scripts from other distributions 
 
 You can access our build platform at: `https://build.openruyi.cn/`
 
-If you already have an account, you can sign in directly. Otherwise, you will need to register for one first. After signing in, enter your home project: `home:<your-username>`.
+Sign in to the build platform with your existing account. After signing in, enter your home project: `home:<your-username>`.
 
 For better organization, we recommend creating a dedicated subproject for each complex package or package set, rather than working directly under `home:<your-username>`.
 
@@ -137,7 +149,7 @@ pass = your-password
 
 Alternatively, the first time you use `osc`, it will prompt you for this information, so creating the file manually is optional.
 
-## Local Build Verification
+## Local Build Verification with OBS
 
 First, check out the project locally with `osc checkout`:
 

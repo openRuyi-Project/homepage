@@ -45,7 +45,11 @@ After you choose a specific task, such as fixing a bug or adding a new feature, 
 
 ## How to Test Changes
 
-openRuyi provides a build platform based on Open Build Service, which allows you to test your contributions after making changes. After you finish your changes, we recommend setting up a local environment and running build tests locally. After your local build passes, you can push the changes to your personal project on OBS.
+openRuyi provides a build platform based on Open Build Service, which is currently available only to users with existing accounts. We recommend that contributors perform build tests locally first.
+
+For example, you can set up your own openRuyi environment, install the required build dependencies, and use tools such as rpmbuild to verify your changes. Users with existing accounts can also use their personal OBS projects for additional verification.
+
+After local verification, submit your changes as a Pull Request. Project CI may also run automated builds and tests during the review process.
 
 ## Workflow for Reporting Bugs and Submitting Feature Requests
 

@@ -7,6 +7,12 @@ slug: /guide/build-platform-tips
 
 # Tips for Using the openRuyi Build System
 
+:::warning Access Restrictions
+
+This document is intended only for users who already have an openRuyi build system account. Due to limited build resources, the build system is currently available only to existing account holders. New account registration are not available.
+
+:::
+
 openRuyi uses Open Build Service (OBS) as its build platform. This document introduces common tips for working with the build platform.
 
 ## Control Build Worker Configuration
